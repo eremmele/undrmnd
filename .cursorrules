@@ -1,0 +1,231 @@
+# Cursor AI Rules for undrmnd
+
+## Project Context
+undrmnd is a mindful citizen science iOS app designed to combat doomscrolling through intentional, session-based engagement. This app connects student researchers to authentic STEM exploration while protecting attention through thoughtful UX patterns.
+
+## Core Mission
+- **Anti-doomscroll by design:** Every feature should respect user attention
+- **Friction is a feature:** Small pauses and reflection points are intentional, not bugs
+- **Education-first:** Make science accessible to students and amateur researchers
+- **Privacy-preserving:** Minimal data collection, no tracking SDKs
+
+---
+
+## Code Style & Architecture
+
+### Swift/SwiftUI Best Practices
+- Use **SwiftUI** for all new UI code
+- Fallback to **UIKit** only when SwiftUI lacks functionality (e.g., advanced gestures, certain animations)
+- Follow **MVVM architecture**: Views, ViewModels, Models
+- Use **Combine** for reactive programming
+- Prefer **value types** (structs) over reference types (classes) when possible
+- Use **async/await** for asynchronous code (iOS 15+)
+
+### Project Structure
+Follow the structure defined in README:
+```
+App/          # Entry point, environment setup
+Features/     # Feature modules (Session, Discovery, Research, Profile)
+Patterns/     # Reusable anti-doomscroll components
+Models/       # Data models (Core Data, Codable)
+Services/     # Networking, auth, analytics
+Resources/    # Assets, localization
+Tests/        # Unit and UI tests
+```
+
+### Naming Conventions
+- **Files:** PascalCase (e.g., `SessionCapsuleView.swift`)
+- **Types:** PascalCase (e.g., `struct ResearchProject`)
+- **Variables/functions:** camelCase (e.g., `func startSession()`)
+- **Constants:** camelCase with `let` (e.g., `let maxSessionDuration`)
+- **Enums:** PascalCase for type, camelCase for cases (e.g., `enum SessionType { case exploration, learning }`)
+
+---
+
+## Anti-Pattern Enforcement
+
+### ❌ NEVER Implement These Dark Patterns
+- **No infinite scroll without explicit gates**
+  - Always use Load-More Gate or End-of-Feed Horizon patterns
+  - User must consciously opt into "more"
+- **No hidden engagement tricks**
+  - No phantom notifications, fake urgency, or intermittent rewards
+- **No pull-to-refresh without friction**
+  - Add micro-delay or reflective prompt
+- **No autoplay by default**
+  - User must explicitly enable autoplay
+- **No engagement-maximizing algorithms without user control**
+  - Always provide Algorithm Tuner & Contract
+
+### ✅ DO Implement These Patterns
+Refer to the 8 core patterns in README:
+1. Session Capsule
+2. Intent-First Launcher
+3. Load-More Gate
+4. Reflective Interrupts
+5. Algorithm Tuner & Contract
+6. End-of-Feed Horizon
+7. Focal Mode (Grayscale + Quiet)
+8. Intentional Discovery Deck
+
+When implementing features, ask: "Does this protect or exploit attention?"
+
+---
+
+## Accessibility Requirements
+
+### Mandatory Accessibility Features
+- **VoiceOver:** All interactive elements must have meaningful labels
+- **Dynamic Type:** Support text scaling (use `.font(.body)`, not fixed sizes)
+- **Color contrast:** Follow WCAG AA standards (4.5:1 for text)
+- **Haptic feedback:** Provide tactile cues for important UI changes
+- **Reduce Motion:** Respect user's motion preferences
+
+### Code Example
+```swift
+Button("Start Session") {
+    startSession()
+}
+.accessibilityLabel("Start a 15-minute exploration session")
+.accessibilityHint("Opens a time-limited session with reflection prompts")
+```
+
+---
+
+## Privacy & Ethics
+
+### Data Collection Rules
+- **Never collect:** Full names, birthdates, precise locations, biometric data
+- **Minimal collection:** Email + username only for auth
+- **No third-party SDKs:** No Firebase Analytics, Mixpanel, or tracking libraries
+- **On-device only:** All behavioral analytics stay on the device
+- **Explicit consent:** Users must opt-in to any data sharing for research
+
+### Analytics Pattern
+```swift
+// ✅ GOOD: On-device only
+struct SessionMetrics {
+    let duration: TimeInterval
+    let reflectionResponses: [String]
+    // Never leaves device
+}
+
+// ❌ BAD: Sends to server without consent
+analytics.track("session_started", userId: user.id) // NEVER DO THIS
+```
+
+---
+
+## Testing & Quality
+
+### Required Tests
+- **Unit tests** for all ViewModels and business logic
+- **UI tests** for critical user flows (session start, reflection prompts, horizon states)
+- **Accessibility audits** using Xcode Accessibility Inspector
+
+### Test anti-patterns
+When writing tests for anti-doomscroll features:
+```swift
+func testLoadMoreGateAppears() {
+    // After scrolling past N items, gate should appear
+    XCTAssertTrue(app.buttons["Load More"].exists)
+    XCTAssertTrue(app.buttons["I'm Done"].exists)
+}
+
+func testReflectiveInterrupt() {
+    // After 10 minutes, prompt should appear
+    XCTAssertTrue(app.staticTexts["How are you feeling?"].exists)
+}
+```
+
+---
+
+## Commenting & Documentation
+
+### When to Comment
+- **Why, not what:** Explain reasoning, not syntax
+- **Anti-patterns:** Mark intentional friction/limitations
+- **Complex algorithms:** Explain recommendation logic
+- **Research citations:** Link to papers that inspired features
+
+### Example
+```swift
+// ANTI-PATTERN: Intentional delay before showing "more" content
+// This 2-second pause gives users time to reflect on whether they want to continue.
+// Research: Lyngs et al. (2019) on digital self-control interventions
+Task {
+    try await Task.sleep(nanoseconds: 2_000_000_000)
+    await showMoreContent()
+}
+```
+
+---
+
+## Cursor-Specific Instructions
+
+### When Generating Code
+1. **Always check README patterns first** before implementing feeds or scroll views
+2. **Ask clarifying questions** if user requests features that might conflict with anti-doomscroll principles
+3. **Suggest alternatives** if user asks for an engagement-maximizing pattern
+4. **Prioritize accessibility** in all UI generation
+5. **Generate tests** alongside features
+
+### When Refactoring
+- Preserve all anti-pattern safeguards (gates, interrupts, friction)
+- Maintain or improve accessibility
+- Never remove explicit user consent flows
+
+### When Debugging
+- Check if issue is caused by intentional friction (not a bug!)
+- Verify accessibility labels and hints
+- Test with VoiceOver and Dynamic Type enabled
+
+---
+
+## Dependencies
+
+### Allowed
+- **Core frameworks:** SwiftUI, UIKit, Combine, Foundation
+- **Apple services:** Core Data, CloudKit, HealthKit (with consent)
+- **Swift Package Manager:** For any open-source dependencies
+
+### Prohibited
+- Analytics/tracking: Firebase Analytics, Mixpanel, Segment, Amplitude
+- Ad networks: AdMob, Meta Audience Network
+- Social SDKs: Facebook SDK, Twitter SDK (unless strictly for auth)
+- Engagement optimization: Anything that A/B tests to maximize time-on-app
+
+---
+
+## Commit Message Style
+Use conventional commits:
+```
+feat: Add Session Capsule with 15-min timer
+fix: Reflective interrupt not appearing after 10 min
+docs: Update README with new research citations
+test: Add UI test for Load-More Gate
+refactor: Extract horizon state into reusable component
+```
+
+---
+
+## Questions to Ask Before Shipping
+1. Does this feature respect user attention?
+2. Can users easily exit or limit this experience?
+3. Is this accessible to users with disabilities?
+4. Does this collect any data without explicit consent?
+5. Would I be comfortable if my students or family used this?
+
+If any answer is "no," reconsider the feature.
+
+---
+
+## Resources
+- [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
+- [SwiftUI Documentation](https://developer.apple.com/documentation/swiftui/)
+- [Accessibility Programming Guide](https://developer.apple.com/accessibility/)
+- [Center for Humane Technology](https://www.humanetech.com/)
+
+---
+
+**Remember:** This is a research project exploring how technology can support mindful engagement. Every line of code is an opportunity to model better design.
