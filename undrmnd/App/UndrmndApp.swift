@@ -4,8 +4,7 @@ import SwiftUI
 struct UndrmndApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(SupabaseService.shared)
+            RootView()
         }
     }
 }
