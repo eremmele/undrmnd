@@ -1,68 +1,87 @@
 import SwiftUI
 
 struct RootView: View {
+    @State private var selectedTab: Tab = .today
+
+    enum Tab {
+        case today
+        case forum
+    }
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            TodaySessionView()
+                .tabItem {
+                    Label("Today", systemImage: "sun.max")
+                }
+                .tag(Tab.today)
+
+            ForumPlaceholderView()
+                .tabItem {
+                    Label("Forum", systemImage: "bubble.left.and.bubble.right")
+                }
+                .tag(Tab.forum)
+        }
+    }
+}
+
+struct TodaySessionView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Welcome to Undrmnd")
+                    Text("Today’s session")
                         .font(.largeTitle.bold())
-                    Text("A calm space to explore questions, learn with others, and contribute to science without endless scrolling.")
+                    Text("A short, finite set of cards to explore, contribute, and then log off feeling lighter.")
                         .font(.body)
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 12) {
-                    Label("Finite, session-based browsing \u2014 no infinite feeds.", systemImage: "hourglass")
-                    Label("Ask beginner questions without backlash.", systemImage: "bubble.left.and.bubble.right")
-                    Label("Discover tiny ways to contribute to real projects.", systemImage: "sparkles")
-                }
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                // TODO: replace with real, finite cards from Supabase
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.secondarySystemBackground))
+                    .frame(maxWidth: .infinity, minHeight: 140)
+                    .overlay(
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Placeholder card")
+                                .font(.headline)
+                            Text("This is where a micro-curiosity or tiny contribution prompt will live.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                    )
 
                 Spacer()
 
-                NavigationLink {
-                    PlaceholderTodayView()
-                } label: {
-                    Text("Start a short session")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                }
-
-                Button {
-                    // TODO: later show how Undrmnd works / research rationale
-                } label: {
-                    Text("How Undrmnd works")
-                        .font(.subheadline)
-                }
-                .padding(.bottom, 8)
+                Text("You’ll see just a few items per session — no infinite scrolling.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
             }
             .padding()
-            .navigationTitle("Undrmnd")
+            .navigationTitle("Today")
         }
     }
 }
 
-struct PlaceholderTodayView: View {
+struct ForumPlaceholderView: View {
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Today’s session")
-                .font(.title2.bold())
+        NavigationStack {
+            VStack(spacing: 16) {
+                Text("Forum (coming soon)")
+                    .font(.title2.bold())
 
-            Text("This is where a small, finite set of cards and conversations will appear \u2014 designed to end, not to keep you here.")
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                Text("A gentle discussion space for questions, stories, and collaboration — designed to be kind, not chaotic.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
 
-            Spacer()
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Forum")
         }
-        .padding()
-        .navigationTitle("Today")
     }
 }
