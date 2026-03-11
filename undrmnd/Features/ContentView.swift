@@ -26,6 +26,8 @@ struct RootView: View {
 }
 
 struct TodaySessionView: View {
+    @StateObject private var viewModel = TodaySessionViewModel()
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
@@ -38,20 +40,38 @@ struct TodaySessionView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                // TODO: replace with real, finite cards from Supabase
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.secondarySystemBackground))
-                    .frame(maxWidth: .infinity, minHeight: 140)
-                    .overlay(
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Placeholder card")
-                                .font(.headline)
-                            Text("This is where a micro-curiosity or tiny contribution prompt will live.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding()
-                    )
+                if viewModel.isLoading {
+                    ProgressView("Loading today’s cards…")
+                        .padding(.top, 16)
+                } else if let error = viewModel.errorMessage {
+                    Text(error)
+                        .font(.footnote)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 16)
+                } else if viewModel.cards.isEmpty {
+                    Text("No cards available yet. Check back soon.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 16)
+                } else {
+                    ForEach(viewModel.cards) { card in
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.secondarySystemBackground))
+                            .frame(maxWidth: .infinity, minHeight: 140)
+                            .overlay(
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(card.title)
+                                        .font(.headline)
+                                    Text(card.hook)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding()
+                            )
+                    }
+                }
 
                 Spacer()
 
@@ -61,7 +81,10 @@ struct TodaySessionView: View {
                     .multilineTextAlignment(.center)
             }
             .padding()
-            .navigationTitle("Today")
+            .navigationTitle("Today")  
+            .task {
+                await viewModel.loadTodayCards()
+            }
         }
     }
 }
