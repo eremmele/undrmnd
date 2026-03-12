@@ -1,8 +1,7 @@
 ---
 description: Core product and design north star for Undrmnd
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Undrmnd Design North Star
 
 - **Lower barriers to inquiry**: Lower the psychological and cultural barriers to scientific inquiry so anyone, at any age, can ask questions, explore interests, and contribute without credentials or fear of backlash.

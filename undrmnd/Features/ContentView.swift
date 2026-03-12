@@ -32,8 +32,6 @@ struct TodaySessionView: View {
         NavigationStack {
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Today’s session")
-                        .font(.largeTitle.bold())
                     Text("A short, finite set of cards to explore, contribute, and then log off feeling lighter.")
                         .font(.body)
                         .foregroundColor(.secondary)
@@ -81,10 +79,10 @@ struct TodaySessionView: View {
                     .multilineTextAlignment(.center)
             }
             .padding()
-            .navigationTitle("Today")  
             .task {
                 await viewModel.loadTodayCards()
             }
+            .navigationTitle("Today’s session")
         }
     }
 }

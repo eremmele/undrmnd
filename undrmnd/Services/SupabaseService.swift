@@ -16,7 +16,6 @@ final class SupabaseService: ObservableObject {
 
     var auth: AuthClient { client.auth }
     var storage: SupabaseStorageClient { client.storage }
-    var rest: PostgrestClient { client.rest }
     var realtime: RealtimeClientV2 { client.realtimeV2 }
     var functions: FunctionsClient { client.functions }
 }

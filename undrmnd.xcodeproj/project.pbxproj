@@ -13,32 +13,48 @@
 		A1000007245A1B0000000004 /* UndrmndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008245A1B0000000004 /* UndrmndTests.swift */; };
 		A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002E245A1B000000002E /* SupabaseConfig.swift */; };
 		A100002F245A1B000000002F /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030245A1B0000000030 /* SupabaseService.swift */; };
+		E61A6F922F62165C009CA58F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9B2F62090300EC3C29 /* Supabase */; };
+		E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */; };
+		E6DC4A9D2F620FD600EC3C29 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9C2F620FD600EC3C29 /* Supabase */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A1000024245A1B0000000020 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1000022245A1B000000001E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1000018245A1B0000000014;
+			remoteInfo = undrmnd;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		A1000009245A1B0000000005 /* undrmnd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = undrmnd.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A100000A245A1B0000000006 /* undrmndTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = undrmndTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000002245A1B0000000001 /* UndrmndApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndrmndApp.swift; sourceTree = "<group>"; };
 		A1000004245A1B0000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1000006245A1B0000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000008245A1B0000000004 /* UndrmndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndrmndTests.swift; sourceTree = "<group>"; };
+		A1000009245A1B0000000005 /* undrmnd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = undrmnd.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A100000A245A1B0000000006 /* undrmndTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = undrmndTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000017245A1B0000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A100002E245A1B000000002E /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		A1000030245A1B0000000030 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
+		E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySessionViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A100000B245A1B0000000007 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A100000C245A1B0000000008 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6DC4A9D2F620FD600EC3C29 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E6DC4A9E2F62150E00EC3C29 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E61A6F922F62165C009CA58F /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,6 +67,7 @@
 				A100000E245A1B000000000A /* undrmnd */,
 				A100000F245A1B000000000B /* undrmndTests */,
 				A1000010245A1B000000000C /* Products */,
+				E6DC4A9F2F62151D00EC3C29 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000004245A1B0000000002 /* ContentView.swift */,
+				E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -132,6 +150,13 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		E6DC4A9F2F62151D00EC3C29 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -140,8 +165,8 @@
 			buildConfigurationList = A1000019245A1B0000000015 /* Build configuration list for PBXNativeTarget "undrmnd" */;
 			buildPhases = (
 				A100001A245A1B0000000016 /* Sources */,
-				A100001B245A1B0000000017 /* Frameworks */,
 				A100001C245A1B0000000018 /* Resources */,
+				E6DC4A9E2F62150E00EC3C29 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -149,7 +174,7 @@
 			);
 			name = undrmnd;
 			packageProductDependencies = (
-				A100002C245A1B000000002C /* Supabase */,
+				E6DC4A9B2F62090300EC3C29 /* Supabase */,
 			);
 			productName = undrmnd;
 			productReference = A1000009245A1B0000000005 /* undrmnd.app */;
@@ -169,6 +194,9 @@
 				A1000021245A1B000000001D /* PBXTargetDependency */,
 			);
 			name = undrmndTests;
+			packageProductDependencies = (
+				E6DC4A9C2F620FD600EC3C29 /* Supabase */,
+			);
 			productName = undrmndTests;
 			productReference = A100000A245A1B0000000006 /* undrmndTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -201,7 +229,7 @@
 			);
 			mainGroup = A100000D245A1B0000000009;
 			packageReferences = (
-				A100002B245A1B000000002B /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				E6DC4A9A2F62090300EC3C29 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			productRefGroup = A1000010245A1B000000000C /* Products */;
 			projectDirPath = "";
@@ -237,6 +265,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001245A1B0000000001 /* UndrmndApp.swift in Sources */,
+				E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */,
 				A1000003245A1B0000000002 /* ContentView.swift in Sources */,
 				A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */,
 				A100002F245A1B000000002F /* SupabaseService.swift in Sources */,
@@ -260,35 +289,6 @@
 			targetProxy = A1000024245A1B0000000020 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		A100002B245A1B000000002B /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase/supabase-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A100002C245A1B000000002C /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A100002B245A1B000000002B /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-/* End XCSwiftPackageProductDependency section */
-
-/* Begin PBXContainerItemProxy section */
-		A1000024245A1B0000000020 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A1000022245A1B000000001E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A1000018245A1B0000000014;
-			remoteInfo = undrmnd;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin XCBuildConfiguration section */
 		A1000025245A1B0000000021 /* Debug */ = {
@@ -533,6 +533,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E6DC4A9A2F62090300EC3C29 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E6DC4A9B2F62090300EC3C29 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E6DC4A9A2F62090300EC3C29 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		E6DC4A9C2F620FD600EC3C29 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E6DC4A9A2F62090300EC3C29 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A1000022245A1B000000001E /* Project object */;
 }

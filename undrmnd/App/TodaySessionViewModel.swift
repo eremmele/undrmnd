@@ -14,7 +14,7 @@ private struct ContentItemRow: Decodable {
     let title: String
     let hook: String
     let interaction_type: String
-
+    
     var asCardItem: CardItem {
         CardItem(
             id: id,
@@ -23,6 +23,10 @@ private struct ContentItemRow: Decodable {
             interactionType: interaction_type
         )
     }
+}
+
+private struct RandomCardsParams: Encodable {
+    let n: Int
 }
 
 @MainActor
@@ -41,10 +45,8 @@ final class TodaySessionViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let client = SupabaseService.shared.client
-
-            let rows: [ContentItemRow] = try await client
-                .rpc("get_random_cards", params: ["n": 3])
+            let rows: [ContentItemRow] = try await SupabaseService.shared.client
+                .rpc("get_random_cards", params: RandomCardsParams(n: 3))
                 .execute()
                 .value
 
