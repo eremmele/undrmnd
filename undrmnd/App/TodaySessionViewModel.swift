@@ -32,6 +32,7 @@ private struct RandomCardsParams: Encodable {
 @MainActor
 final class TodaySessionViewModel: ObservableObject {
     @Published private(set) var cards: [CardItem] = []
+    @Published private(set) var completedCardIDs: Set<UUID> = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
 
@@ -58,5 +59,9 @@ final class TodaySessionViewModel: ObservableObject {
         }
 
         isLoading = false
+    }
+
+    func markCompleted(cardID: UUID) {
+        completedCardIDs.insert(cardID)
     }
 }

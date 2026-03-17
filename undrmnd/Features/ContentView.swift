@@ -27,6 +27,7 @@ struct RootView: View {
 
 struct TodaySessionView: View {
     @StateObject private var viewModel = TodaySessionViewModel()
+    @State private var selectedCard: CardItem?
 
     var body: some View {
         NavigationStack {
@@ -55,19 +56,24 @@ struct TodaySessionView: View {
                         .padding(.top, 16)
                 } else {
                     ForEach(viewModel.cards) { card in
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.secondarySystemBackground))
-                            .frame(maxWidth: .infinity, minHeight: 140)
-                            .overlay(
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(card.title)
-                                        .font(.headline)
-                                    Text(card.hook)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding()
-                            )
+                        Button {
+                            selectedCard = card
+                        } label: {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(.secondarySystemBackground))
+                                .frame(maxWidth: .infinity, minHeight: 140)
+                                .overlay(
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(card.title)
+                                            .font(.headline)
+                                        Text(card.hook)
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .padding()
+                                )
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
 
@@ -83,6 +89,12 @@ struct TodaySessionView: View {
                 await viewModel.loadTodayCards()
             }
             .navigationTitle("Today’s session")
+            .sheet(item: $selectedCard) { card in
+                CardDetailView(card: card) {
+                    viewModel.markCompleted(cardID: card.id)
+                    selectedCard = nil
+                }
+            }
         }
     }
 }
