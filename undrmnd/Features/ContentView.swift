@@ -28,6 +28,7 @@ struct RootView: View {
 struct TodaySessionView: View {
     @StateObject private var viewModel = TodaySessionViewModel()
     @State private var selectedCard: CardItem?
+    @State private var isShowingSessionComplete: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -72,8 +73,17 @@ struct TodaySessionView: View {
                                     }
                                     .padding()
                                 )
+                                .overlay(alignment: .topTrailing) {
+                                    if viewModel.completedCardIDs.contains(card.id) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.title3)
+                                            .foregroundColor(.green)
+                                            .padding(12)
+                                    }
+                                }
                         }
                         .buttonStyle(.plain)
+                        .opacity(viewModel.completedCardIDs.contains(card.id) ? 0.5 : 1.0)
                     }
                 }
 
@@ -90,9 +100,32 @@ struct TodaySessionView: View {
             }
             .navigationTitle("Today’s session")
             .sheet(item: $selectedCard) { card in
-                CardDetailView(card: card) {
+                CardDetailView(
+                    card: card,
+                    onComplete: {
                     viewModel.markCompleted(cardID: card.id)
                     selectedCard = nil
+                    },
+                    onClose: { selectedCard = nil }
+                )
+            }
+            .onChange(of: viewModel.isSessionComplete) { _, isComplete in
+                if isComplete {
+                    selectedCard = nil
+                    isShowingSessionComplete = true
+                }
+            }
+            .fullScreenCover(isPresented: $isShowingSessionComplete) {
+                SessionCompleteView(
+                    cardsServedCount: viewModel.cards.count,
+                    cardsCompletedCount: viewModel.completedCardIDs.count,
+                    onDone: {
+                        isShowingSessionComplete = false
+                        viewModel.resetSession()
+                    }
+                )
+                .task {
+                    await viewModel.completeSession()
                 }
             }
         }

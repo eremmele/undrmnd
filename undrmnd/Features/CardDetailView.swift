@@ -3,6 +3,7 @@ import SwiftUI
 struct CardDetailView: View {
     let card: CardItem
     let onComplete: () -> Void
+    let onClose: () -> Void
 
     private var ctaTitle: String {
         let t = card.interactionType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -14,30 +15,32 @@ struct CardDetailView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(card.title)
-                    .font(.title.bold())
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Text(card.hook)
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
                 Spacer()
-
-                Button(ctaTitle) {
-                    print("CTA tapped:", ctaTitle, "interactionType:", card.interactionType, "cardID:", card.id)
-                    onComplete()
-                }
-                .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity, alignment: .center)
+                Button("Close") { onClose() }
+                    .font(.headline)
             }
-            .padding()
-            .navigationTitle("Card")
-            .navigationBarTitleDisplayMode(.inline)
+
+            Text(card.title)
+                .font(.title.bold())
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(card.hook)
+                .font(.title3)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Spacer()
+
+            Button(ctaTitle) {
+                print("CTA tapped:", ctaTitle, "interactionType:", card.interactionType, "cardID:", card.id)
+                onComplete()
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
+        .padding()
     }
 }
 

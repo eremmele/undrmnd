@@ -13,7 +13,9 @@
 		A1000007245A1B0000000004 /* UndrmndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008245A1B0000000004 /* UndrmndTests.swift */; };
 		A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002E245A1B000000002E /* SupabaseConfig.swift */; };
 		A100002F245A1B000000002F /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030245A1B0000000030 /* SupabaseService.swift */; };
+		E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */; };
 		E6B3D3C32F8F4A0C0037A1B2 /* CardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */; };
+		E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */; };
 		E61A6F922F62165C009CA58F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9B2F62090300EC3C29 /* Supabase */; };
 		E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */; };
 		E6DC4A9D2F620FD600EC3C29 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9C2F620FD600EC3C29 /* Supabase */; };
@@ -40,7 +42,9 @@
 		A100002E245A1B000000002E /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		A1000030245A1B0000000030 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailView.swift; sourceTree = "<group>"; };
-		E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySessionViewModel.swift; sourceTree = "<group>"; };
+		E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardItem.swift; sourceTree = "<group>"; };
+		E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompleteView.swift; sourceTree = "<group>"; };
+		E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TodaySessionViewModel.swift; path = App/TodaySessionViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,7 @@
 			children = (
 				A1000002245A1B0000000001 /* UndrmndApp.swift */,
 				A100002E245A1B000000002E /* SupabaseConfig.swift */,
+				E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -118,7 +123,7 @@
 			children = (
 				A1000004245A1B0000000002 /* ContentView.swift */,
 				E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */,
-				E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */,
+				E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -133,6 +138,7 @@
 		A1000014245A1B0000000010 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -270,7 +276,9 @@
 				A1000001245A1B0000000001 /* UndrmndApp.swift in Sources */,
 				E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */,
 				A1000003245A1B0000000002 /* ContentView.swift in Sources */,
+				E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */,
 				E6B3D3C32F8F4A0C0037A1B2 /* CardDetailView.swift in Sources */,
+				E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */,
 				A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */,
 				A100002F245A1B000000002F /* SupabaseService.swift in Sources */,
 			);
