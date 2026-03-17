@@ -39,6 +39,14 @@ struct CardDetailView: View {
             }
             .buttonStyle(.borderedProminent)
             .frame(maxWidth: .infinity, alignment: .center)
+
+            if let sourceUrl = card.sourceUrl, let url = URL(string: sourceUrl) {
+                Link("Read the paper →", destination: url)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .tint(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
         .padding()
     }

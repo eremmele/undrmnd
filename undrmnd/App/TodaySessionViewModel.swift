@@ -16,6 +16,8 @@ private struct ContentItemRow: Decodable {
     let title: String
     let hook: String
     let interaction_type: String
+    let source_url: String?
+    let topic: String?
     
     var asCardItem: CardItem {
         CardItem(
@@ -23,8 +25,8 @@ private struct ContentItemRow: Decodable {
             title: title,
             hook: hook,
             interactionType: interaction_type,
-            sourceUrl: nil,
-            topic: nil
+            sourceUrl: source_url,
+            topic: topic
         )
     }
 }
