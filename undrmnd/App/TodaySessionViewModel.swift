@@ -22,7 +22,9 @@ private struct ContentItemRow: Decodable {
             id: id,
             title: title,
             hook: hook,
-            interactionType: interaction_type
+            interactionType: interaction_type,
+            sourceUrl: nil,
+            topic: nil
         )
     }
 }
@@ -102,5 +104,9 @@ final class TodaySessionViewModel: ObservableObject {
         isLoading = false
 
         Task { await loadTodayCards() }
+    }
+
+    func cards(for topic: String) -> [CardItem] {
+        cards.filter { $0.topic == topic }
     }
 }

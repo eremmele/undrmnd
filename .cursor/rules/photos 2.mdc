@@ -1,0 +1,22 @@
+---
+description: Photo source constraint - no local photo library
+globs: **/*.swift
+alwaysApply: true
+---
+
+# Photo Source Constraint
+
+**Photos must NOT come from the device photo library.**
+
+Do not use:
+- `PhotosUI` / `PhotosPicker`
+- `UIImagePickerController`
+- `PHPickerViewController`
+- `PHPhotoLibrary`
+- Any API that accesses the user's local Photos app
+
+Photos should come from:
+- Remote URLs
+- APIs / backend services
+- Bundled assets
+- Camera capture (if needed)
