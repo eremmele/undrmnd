@@ -13,12 +13,15 @@
 		A1000007245A1B0000000004 /* UndrmndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008245A1B0000000004 /* UndrmndTests.swift */; };
 		A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002E245A1B000000002E /* SupabaseConfig.swift */; };
 		A100002F245A1B000000002F /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030245A1B0000000030 /* SupabaseService.swift */; };
-		E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */; };
-		E6B3D3C32F8F4A0C0037A1B2 /* CardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */; };
-		E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */; };
 		E61A6F922F62165C009CA58F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9B2F62090300EC3C29 /* Supabase */; };
 		E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */; };
+		E6B3D3C32F8F4A0C0037A1B2 /* CardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */; };
+		E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */; };
+		E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */; };
 		E6DC4A9D2F620FD600EC3C29 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9C2F620FD600EC3C29 /* Supabase */; };
+		E7B8SCAN02 /* ScanEffect in Resources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN01 /* ScanEffect */; };
+		E7B8SCAN04 /* IntroInterstitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN03 /* IntroInterstitialView.swift */; };
+		E7B8SCAN06 /* ScanEffectWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN05 /* ScanEffectWebView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,10 +44,13 @@
 		A1000017245A1B0000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A100002E245A1B000000002E /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		A1000030245A1B0000000030 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
+		E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySessionViewModel.swift; sourceTree = "<group>"; };
 		E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailView.swift; sourceTree = "<group>"; };
 		E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardItem.swift; sourceTree = "<group>"; };
 		E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompleteView.swift; sourceTree = "<group>"; };
-		E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TodaySessionViewModel.swift; path = TodaySessionViewModel.swift; sourceTree = "<group>"; };
+		E7B8SCAN01 /* ScanEffect */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ScanEffect; sourceTree = "<group>"; };
+		E7B8SCAN03 /* IntroInterstitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroInterstitialView.swift; sourceTree = "<group>"; };
+		E7B8SCAN05 /* ScanEffectWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanEffectWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000004245A1B0000000002 /* ContentView.swift */,
+				E7B8SCAN03 /* IntroInterstitialView.swift */,
 				E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */,
 				E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */,
 			);
@@ -131,6 +138,7 @@
 		A1000013245A1B000000000F /* Patterns */ = {
 			isa = PBXGroup;
 			children = (
+				E7B8SCAN05 /* ScanEffectWebView.swift */,
 			);
 			path = Patterns;
 			sourceTree = "<group>";
@@ -155,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000006245A1B0000000003 /* Assets.xcassets */,
+				E7B8SCAN01 /* ScanEffect */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -218,7 +227,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					A1000018245A1B0000000014 = {
 						CreatedOnToolsVersion = 15.0;
@@ -256,6 +265,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000005245A1B0000000003 /* Assets.xcassets in Resources */,
+				E7B8SCAN02 /* ScanEffect in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +291,8 @@
 				E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */,
 				A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */,
 				A100002F245A1B000000002F /* SupabaseService.swift in Sources */,
+				E7B8SCAN04 /* IntroInterstitialView.swift in Sources */,
+				E7B8SCAN06 /* ScanEffectWebView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +373,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -417,6 +430,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -430,6 +444,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = NAJ3JAZTJX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = undrmnd/Info.plist;
@@ -458,6 +473,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = NAJ3JAZTJX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = undrmnd/Info.plist;

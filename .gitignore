@@ -26,6 +26,9 @@ xcuserdata/
 Pods/
 *.xcworkspace
 
+# Scan effect npm build (bundle in Resources/ScanEffect is committed)
+undrmnd/Tooling/scan-effect-build/node_modules/
+
 # macOS
 .DS_Store
 

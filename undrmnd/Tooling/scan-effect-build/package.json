@@ -1,0 +1,8 @@
+{
+  "name": "undrmnd-scan-effect-build",
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "three": "0.170.0"
+  }
+}
