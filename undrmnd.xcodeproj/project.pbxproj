@@ -14,10 +14,12 @@
 		A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002E245A1B000000002E /* SupabaseConfig.swift */; };
 		A100002F245A1B000000002F /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030245A1B0000000030 /* SupabaseService.swift */; };
 		E61A6F922F62165C009CA58F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9B2F62090300EC3C29 /* Supabase */; };
-		E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */; };
-		E6B3D3C32F8F4A0C0037A1B2 /* CardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */; };
 		E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */; };
-		E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */; };
+		E8F2A0B12F9000A1009CA58F /* UndrmndPrototypeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */; };
+		E8F2A0B22F9000A1009CA58F /* WalkPathModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */; };
+		E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */; };
+		E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */; };
+		E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */; };
 		E6DC4A9D2F620FD600EC3C29 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9C2F620FD600EC3C29 /* Supabase */; };
 		E7B8SCAN02 /* ScanEffect in Resources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN01 /* ScanEffect */; };
 		E7B8SCAN04 /* IntroInterstitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN03 /* IntroInterstitialView.swift */; };
@@ -44,10 +46,12 @@
 		A1000017245A1B0000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A100002E245A1B000000002E /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		A1000030245A1B0000000030 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
-		E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySessionViewModel.swift; sourceTree = "<group>"; };
-		E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailView.swift; sourceTree = "<group>"; };
 		E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardItem.swift; sourceTree = "<group>"; };
-		E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompleteView.swift; sourceTree = "<group>"; };
+		E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndrmndPrototypeTheme.swift; sourceTree = "<group>"; };
+		E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathModels.swift; sourceTree = "<group>"; };
+		E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathFlowView.swift; sourceTree = "<group>"; };
+		E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalClarifierView.swift; sourceTree = "<group>"; };
+		E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrototypeShellViews.swift; sourceTree = "<group>"; };
 		E7B8SCAN01 /* ScanEffect */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ScanEffect; sourceTree = "<group>"; };
 		E7B8SCAN03 /* IntroInterstitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroInterstitialView.swift; sourceTree = "<group>"; };
 		E7B8SCAN05 /* ScanEffectWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanEffectWebView.swift; sourceTree = "<group>"; };
@@ -119,7 +123,6 @@
 			children = (
 				A1000002245A1B0000000001 /* UndrmndApp.swift */,
 				A100002E245A1B000000002E /* SupabaseConfig.swift */,
-				E61A6F932F621865009CA58F /* TodaySessionViewModel.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -129,8 +132,9 @@
 			children = (
 				A1000004245A1B0000000002 /* ContentView.swift */,
 				E7B8SCAN03 /* IntroInterstitialView.swift */,
-				E6B3D3C22F8F4A0C0037A1B2 /* CardDetailView.swift */,
-				E6B3D3C62F8F4C6E0037A1B2 /* SessionCompleteView.swift */,
+				E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */,
+				E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */,
+				E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -147,6 +151,8 @@
 			isa = PBXGroup;
 			children = (
 				E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */,
+				E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */,
+				E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -284,15 +290,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001245A1B0000000001 /* UndrmndApp.swift in Sources */,
-				E61A6F942F621865009CA58F /* TodaySessionViewModel.swift in Sources */,
 				A1000003245A1B0000000002 /* ContentView.swift in Sources */,
 				E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */,
-				E6B3D3C32F8F4A0C0037A1B2 /* CardDetailView.swift in Sources */,
-				E6B3D3C72F8F4C6E0037A1B2 /* SessionCompleteView.swift in Sources */,
 				A100002D245A1B000000002D /* SupabaseConfig.swift in Sources */,
 				A100002F245A1B000000002F /* SupabaseService.swift in Sources */,
 				E7B8SCAN04 /* IntroInterstitialView.swift in Sources */,
 				E7B8SCAN06 /* ScanEffectWebView.swift in Sources */,
+				E8F2A0B12F9000A1009CA58F /* UndrmndPrototypeTheme.swift in Sources */,
+				E8F2A0B22F9000A1009CA58F /* WalkPathModels.swift in Sources */,
+				E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */,
+				E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */,
+				E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
