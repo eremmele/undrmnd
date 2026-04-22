@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Comfortable reading rhythm for long body copy (~1.2× line height on book 17pt).
+private let cardBodyLineSpacing: CGFloat = 5
+
 struct CardView: View {
     let item: ContentItem
     var nodeByline: String?
@@ -35,6 +38,7 @@ struct CardView: View {
                 Text(body)
                     .font(AppFont.body)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    .lineSpacing(cardBodyLineSpacing)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -125,7 +129,7 @@ struct CardView: View {
             }
         case .contribute:
             if let a = act {
-                Button { onRequestSafari(a, true) } label: { Text("Try it") }
+                Button { onRequestSafari(a, true) } label: { Text("Explore") }
                     .buttonStyle(LargeProminentPathButtonStyle())
             } else if let s = src {
                 Button {
@@ -133,10 +137,10 @@ struct CardView: View {
                     print("warning: contribute card missing action_url; using source_url")
                     #endif
                     onRequestSafari(s, true)
-                } label: { Text("Try it") }
+                } label: { Text("Explore") }
                 .buttonStyle(LargeProminentPathButtonStyle())
             } else {
-                Button { onContinue() } label: { Text("Try it") }
+                Button { onContinue() } label: { Text("Explore") }
                     .buttonStyle(LargeProminentPathButtonStyle())
                     .disabled(true)
                     .accessibilityLabel("Contribute handoff link missing")
@@ -147,9 +151,15 @@ struct CardView: View {
     private var continueButton: some View {
         Button(action: onContinue) {
             Text("Continue")
-                .font(AppFont.bodyMedium)
+                .font(.system(.body, design: .default))
+                .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 14)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(UndrmndPrototypeTheme.divider.opacity(0.45), lineWidth: 1)
+                )
         }
         .buttonStyle(.plain)
         .foregroundStyle(UndrmndPrototypeTheme.accent)

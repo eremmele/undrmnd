@@ -39,8 +39,7 @@ struct SignInView: View {
                 .padding(20)
             }
             .background(UndrmndPrototypeTheme.paper)
-            .navigationTitle("Sign in")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitleBrand("Sign in")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }

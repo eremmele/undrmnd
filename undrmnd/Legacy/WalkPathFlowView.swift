@@ -48,8 +48,7 @@ struct WalkPathFlowView: View {
             }
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle(path.title)
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand(path.title)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Close") { dismiss() }

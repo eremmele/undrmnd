@@ -32,4 +32,22 @@ struct ContentItem: Codable, Identifiable, Hashable {
         case isActive = "is_active"
         case contributedBy = "contributed_by"
     }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        title = try c.decode(String.self, forKey: .title)
+        hook = try c.decode(String.self, forKey: .hook)
+        body = try c.decodeIfPresent(String.self, forKey: .body)
+        tags = try c.decodeIfPresent([String].self, forKey: .tags) ?? []
+        interactionType = try c.decode(InteractionType.self, forKey: .interactionType)
+        sourceCitation = try c.decodeIfPresent(String.self, forKey: .sourceCitation)
+        sourceUrl = try c.decodeIfPresent(String.self, forKey: .sourceUrl)
+        actionUrl = try c.decodeIfPresent(String.self, forKey: .actionUrl)
+        topic = try c.decode(Pillar.self, forKey: .topic)
+        estimatedTimeMinutes = try c.decodeIfPresent(Int.self, forKey: .estimatedTimeMinutes)
+        isOpenQuestion = try c.decodeIfPresent(Bool.self, forKey: .isOpenQuestion) ?? true
+        isActive = try c.decodeIfPresent(Bool.self, forKey: .isActive) ?? true
+        contributedBy = try c.decodeIfPresent(String.self, forKey: .contributedBy)
+    }
 }

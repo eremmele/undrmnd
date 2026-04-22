@@ -52,6 +52,8 @@
 		E7D30009 /* ContentDetailReadOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D3000A /* ContentDetailReadOnlyView.swift */; };
 		E7D40012 /* PathResumeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D40011 /* PathResumeStore.swift */; };
 		E7D50001 /* ContributeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D50002 /* ContributeFeature.swift */; };
+		E7D60001 /* AlertsPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D60002 /* AlertsPanelView.swift */; };
+		E7D61001 /* AboutUndrmndView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D61002 /* AboutUndrmndView.swift */; };
 		E7AF1002 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AF1001 /* AppFont.swift */; };
 		E7FN0012 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E7FN0011 /* Fonts */; };
 /* End PBXBuildFile section */
@@ -114,6 +116,8 @@
 		E7D40010 /* undrmnd.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = undrmnd.entitlements; sourceTree = "<group>"; };
 		E7D40011 /* PathResumeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathResumeStore.swift; sourceTree = "<group>"; };
 		E7D50002 /* ContributeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeFeature.swift; sourceTree = "<group>"; };
+		E7D60002 /* AlertsPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsPanelView.swift; sourceTree = "<group>"; };
+		E7D61002 /* AboutUndrmndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutUndrmndView.swift; sourceTree = "<group>"; };
 		E7AF1001 /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		E7FN0011 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -200,6 +204,8 @@
 				E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */,
 				E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */,
 				E7D50003 /* Contribute */,
+				E7D60004 /* Alerts */,
+				E7D61003 /* About */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -210,6 +216,22 @@
 				E7D50002 /* ContributeFeature.swift */,
 			);
 			path = Contribute;
+			sourceTree = "<group>";
+		};
+		E7D60004 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				E7D60002 /* AlertsPanelView.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
+		E7D61003 /* About */ = {
+			isa = PBXGroup;
+			children = (
+				E7D61002 /* AboutUndrmndView.swift */,
+			);
+			path = About;
 			sourceTree = "<group>";
 		};
 		E7LEG0001 /* Legacy */ = {
@@ -470,6 +492,8 @@
 				E7D30009 /* ContentDetailReadOnlyView.swift in Sources */,
 				E7D40012 /* PathResumeStore.swift in Sources */,
 				E7D50001 /* ContributeFeature.swift in Sources */,
+				E7D60001 /* AlertsPanelView.swift in Sources */,
+				E7D61001 /* AboutUndrmndView.swift in Sources */,
 				E7AF1002 /* AppFont.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -39,8 +39,7 @@ struct ProfileEditView: View {
             }
             .scrollContentBackground(.hidden)
             .background(UndrmndPrototypeTheme.paper)
-            .navigationTitle("Edit profile")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitleBrand("Edit profile")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

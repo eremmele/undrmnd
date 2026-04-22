@@ -59,13 +59,29 @@ struct IntroInterstitialView: View {
             VStack {
                 Spacer(minLength: 0)
                     .allowsHitTesting(false)
-                Button("Continue") {
-                    onContinue()
+                // Compact, glassy control — not full-bleed; white label on a soft blurred pill.
+                Button(action: onContinue) {
+                    Text("Continue")
+                        .font(.system(.subheadline, design: .default).weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 9)
+                        .background {
+                            ZStack {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.07))
+                                Capsule()
+                                    .fill(.ultraThinMaterial)
+                                    .opacity(0.42)
+                            }
+                        }
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .strokeBorder(Color.white.opacity(0.24), lineWidth: 0.5)
+                        )
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.white)
-                .foregroundStyle(.black)
-                .controlSize(.large)
+                .buttonStyle(.plain)
                 .accessibilityLabel("Continue into the app")
                 .accessibilityHint("Dismisses this intro screen")
                 .padding(.horizontal, 24)

@@ -170,30 +170,34 @@ struct TerritoryMapPlaceholderView: View {
                 VStack(spacing: 4) {
                     Text("Your accumulated understanding")
                         .font(AppFont.captionEmphasis)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .foregroundStyle(UndrmndPrototypeTheme.primary.opacity(0.88))
                     Text("2 topics · 1 completed branch · 1 in progress")
                         .font(AppFont.caption2)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 }
                 .multilineTextAlignment(.center)
                 .padding(16)
-                .frame(maxWidth: .infinity)
+                .padding(.bottom, 6)
+                .frame(maxWidth: .infinity, alignment: .center)
                 .background(UndrmndPrototypeTheme.panel)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-                )
-                .padding(.horizontal, 16)
-                .padding(.bottom, 4)
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(UndrmndPrototypeTheme.divider)
+                        .frame(height: 0.5)
+                }
+                .ignoresSafeArea(edges: .bottom)
             }
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Your Map")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Your Map")
         .toolbar {
             if let onMapDismiss {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done", action: onMapDismiss)
+                    Button(action: onMapDismiss) {
+                        Text("Done")
+                            .font(.system(.body))
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    }
                 }
             }
         }
@@ -211,6 +215,10 @@ private struct PublicEventRow: Identifiable {
 }
 
 struct NearbyEventsView: View {
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+
     private let events: [PublicEventRow] = [
         PublicEventRow(
             title: "Astronomy on Tap — public talks at a local pub",
@@ -241,7 +249,7 @@ struct NearbyEventsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Meetup and Eventbrite-style listings; open a link in your browser. The app does not use your location in the background.")
+                Text("Based on your goals, here are a few events in your local community.")
                     .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -254,9 +262,17 @@ struct NearbyEventsView: View {
                             .font(AppFont.subheadline)
                         Text(e.source)
                             .font(AppFont.caption2)
-                            .foregroundStyle(UndrmndPrototypeTheme.muted)
-                        Link("View listing in browser", destination: e.url)
-                            .font(AppFont.captionEmphasis)
+                            .foregroundStyle(sourceListColor(e.source))
+                        Link(destination: e.url) {
+                            HStack(spacing: 5) {
+                                Text("RSVP")
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 12, weight: .semibold))
+                            }
+                            .font(.system(.subheadline))
+                            .foregroundStyle(UndrmndPrototypeTheme.accent)
+                        }
+                        .accessibilityLabel("RSVP, opens in browser")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16)
@@ -270,8 +286,17 @@ struct NearbyEventsView: View {
             .padding(20)
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Nearby")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Nearby")
+        .toolbar {
+            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
+        }
+    }
+
+    private func sourceListColor(_ source: String) -> Color {
+        if source == "Meetup" {
+            return UndrmndPrototypeTheme.secondary.opacity(0.92)
+        }
+        return UndrmndPrototypeTheme.muted
     }
 }
 
@@ -292,8 +317,7 @@ struct ProfilePlaceholderView: View {
             .padding(20)
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Profile")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Profile")
     }
 }
 
@@ -363,10 +387,14 @@ struct SearchPlaceholderView: View {
                 .padding(16)
             }
             .background(UndrmndPrototypeTheme.paper)
-            .navigationTitle("Search")
+            .navigationTitleBrand("Search")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button(action: { dismiss() }) {
+                        Text("Done")
+                            .font(.system(.body))
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    }
                 }
             }
         }

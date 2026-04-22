@@ -10,10 +10,18 @@ enum ContentService {
         n: Int = 3,
         client: SupabaseClient = SupabaseService.shared.client
     ) async throws -> [ContentPreview] {
-        let res: PostgrestResponse<[ContentPreview]> = try await client
+        let res: PostgrestResponse<[ContentItem]> = try await client
             .rpc("get_random_cards", params: RandomCardsParams(n: n))
             .execute()
-        return res.value
+        var rows = res.value.map { ContentPreview(from: $0) }
+        if rows.count < n {
+            let need = n - rows.count
+            let extras = ContentPreview.sessionFallback.filter { f in
+                !rows.contains { $0.id == f.id }
+            }
+            rows.append(contentsOf: extras.prefix(need))
+        }
+        return Array(rows.prefix(n))
     }
 
     static func fetchCardDetail(

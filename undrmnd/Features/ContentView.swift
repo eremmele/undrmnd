@@ -5,6 +5,7 @@ enum HomeRoute: Hashable {
     case path(String)
     case threeCard(Pillar?)
     case territoryMap
+    case about
 }
 
 struct RootView: View {
@@ -19,6 +20,9 @@ struct RootView: View {
     @State private var explorePath = NavigationPath()
     @State private var showSearch = false
     @State private var showExploreMap = false
+    @State private var showAlerts = false
+
+    @StateObject private var alertsStore = AlertsStore()
 
     var body: some View {
         TabView(selection: $tab) {
@@ -26,11 +30,13 @@ struct RootView: View {
                 PrototypeEntryView(
                     onSearch: { showSearch = true },
                     onOpenMap: { showExploreMap = true },
+                    onOpenAlerts: { showAlerts = true },
                     onGoalClarifier: { explorePath.append(HomeRoute.goalClarifier) },
                     onPathSlug: { slug in explorePath.append(HomeRoute.path(slug)) },
                     onThreeCard: { p in explorePath.append(HomeRoute.threeCard(p)) },
                     onTerritoryMap: { explorePath.append(HomeRoute.territoryMap) },
-                    onOpenContribute: { tab = .contribute }
+                    onOpenContribute: { tab = .contribute },
+                    onAbout: { explorePath.append(HomeRoute.about) }
                 )
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
@@ -47,6 +53,8 @@ struct RootView: View {
                         TerritoryMapPlaceholderView { pillar in
                             explorePath.append(HomeRoute.threeCard(pillar))
                         }
+                    case .about:
+                        AboutUndrmndView()
                     }
                 }
             }
@@ -80,6 +88,10 @@ struct RootView: View {
             .tag(MainTab.profile)
         }
         .tint(UndrmndPrototypeTheme.primary)
+        .environmentObject(alertsStore)
+        .environment(\.openTerritoryMapFromShell) { showExploreMap = true }
+        .environment(\.openTopicSearchFromShell) { showSearch = true }
+        .environment(\.openAlertsFromShell) { showAlerts = true }
         .sheet(isPresented: $showSearch) {
             SearchPlaceholderView { route in
                 showSearch = false
@@ -99,19 +111,25 @@ struct RootView: View {
                 )
             }
         }
+        .sheet(isPresented: $showAlerts) {
+            AlertsPanelView()
+                .environmentObject(alertsStore)
+        }
     }
 }
 
 struct PrototypeEntryView: View {
+    @EnvironmentObject private var alertsStore: AlertsStore
+
     var onSearch: () -> Void
     var onOpenMap: () -> Void
+    var onOpenAlerts: () -> Void
     var onGoalClarifier: () -> Void
     var onPathSlug: (String) -> Void
     var onThreeCard: (Pillar?) -> Void
     var onTerritoryMap: () -> Void
     var onOpenContribute: () -> Void
-
-    @State private var showNoResumeAlert = false
+    var onAbout: () -> Void
 
     private var greeting: String {
         let h = Calendar.current.component(.hour, from: Date())
@@ -134,7 +152,7 @@ struct PrototypeEntryView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 4)
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 18) {
                     entryCard(
                         title: "I want to know something",
                         subtitle: "Set your goal, ask questions, and find the answers you’re seeking.",
@@ -150,27 +168,22 @@ struct PrototypeEntryView: View {
                     entryCard(
                         title: "Resume a path",
                         subtitle: "Continue where you left off in a previous exploration.",
-                        action: {
-                            if let slug = PathResumeStore.lastPathSlug {
-                                onPathSlug(slug)
-                            } else {
-                                showNoResumeAlert = true
-                            }
-                        }
+                        action: onOpenMap
+                    )
+
+                    entryCard(
+                        title: "Why undrmnd",
+                        subtitle: "Short about cards: what this is, what it’s not, and how your attention is treated.",
+                        action: onAbout
                     )
                 }
-                .padding(.top, 8)
+                .padding(.top, 12)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationBarTitleDisplayMode(.inline)
-        .alert("No path in progress", isPresented: $showNoResumeAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Open a path from a goal or search first — we’ll save it for next time.")
-        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("undrmnd")
@@ -178,18 +191,36 @@ struct PrototypeEntryView: View {
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button(action: onOpenMap) {
-                    Image(systemName: "map")
-                        .font(.system(.subheadline))
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                HStack(spacing: 8) {
+                    ToolbarPillButton(
+                        systemName: "magnifyingglass",
+                        accessibilityLabel: "Search",
+                        action: onSearch
+                    )
+                    ToolbarPillButton(
+                        systemName: "map",
+                        accessibilityLabel: "Open your topic map",
+                        action: onOpenMap
+                    )
+                    if alertsStore.unreadCount > 0 {
+                        Button(action: onOpenAlerts) {
+                            Image(systemName: "bell")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                                .frame(width: 40, height: 40)
+                                .background { ToolbarPillBackground() }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Open alerts, \(alertsStore.unreadCount) unread")
+                        .badge(alertsStore.unreadCount)
+                    } else {
+                        ToolbarPillButton(
+                            systemName: "bell",
+                            accessibilityLabel: "Open alerts",
+                            action: onOpenAlerts
+                        )
+                    }
                 }
-                .accessibilityLabel("Open your topic map")
-                Button(action: onSearch) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(.subheadline))
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                }
-                .accessibilityLabel("Search")
             }
         }
     }
@@ -217,6 +248,102 @@ struct PrototypeEntryView: View {
     }
 }
 
+// MARK: - Toolbar chrome (separate rounded “docks” for each control)
+
+private struct ToolbarPillBackground: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(UndrmndPrototypeTheme.panel)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 0.5)
+            )
+    }
+}
+
+/// 40×40 rounded control; use in an `HStack(spacing: 8)` so search, map, and alerts read as separate docks.
+struct ToolbarPillButton: View {
+    let systemName: String
+    var accessibilityLabel: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                .frame(width: 40, height: 40)
+                .background { ToolbarPillBackground() }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
+// MARK: - Global Explore shell (map + search) for any pushed screen
+
+private struct OpenTerritoryMapKey: EnvironmentKey {
+    static let defaultValue: () -> Void = {}
+}
+
+private struct OpenTopicSearchKey: EnvironmentKey {
+    static let defaultValue: () -> Void = {}
+}
+
+private struct OpenAlertsKey: EnvironmentKey {
+    static let defaultValue: () -> Void = {}
+}
+
+extension EnvironmentValues {
+    /// Present the territory map sheet (same as Explore toolbar map).
+    var openTerritoryMapFromShell: () -> Void {
+        get { self[OpenTerritoryMapKey.self] }
+        set { self[OpenTerritoryMapKey.self] = newValue }
+    }
+
+    /// Present the topic / path search sheet (same as Explore toolbar search).
+    var openTopicSearchFromShell: () -> Void {
+        get { self[OpenTopicSearchKey.self] }
+        set { self[OpenTopicSearchKey.self] = newValue }
+    }
+
+    /// Present the in-app **alerts** panel (on-device copy only; not remote push).
+    var openAlertsFromShell: () -> Void {
+        get { self[OpenAlertsKey.self] }
+        set { self[OpenAlertsKey.self] = newValue }
+    }
+}
+
+enum ExploreShellToolbar {
+    @ToolbarContentBuilder
+    static func items(
+        openMap: @escaping () -> Void,
+        openSearch: @escaping () -> Void,
+        openAlerts: @escaping () -> Void = {}
+    ) -> some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            HStack(spacing: 8) {
+                ToolbarPillButton(
+                    systemName: "magnifyingglass",
+                    accessibilityLabel: "Search topics and paths",
+                    action: openSearch
+                )
+                ToolbarPillButton(
+                    systemName: "map",
+                    accessibilityLabel: "Open your topic map",
+                    action: openMap
+                )
+                ToolbarPillButton(
+                    systemName: "bell",
+                    accessibilityLabel: "Open alerts",
+                    action: openAlerts
+                )
+            }
+        }
+    }
+}
+
 #Preview {
     RootView()
+        .environmentObject(AlertsStore())
 }

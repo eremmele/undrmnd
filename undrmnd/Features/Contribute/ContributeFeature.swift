@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Models
 
@@ -191,6 +192,10 @@ enum ContributeSeedData {
 // MARK: - Hub
 
 struct ContributeView: View {
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+
     @State private var selectedPillar: Pillar = .cosmos
     private var filtered: [PillarDiscussionThread] {
         ContributeSeedData.threads.filter { $0.pillar == selectedPillar }
@@ -230,10 +235,13 @@ struct ContributeView: View {
                 }
             }
             .padding(20)
+            .padding(.bottom, 48)
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Contribute")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Contribute")
+        .toolbar {
+            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
+        }
     }
 }
 
@@ -243,36 +251,29 @@ private struct CanvasThreadRowCard: View {
     let thread: PillarDiscussionThread
 
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(PillarColor.accent(for: thread.pillar))
-                .frame(width: 4)
-                .padding(.vertical, 2)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(thread.titleQuestion)
-                    .font(AppFont.headline)
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
-                    .multilineTextAlignment(.leading)
-                HStack(spacing: 6) {
-                    Text("\(thread.seedReplies.count) replies")
-                        .font(AppFont.caption2)
-                    Text("·")
-                        .font(AppFont.caption2)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
-                    Text(thread.lastActivityLabel)
-                        .font(AppFont.caption2)
-                }
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
-                if thread.contentItems.count > 1 {
-                    Text("\(thread.contentItems.count) cards in thread")
-                        .font(AppFont.caption2)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                }
+        VStack(alignment: .leading, spacing: 8) {
+            Text(thread.titleQuestion)
+                .font(AppFont.headline)
+                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                .multilineTextAlignment(.leading)
+            HStack(spacing: 6) {
+                Text("\(thread.seedReplies.count) replies")
+                    .font(AppFont.caption2)
+                Text("·")
+                    .font(AppFont.caption2)
+                    .foregroundStyle(UndrmndPrototypeTheme.muted)
+                Text(thread.lastActivityLabel)
+                    .font(AppFont.caption2)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
+            .foregroundStyle(UndrmndPrototypeTheme.muted)
+            if thread.contentItems.count > 1 {
+                Text("\(thread.contentItems.count) cards in thread")
+                    .font(AppFont.caption2)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(UndrmndPrototypeTheme.panel)
@@ -287,31 +288,24 @@ private struct CanvasThreadRowCard: View {
     }
 }
 
-// MARK: - Pillar tints (subtle, print-friendly)
-
-private enum PillarColor {
-    static func accent(for p: Pillar) -> Color {
-        switch p {
-        case .cosmos: return Color(red: 0.25, green: 0.32, blue: 0.42)
-        case .livingWorld: return Color(red: 0.2, green: 0.4, blue: 0.32)
-        case .mindAndBrain: return Color(red: 0.38, green: 0.28, blue: 0.42)
-        case .howWeKnow: return Color(red: 0.35, green: 0.33, blue: 0.28)
-        }
-    }
-}
-
 // MARK: - Thread detail
 
 struct ContributeThreadDetailView: View {
     let thread: PillarDiscussionThread
 
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+
     @State private var extraReplies: [ThreadReply] = []
     @State private var draft: String = ""
+    @FocusState private var replyFieldFocused: Bool
 
     private var allReplies: [ThreadReply] { thread.seedReplies + extraReplies }
 
     var body: some View {
-        ScrollView {
+        ScrollViewReader { proxy in
+            ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(thread.pillar.displayName.uppercased())
@@ -361,12 +355,14 @@ struct ContributeThreadDetailView: View {
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                     TextField("Write a thoughtful reply…", text: $draft, axis: .vertical)
                         .lineLimit(3...8)
+                        .focused($replyFieldFocused)
                         .padding(10)
                         .background(UndrmndPrototypeTheme.panel)
                         .overlay(
                             RoundedRectangle(cornerRadius: 4)
                                 .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
                         )
+                        .id("replyField")
                     Button {
                         let t = draft.trimmingCharacters(in: .whitespacesAndNewlines)
                         guard !t.isEmpty else { return }
@@ -380,49 +376,65 @@ struct ContributeThreadDetailView: View {
                             )
                         )
                         draft = ""
+                        replyFieldFocused = false
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            proxy.scrollTo("replyConfirm", anchor: .bottom)
+                        }
                     } label: {
                         Text("Post reply")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(LargeProminentPathButtonStyle())
                     .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Color.clear.frame(height: 1).id("replyConfirm")
                 }
                 .padding(.top, 4)
             }
             .padding(20)
+            .padding(.bottom, 56)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: replyFieldFocused) { _, on in
+                if on {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        withAnimation {
+                            proxy.scrollTo("replyField", anchor: .bottom)
+                        }
+                    }
+                }
+            }
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
+        }
     }
 
     @ViewBuilder
     private func contentCardBlock(_ ref: ThreadContentItemRef, isLink: Bool) -> some View {
-        HStack(alignment: .top, spacing: 0) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(PillarColor.accent(for: thread.pillar).opacity(0.85))
-                .frame(width: 3)
-            VStack(alignment: .leading, spacing: 6) {
-                Text(ref.title)
-                    .font(AppFont.subheadlineEmphasis)
-                Text(ref.hook)
-                    .font(AppFont.caption)
-                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                Text("— @\(ref.contributedBy)")
-                    .font(AppFont.caption2)
-                    .foregroundStyle(UndrmndPrototypeTheme.muted)
-                if isLink {
-                    HStack(spacing: 4) {
-                        Text("Open full card")
-                        Image(systemName: "chevron.right")
-                            .font(AppFont.caption2)
-                    }
-                    .font(AppFont.captionEmphasis)
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(ref.title)
+                .font(AppFont.subheadlineEmphasis)
+            Text(ref.hook)
+                .font(AppFont.caption)
+                .foregroundStyle(UndrmndPrototypeTheme.secondary)
+            Text("— @\(ref.contributedBy)")
+                .font(AppFont.caption2)
+                .foregroundStyle(UndrmndPrototypeTheme.muted)
+            if isLink {
+                HStack(spacing: 4) {
+                    Text("Open full card")
+                    Image(systemName: "chevron.right")
+                        .font(AppFont.caption2)
                 }
+                .font(AppFont.captionEmphasis)
+                .foregroundStyle(UndrmndPrototypeTheme.primary)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
         .background(UndrmndPrototypeTheme.panel)
         .overlay(
             RoundedRectangle(cornerRadius: 8, style: .continuous)

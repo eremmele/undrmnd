@@ -70,8 +70,7 @@ struct PublicProfileView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Profile")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Profile")
         .task { await load() }
     }
 

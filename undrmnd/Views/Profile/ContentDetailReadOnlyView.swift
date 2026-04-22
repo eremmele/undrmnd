@@ -3,6 +3,11 @@ import SwiftUI
 /// Single-card read-only (profile tap-through); no play metrics or “next” prompts.
 struct ContentDetailReadOnlyView: View {
     let contentId: UUID
+
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+
     @State private var item: ContentItem?
     @State private var error: String?
 
@@ -19,10 +24,12 @@ struct ContentDetailReadOnlyView: View {
                         if let b = item.body, !b.isEmpty {
                             Text(b)
                                 .font(AppFont.body)
+                                .lineSpacing(5)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(20)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 22)
                 }
             } else if let error {
                 Text(error).padding()
@@ -31,6 +38,9 @@ struct ContentDetailReadOnlyView: View {
             }
         }
         .background(UndrmndPrototypeTheme.paper)
+        .toolbar {
+            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
+        }
         .task { await load() }
     }
 

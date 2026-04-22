@@ -101,11 +101,14 @@ struct PathMapView: View {
                 )
             }
             .background(UndrmndPrototypeTheme.paper)
-            .navigationTitle("Map")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitleBrand("Map")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button(action: { dismiss() }) {
+                        Text("Done")
+                            .font(.system(.body))
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    }
                 }
             }
         }

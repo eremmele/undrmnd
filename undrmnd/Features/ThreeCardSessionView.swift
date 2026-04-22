@@ -1,11 +1,14 @@
 import SwiftUI
 
-/// Finite three-card “open question” session: no autoplay, no “one more” in-app.
+/// Open-topic card session: no autoplay, no “one more” in-app.
 struct ThreeCardSessionView: View {
     /// When set, we bias selection toward this pillar. The database RPC is unfiltered, so we over-fetch and filter.
     var topicFilter: Pillar?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
     @State private var items: [ContentPreview] = []
     @State private var step: Int = 0
     @State private var error: String?
@@ -30,7 +33,7 @@ struct ThreeCardSessionView: View {
             } else if let err = error {
                 Text(err).padding()
             } else if items.isEmpty {
-                ProgressView("Drawing three cards…")
+                ProgressView("Loading topics…")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if step < 3, items.indices.contains(step) {
                 stepView(preview: items[step])
@@ -38,48 +41,54 @@ struct ThreeCardSessionView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Three open questions")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Open topics")
+        .toolbar {
+            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
+        }
         .task { await load() }
     }
 
     @ViewBuilder
     private func stepView(preview: ContentPreview) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Card \(step + 1) of 3")
-                .font(AppFont.caption)
-                .foregroundStyle(UndrmndPrototypeTheme.secondary)
-            if let d = detail {
-                Text(d.title)
-                    .font(AppFont.title3)
-                Text(d.hook)
-                    .font(AppFont.subheadline)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Card \(step + 1) of 3")
+                    .font(AppFont.caption)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                if let b = d.body, !b.isEmpty {
-                    Text(b)
-                        .font(AppFont.body)
-                }
-            } else {
-                Text(preview.title)
-                    .font(AppFont.title3)
-                Text(preview.hook)
-                    .font(AppFont.subheadline)
-            }
-            Spacer()
-            Button {
-                if step == 2 {
-                    isDone = true
+                if let d = detail {
+                    Text(d.title)
+                        .font(AppFont.title3)
+                    Text(d.hook)
+                        .font(AppFont.subheadline)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    if let b = d.body, !b.isEmpty {
+                        Text(b)
+                            .font(AppFont.body)
+                            .lineSpacing(5)
+                    }
                 } else {
-                    step += 1
-                    detail = nil
-                    Task { await loadDetail(for: items[step]) }
+                    Text(preview.title)
+                        .font(AppFont.title3)
+                    Text(preview.hook)
+                        .font(AppFont.subheadline)
                 }
-            } label: {
-                Text(step == 2 ? "Finish" : "Next")
+                Button {
+                    if step == 2 {
+                        isDone = true
+                    } else {
+                        step += 1
+                        detail = nil
+                        Task { await loadDetail(for: items[step]) }
+                    }
+                } label: {
+                    Text(step == 2 ? "Finish" : "Next")
+                }
+                .buttonStyle(LargeProminentPathButtonStyle())
             }
-            .buttonStyle(LargeProminentPathButtonStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 22)
         }
-        .padding(20)
         .task(id: step) {
             await loadDetail(for: preview)
         }

@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+
     @State private var myProfile: Profile?
     @State private var isSignedIn = false
     @State private var loadError: String?
@@ -39,8 +43,7 @@ struct ProfileView: View {
             }
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Profile")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitleBrand("Profile")
         .task { await refreshSession() }
         .onChange(of: isSignedIn) { _, _ in Task { await load() } }
         .onChange(of: showSignIn) { _, isShowing in
@@ -50,6 +53,7 @@ struct ProfileView: View {
             SignInView()
         }
         .toolbar {
+            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
             if isSignedIn {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") {

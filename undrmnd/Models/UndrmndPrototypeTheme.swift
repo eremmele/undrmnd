@@ -11,3 +11,22 @@ enum UndrmndPrototypeTheme {
     static let accent = Color("AccentColor")
     static let primary = Color("AccentColor")
 }
+
+// MARK: - Navigation chrome (inline titles match the Explore “undrmnd” bar: MD Lórien headline)
+
+extension View {
+    /// Same typographic title treatment as the Explore tab’s custom principal label (`AppFont.brandWordmark`).
+    func navigationTitleBrand(_ title: String) -> some View {
+        navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(title)
+                        .font(AppFont.brandWordmark)
+                        .foregroundStyle(UndrmndPrototypeTheme.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+            }
+    }
+}
