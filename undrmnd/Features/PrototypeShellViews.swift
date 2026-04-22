@@ -23,7 +23,7 @@ private struct TerritoryMapViteGraphic: View {
                     )
                 }
 
-                // Climate Anxiety cluster
+                // Example cluster A
                 strokeLine(130, 40, 130, 90, color: UndrmndPrototypeTheme.secondary, width: 1.5)
                 strokeLine(130, 90, 130, 140, color: UndrmndPrototypeTheme.secondary, width: 1.5)
                 strokeLine(130, 140, 80, 180, color: UndrmndPrototypeTheme.primary, width: 1.5)
@@ -31,7 +31,7 @@ private struct TerritoryMapViteGraphic: View {
                 strokeLine(130, 140, 180, 180, color: UndrmndPrototypeTheme.divider, width: 1)
                 strokeLine(80, 180, 80, 210, color: UndrmndPrototypeTheme.primary, width: 1.5)
 
-                // ADHD cluster
+                // Example cluster B
                 strokeLine(200, 60, 200, 100, color: UndrmndPrototypeTheme.muted, width: 1, dash: [3, 3])
                 strokeLine(200, 100, 200, 140, color: UndrmndPrototypeTheme.muted, width: 1, dash: [3, 3])
 
@@ -69,7 +69,7 @@ private struct TerritoryMapViteGraphic: View {
                 strokeCircle(110, 265, 4, color: UndrmndPrototypeTheme.divider, width: 1, dash: [2, 2])
             }
 
-            Text("Climate Anxiety")
+            Text("Living World")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 .position(x: 130, y: 28)
@@ -79,7 +79,7 @@ private struct TerritoryMapViteGraphic: View {
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .position(x: 80, y: 228)
 
-            Text("ADHD")
+            Text("Mind & Brain")
                 .font(.system(size: 9))
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .position(x: 200, y: 48)
@@ -106,7 +106,7 @@ private struct TerritoryMapViteGraphic: View {
         }
         .frame(width: 260, height: 300)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Territory map sketch with Climate Anxiety path and ADHD path in progress")
+        .accessibilityLabel("Territory map sketch with two example topic clusters")
     }
 }
 
@@ -143,17 +143,17 @@ struct CampfirePlaceholderView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Spacer(minLength: 0)
-                    Text("Climate Science")
+                    Text("Open question")
                         .font(.system(size: 9))
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
 
-                Text("Is climate doomerism helpful?")
+                Text("What makes a good open question?")
                     .font(.title3.weight(.medium))
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("14 contributions · via Climate Anxiety path")
+                Text("Thread placeholder — no live data in this build")
                     .font(.caption2)
                     .foregroundStyle(UndrmndPrototypeTheme.muted)
 
@@ -216,7 +216,7 @@ struct ProfilePlaceholderView: View {
 struct SearchPlaceholderView: View {
     @Environment(\.dismiss) private var dismiss
 
-    private let recent = ["Climate anxiety", "ADHD", "Digital wellbeing"]
+    private let recent = ["Cosmos", "Living World", "How We Know"]
 
     var body: some View {
         NavigationStack {

@@ -10,7 +10,7 @@ private struct PublicProfileID: Identifiable, Hashable {
     var id: String { username }
 }
 
-/// v2 path experience: fetches a `PathMap` and walks card → branch → endpoint nodes.
+/// v2 path experience: fetches a `PathMap` and moves through card → branch → endpoint nodes.
 struct PathView: View {
     let slug: String
 

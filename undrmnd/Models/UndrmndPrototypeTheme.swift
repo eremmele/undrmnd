@@ -7,7 +7,7 @@ enum UndrmndPrototypeTheme {
     static let divider = Color(red: 0.914, green: 0.910, blue: 0.902)
     static let muted = Color(red: 0.769, green: 0.765, blue: 0.757)
     static let secondary = Color(red: 0.541, green: 0.537, blue: 0.529)
-    static let primary = Color(red: 0.173, green: 0.173, blue: 0.169)
-    /// Vite `INK.accent` — deep ink for filled controls.
-    static let accent = Color(red: 0.102, green: 0.102, blue: 0.098)
+    /// Single ink accent — matches `AccentColor` in Assets (#1A1A19).
+    static let accent = Color("AccentColor")
+    static let primary = Color("AccentColor")
 }

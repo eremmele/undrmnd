@@ -45,6 +45,8 @@ undrmndTests/
 2. Select a simulator or device
 3. Build and run (⌘R)
 
+For tests, build flags, and content proposals, see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md).
+
 ## Design Constraints
 
 - **Photos**: Do not use the device photo library (PhotosUI, UIImagePickerController, PHPicker). Photos must come from remote sources (APIs, URLs) or other non-local sources.
