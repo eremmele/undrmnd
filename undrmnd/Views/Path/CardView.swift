@@ -10,7 +10,10 @@ struct CardView: View {
     /// When `true`, path advances when Safari is dismissed (contribute / read as needed).
     var onRequestSafari: (URL, Bool) -> Void
     var onContinue: () -> Void
+    var onOpenTheWork: (() -> Void)?
     var onOpenContributor: ((String) -> Void)?
+
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var reflectDraft: String = ""
 
@@ -60,7 +63,23 @@ struct CardView: View {
                 primaryBlock
 
                 if showsContinue {
-                    continueButton
+                    if let openWork = onOpenTheWork {
+                        Group {
+                            if horizontalSizeClass == .regular {
+                                HStack(spacing: 12) {
+                                    openTheWorkCTA(action: openWork)
+                                    continueButton
+                                }
+                            } else {
+                                VStack(spacing: 10) {
+                                    openTheWorkCTA(action: openWork)
+                                    continueButton
+                                }
+                            }
+                        }
+                    } else {
+                        continueButton
+                    }
                 }
             }
 
@@ -155,8 +174,19 @@ struct CardView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(LargeProminentPathButtonStyle())
         .accessibilityLabel("Continue on this path")
+    }
+
+    private func openTheWorkCTA(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text("Open the work")
+                .font(AppFont.bodySemibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+        }
+        .buttonStyle(OpenTheWorkCTAButtonStyle())
+        .accessibilityLabel("Open the work, full article")
     }
 
     @ViewBuilder
@@ -176,6 +206,20 @@ struct CardView: View {
             .disabled(onOpenContributor == nil)
             .accessibilityLabel("Contributed by \(h). Double tap to open profile.")
         }
+    }
+}
+
+/// Outlined CTA: paper fill, thin ink border (pair with `LargeProminentPathButtonStyle` for primary).
+struct OpenTheWorkCTAButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(UndrmndPrototypeTheme.primary)
+            .background(UndrmndPrototypeTheme.paper)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .strokeBorder(UndrmndPrototypeTheme.primary, lineWidth: 1)
+            )
+            .opacity(configuration.isPressed ? 0.9 : 1)
     }
 }
 

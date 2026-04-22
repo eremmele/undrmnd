@@ -27,6 +27,8 @@ struct PathView: View {
     @State private var isMapOpen = false
     @State private var publicProfile: PublicProfileID?
 
+    @Environment(\.openArticleForContent) private var openArticleForContent
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let err = loadError {
@@ -144,6 +146,7 @@ struct PathView: View {
                         safariItem = IdentifiedSafari(url: url)
                     },
                     onContinue: { goNext(map: map) },
+                    onOpenTheWork: { openArticleForContent(item.id) },
                     onOpenContributor: { u in
                         publicProfile = PublicProfileID(username: u)
                     }

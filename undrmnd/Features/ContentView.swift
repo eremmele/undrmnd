@@ -4,6 +4,7 @@ enum HomeRoute: Hashable {
     case goalClarifier
     case path(String)
     case threeCard(Pillar?)
+    case articleForCard(UUID)
     case territoryMap
     case about
 }
@@ -36,6 +37,9 @@ struct RootView: View {
                     onOpenContribute: { tab = .contribute },
                     onAbout: { explorePath.append(HomeRoute.about) }
                 )
+                .environment(\.openArticleForContent) { id in
+                    explorePath.append(HomeRoute.articleForCard(id))
+                }
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .goalClarifier:
@@ -47,6 +51,8 @@ struct RootView: View {
                         PathView(slug: slug)
                     case .threeCard(let pillar):
                         ThreeCardSessionView(topicFilter: pillar)
+                    case .articleForCard(let id):
+                        ArticleView(contentId: id)
                     case .territoryMap:
                         TerritoryMapPlaceholderView { pillar in
                             explorePath.append(HomeRoute.threeCard(pillar))
@@ -263,6 +269,10 @@ private struct OpenAlertsKey: EnvironmentKey {
     static let defaultValue: () -> Void = {}
 }
 
+private struct OpenArticleForContentKey: EnvironmentKey {
+    static let defaultValue: (UUID) -> Void = { _ in }
+}
+
 extension EnvironmentValues {
     /// Present the territory map sheet (same as Explore toolbar map).
     var openTerritoryMapFromShell: () -> Void {
@@ -280,6 +290,12 @@ extension EnvironmentValues {
     var openAlertsFromShell: () -> Void {
         get { self[OpenAlertsKey.self] }
         set { self[OpenAlertsKey.self] = newValue }
+    }
+
+    /// Push the article (Open the work) for a `content_items` id on the current Explore stack.
+    var openArticleForContent: (UUID) -> Void {
+        get { self[OpenArticleForContentKey.self] }
+        set { self[OpenArticleForContentKey.self] = newValue }
     }
 }
 

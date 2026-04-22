@@ -6,6 +6,8 @@ struct ThreeCardSessionView: View {
     var topicFilter: Pillar?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.openArticleForContent) private var openArticleForContent
     @State private var items: [ContentPreview] = []
     @State private var step: Int = 0
     @State private var error: String?
@@ -57,6 +59,41 @@ struct ThreeCardSessionView: View {
         .task { await load() }
     }
 
+    @ViewBuilder
+    private func openTheWorkButton(contentId: UUID) -> some View {
+        Button {
+            openArticleForContent(contentId)
+        } label: {
+            Text("Open the work")
+                .font(AppFont.bodySemibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+        }
+        .buttonStyle(OpenTheWorkCTAButtonStyle())
+        .accessibilityLabel("Open the work, full article")
+    }
+
+    @ViewBuilder
+    private func nextOrFinishButton(preview: ContentPreview) -> some View {
+        Button {
+            if step == 2 {
+                isDone = true
+            } else {
+                let next = step + 1
+                step = next
+                detail = nil
+                Task { await loadDetail(for: items[next]) }
+            }
+        } label: {
+            Text(step == 2 ? "Finish" : "Next")
+                .font(AppFont.bodySemibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+        }
+        .buttonStyle(LargeProminentPathButtonStyle())
+        .accessibilityLabel(step == 2 ? "Finish this set" : "Next card")
+    }
+
     /// Content scrolls; primary CTA is pinned in the thumb zone above the tab bar (not inside `ScrollView`, so it doesn’t jump when body text length changes or when advancing steps).
     @ViewBuilder
     private func cardStepView(preview: ContentPreview) -> some View {
@@ -94,19 +131,20 @@ struct ThreeCardSessionView: View {
                 Rectangle()
                     .fill(UndrmndPrototypeTheme.divider)
                     .frame(height: 0.5)
-                Button {
-                    if step == 2 {
-                        isDone = true
+                let currentCardId = detail?.id ?? preview.id
+                Group {
+                    if horizontalSizeClass == .regular {
+                        HStack(spacing: 12) {
+                            openTheWorkButton(contentId: currentCardId)
+                            nextOrFinishButton(preview: preview)
+                        }
                     } else {
-                        let next = step + 1
-                        step = next
-                        detail = nil
-                        Task { await loadDetail(for: items[next]) }
+                        VStack(spacing: 10) {
+                            openTheWorkButton(contentId: currentCardId)
+                            nextOrFinishButton(preview: preview)
+                        }
                     }
-                } label: {
-                    Text(step == 2 ? "Finish" : "Next")
                 }
-                .buttonStyle(LargeProminentPathButtonStyle())
                 .padding(.horizontal, 24)
                 .padding(.top, 12)
                 .padding(.bottom, 10)
