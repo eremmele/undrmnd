@@ -57,3 +57,18 @@ undrmndTests/
 - **Models/**: Domain and data transfer objects
 - **Services/**: External integrations, APIs, and business logic
 - **Resources/**: Images, colors, strings, and other assets
+
+## v2 content model
+
+Editorial and schema for the tree/graph paths, open-question cards, and profiles live in the repo as reference material (apply SQL in Supabase yourself; the app does not run migrations):
+
+| Location | Purpose |
+|----------|---------|
+| [`v2-artifacts/undrmnd_schema_v2.sql`](v2-artifacts/undrmnd_schema_v2.sql) | Supabase migrations (tables, RPCs, RLS) |
+| [`v2-artifacts/undrmnd_content_seed_v2.sql`](v2-artifacts/undrmnd_content_seed_v2.sql) | 30 seed cards (open-question gated) |
+| [`v2-artifacts/undrmnd_content_seed_v2.csv`](v2-artifacts/undrmnd_content_seed_v2.csv) | Same titles (CSV export for review) |
+| [`v2-artifacts/undrmnd_paths_seed.sql`](v2-artifacts/undrmnd_paths_seed.sql) | Example paths / nodes / edges |
+| [`v2-artifacts/undrmnd_path_models.swift`](v2-artifacts/undrmnd_path_models.swift) | Original monolithic Swift reference (split under `undrmnd/Models/v2/`) |
+| [`docs/v2-artifacts/`](docs/v2-artifacts/) | Copy of the above for docs browsing on GitHub |
+
+**Canonical editorial rubric:** [`docs/CONTENT_RUBRIC.md`](docs/CONTENT_RUBRIC.md) (mirrors [`v2-artifacts/undrmnd_content_rubric_v2.md`](v2-artifacts/undrmnd_content_rubric_v2.md)).

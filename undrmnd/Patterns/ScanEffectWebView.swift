@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftUI
 import WebKit
 
@@ -6,6 +7,18 @@ import WebKit
 /// **Console noise:** Log lines such as slow GPU/WebContent process launch, sandbox extension, `CARenderServer`,
 /// or WebPrivacy “query parameters” come from WebKit and the OS (often amplified on Simulator). They are not
 /// actionable app defects; filter the Xcode console or verify on a physical device when diagnosing real issues.
+///
+/// Call once at launch so the same bundled file is in memory / decoded before `WKWebView` loads the intro page.
+enum ScanEffectVideoPrewarmer {
+    static func prewarmBundledVideo() {
+        guard let url = Bundle.main.url(forResource: "video", withExtension: "mp4", subdirectory: "ScanEffect") else {
+            return
+        }
+        let asset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: false])
+        asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) {}
+    }
+}
+
 struct ScanEffectWebView: UIViewRepresentable {
     @Binding var isBackgroundReady: Bool
 

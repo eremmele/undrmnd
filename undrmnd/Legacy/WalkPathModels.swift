@@ -1,5 +1,7 @@
 import Foundation
 
+// DEPRECATED — see v2-artifacts/undrmnd_content_rubric_v2.md. Use v2 `Path` / `PathMap` from `Models/v2/`.
+
 struct WalkGuide: Equatable, Hashable {
     var name: String
     var completed: String

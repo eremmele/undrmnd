@@ -1,6 +1,8 @@
 import SwiftUI
 import UIKit
 
+// DEPRECATED — see v2-artifacts/undrmnd_content_rubric_v2.md. Use `Views/Path/PathView`.
+
 /// Linear path experience ported from the web prototype’s `LA` screen (spark → nugget → branch → … → destination).
 struct WalkPathFlowView: View {
     let path: WalkPath
