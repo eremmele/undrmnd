@@ -28,6 +28,9 @@
 		E7D10012 /* InteractionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10013 /* InteractionType.swift */; };
 		E7D10014 /* ContentPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10015 /* ContentPreview.swift */; };
 		E7D10016 /* ContentItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10017 /* ContentItem.swift */; };
+		E7D10090 /* ContributeThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10091 /* ContributeThread.swift */; };
+		E7D10092 /* ContributePost.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10093 /* ContributePost.swift */; };
+		E7D10094 /* ContributeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10095 /* ContributeService.swift */; };
 		E7D10018 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10019 /* Profile.swift */; };
 		E7D1001A /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D1001B /* Path.swift */; };
 		E7D1001C /* PathNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D1001D /* PathNode.swift */; };
@@ -89,6 +92,9 @@
 		E7D10013 /* InteractionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionType.swift; sourceTree = "<group>"; };
 		E7D10015 /* ContentPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPreview.swift; sourceTree = "<group>"; };
 		E7D10017 /* ContentItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentItem.swift; sourceTree = "<group>"; };
+		E7D10091 /* ContributeThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeThread.swift; sourceTree = "<group>"; };
+		E7D10093 /* ContributePost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributePost.swift; sourceTree = "<group>"; };
+		E7D10095 /* ContributeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeService.swift; sourceTree = "<group>"; };
 		E7D10019 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		E7D1001B /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
 		E7D1001D /* PathNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathNode.swift; sourceTree = "<group>"; };
@@ -263,6 +269,8 @@
 				E7D10013 /* InteractionType.swift */,
 				E7D10015 /* ContentPreview.swift */,
 				E7D10017 /* ContentItem.swift */,
+				E7D10091 /* ContributeThread.swift */,
+				E7D10093 /* ContributePost.swift */,
 				E7D10019 /* Profile.swift */,
 				E7D1001B /* Path.swift */,
 				E7D1001D /* PathNode.swift */,
@@ -299,6 +307,7 @@
 				E7D10027 /* PathService.swift */,
 				E7D10029 /* ContentService.swift */,
 				E7D1002B /* ProfileService.swift */,
+				E7D10095 /* ContributeService.swift */,
 				E7D40011 /* PathResumeStore.swift */,
 			);
 			path = Services;
@@ -446,6 +455,8 @@
 				E7D10012 /* InteractionType.swift in Sources */,
 				E7D10014 /* ContentPreview.swift in Sources */,
 				E7D10016 /* ContentItem.swift in Sources */,
+				E7D10090 /* ContributeThread.swift in Sources */,
+				E7D10092 /* ContributePost.swift in Sources */,
 				E7D10018 /* Profile.swift in Sources */,
 				E7D1001A /* Path.swift in Sources */,
 				E7D1001C /* PathNode.swift in Sources */,
@@ -456,6 +467,7 @@
 				E7D10026 /* PathService.swift in Sources */,
 				E7D10028 /* ContentService.swift in Sources */,
 				E7D1002A /* ProfileService.swift in Sources */,
+				E7D10094 /* ContributeService.swift in Sources */,
 				E7D20010 /* SafariView.swift in Sources */,
 				E7D20012 /* CardView.swift in Sources */,
 				E7D20014 /* BranchView.swift in Sources */,
