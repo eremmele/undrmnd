@@ -78,20 +78,26 @@ struct PathView: View {
                 .ignoresSafeArea()
         }
         .sheet(isPresented: $isMapOpen) {
-            if let m = pathMap {
-                PathMapView(
-                    pathMap: m,
-                    currentId: currentId,
-                    visited: visited,
-                    onSelectNode: { id in
-                        isMapOpen = false
-                        jumpToNode(id, map: m)
-                    }
-                )
+            Group {
+                if let m = pathMap {
+                    PathMapView(
+                        pathMap: m,
+                        currentId: currentId,
+                        visited: visited,
+                        onSelectNode: { id in
+                            isMapOpen = false
+                            jumpToNode(id, map: m)
+                        }
+                    )
+                } else {
+                    Text("Map loading…")
+                }
             }
         }
         .sheet(item: $publicProfile) { p in
-            PublicProfileView(username: p.username)
+            NavigationStack {
+                PublicProfileView(username: p.username)
+            }
         }
     }
 

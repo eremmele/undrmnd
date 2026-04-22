@@ -1,18 +1,12 @@
 import SwiftUI
-import UIKit
 
-/// “What are you looking for?” screen from the web prototype (`NA`).
+/// Chooses a live path from the database or a three-card open-question set with an optional pillar bias.
 struct GoalClarifierView: View {
-    var onPickTopic: () -> Void
+    var onSelectPath: (String) -> Void
+    var onThreeCardSession: (Pillar?) -> Void
 
-    private let chips = [
-        "Understand a topic",
-        "Find a community",
-        "Contribute to a discussion",
-        "Attend an event",
-        "Save something for later",
-        "Explore freely"
-    ]
+    @State private var activePaths: [PathRecord] = []
+    @State private var loadError: String?
 
     var body: some View {
         ScrollView {
@@ -20,54 +14,87 @@ struct GoalClarifierView: View {
                 Text("What are you looking for?")
                     .font(.title2.weight(.medium))
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
-                    .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(chips, id: \.self) { chip in
+                if !activePaths.isEmpty {
+                    Text("Start with a path")
+                        .font(.subheadline.weight(.medium))
+                    ForEach(activePaths, id: \.id) { p in
                         Button {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            onPickTopic()
+                            onSelectPath(p.slug)
                         } label: {
-                            Text(chip)
-                                .font(.caption.weight(.medium))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .foregroundStyle(UndrmndPrototypeTheme.primary)
-                                .background(UndrmndPrototypeTheme.paper)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .strokeBorder(UndrmndPrototypeTheme.primary, lineWidth: 1)
-                                )
+                            VStack(alignment: .leading, spacing: 4) {
+                                if let s = p.subtitle, !s.isEmpty {
+                                    Text(s)
+                                        .font(.caption)
+                                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                                }
+                                Text(p.title)
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(12)
+                            .background(UndrmndPrototypeTheme.panel)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                            )
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(chip)
-                        .accessibilityHint("Starts a curated path on this theme")
                     }
+                } else {
+                    Text("No paths are active in the project yet. You can still use three open questions, or check back after editorial turns paths on in Supabase.")
+                        .font(.caption)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Or describe what's on your mind…")
-                        .font(.caption)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                    Text("Or: three open questions, by pillar")
+                        .font(.subheadline.weight(.medium))
+                    ForEach(Pillar.allCases) { pillar in
+                        Button {
+                            onThreeCardSession(pillar)
+                        } label: {
+                            Text("Explore \(pillar.displayName) — three cards, then stop")
+                                .font(.caption)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(10)
+                        .background(UndrmndPrototypeTheme.panel)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                        )
+                    }
+                    Button {
+                        onThreeCardSession(nil)
+                    } label: {
+                        Text("No pillar filter — three cards, then stop")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(10)
                 }
-                .padding(14)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(UndrmndPrototypeTheme.panel)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-                )
 
-                Text("Each choice leads to a curated path — a short, focused journey through ideas, not an open-ended browse.")
-                    .font(.caption)
-                    .foregroundStyle(UndrmndPrototypeTheme.muted)
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                if let loadError {
+                    Text(loadError)
+                        .font(.caption)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 28)
+            .padding(20)
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationBarTitleDisplayMode(.inline)
+        .task { await load() }
+    }
+
+    private func load() async {
+        do {
+            activePaths = try await PathService.fetchActivePaths()
+        } catch {
+            loadError = "Couldn’t list paths. \(error.localizedDescription)"
+        }
     }
 }

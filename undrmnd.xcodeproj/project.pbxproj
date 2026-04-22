@@ -45,6 +45,11 @@
 		E7D20018 /* PathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D20019 /* PathView.swift */; };
 		E7D2001A /* PathMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D2001B /* PathMapView.swift */; };
 		E7D2001C /* PublicProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D2001D /* PublicProfileView.swift */; };
+		E7D30001 /* ThreeCardSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D30002 /* ThreeCardSessionView.swift */; };
+		E7D30003 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D30004 /* SignInView.swift */; };
+		E7D30005 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D30006 /* ProfileEditView.swift */; };
+		E7D30007 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D30008 /* ProfileView.swift */; };
+		E7D30009 /* ContentDetailReadOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D3000A /* ContentDetailReadOnlyView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +102,11 @@
 		E7D20019 /* PathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathView.swift; sourceTree = "<group>"; };
 		E7D2001B /* PathMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMapView.swift; sourceTree = "<group>"; };
 		E7D2001D /* PublicProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicProfileView.swift; sourceTree = "<group>"; };
+		E7D30002 /* ThreeCardSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeCardSessionView.swift; sourceTree = "<group>"; };
+		E7D30004 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		E7D30006 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
+		E7D30008 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		E7D3000A /* ContentDetailReadOnlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentDetailReadOnlyView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +186,7 @@
 			children = (
 				A1000004245A1B0000000002 /* ContentView.swift */,
 				E7B8SCAN03 /* IntroInterstitialView.swift */,
+				E7D30002 /* ThreeCardSessionView.swift */,
 				E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */,
 				E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */,
 			);
@@ -218,6 +229,10 @@
 			isa = PBXGroup;
 			children = (
 				E7D2001D /* PublicProfileView.swift */,
+				E7D30004 /* SignInView.swift */,
+				E7D30006 /* ProfileEditView.swift */,
+				E7D30008 /* ProfileView.swift */,
+				E7D3000A /* ContentDetailReadOnlyView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -425,6 +440,11 @@
 				E7D20018 /* PathView.swift in Sources */,
 				E7D2001A /* PathMapView.swift in Sources */,
 				E7D2001C /* PublicProfileView.swift in Sources */,
+				E7D30001 /* ThreeCardSessionView.swift in Sources */,
+				E7D30003 /* SignInView.swift in Sources */,
+				E7D30005 /* ProfileEditView.swift in Sources */,
+				E7D30007 /* ProfileView.swift in Sources */,
+				E7D30009 /* ContentDetailReadOnlyView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,6 +28,18 @@ enum PathService {
         return map
     }
 
+    static func fetchActivePaths(
+        client: SupabaseClient = SupabaseService.shared.client
+    ) async throws -> [PathRecord] {
+        let res: PostgrestResponse<[PathRecord]> = try await client
+            .from("paths")
+            .select()
+            .eq("is_active", value: true)
+            .order("title", ascending: true)
+            .execute()
+        return res.value
+    }
+
     /// Featured paths for the home screen (newest first, capped in UI if needed).
     static func fetchFeaturedPaths(limit: Int = 10, client: SupabaseClient = SupabaseService.shared.client) async throws
         -> [PathRecord] {

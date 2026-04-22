@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Pillars
 
-enum Pillar: String, Codable, CaseIterable, Identifiable, Hashable {
+enum Pillar: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case cosmos = "cosmos"
     case livingWorld = "living_world"
     case mindAndBrain = "mind_and_brain"

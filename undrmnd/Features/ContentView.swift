@@ -2,13 +2,9 @@ import SwiftUI
 
 enum HomeRoute: Hashable {
     case goalClarifier
-    case walk(WalkPath)
+    case path(String)
+    case threeCard(Pillar?)
     case territoryMap
-}
-
-private struct ClosingSheetPayload: Identifiable {
-    let id = UUID()
-    let path: WalkPath
 }
 
 struct RootView: View {
@@ -22,35 +18,28 @@ struct RootView: View {
     @State private var tab: MainTab = .home
     @State private var homePath = NavigationPath()
     @State private var showSearch = false
-    @State private var closingSheet: ClosingSheetPayload?
 
     var body: some View {
         TabView(selection: $tab) {
             NavigationStack(path: $homePath) {
                 PrototypeEntryView(
                     onSearch: { showSearch = true },
-                    onProfile: { tab = .profile },
                     onGoalClarifier: { homePath.append(HomeRoute.goalClarifier) },
-                    onFirstWalk: { homePath.append(HomeRoute.walk(.firstWalk)) },
-                    onResume: { homePath.append(HomeRoute.walk(SavedPathProgress.demoResume.path)) },
+                    onPathSlug: { slug in homePath.append(HomeRoute.path(slug)) },
+                    onThreeCard: { p in homePath.append(HomeRoute.threeCard(p)) },
                     onTerritoryMap: { homePath.append(HomeRoute.territoryMap) }
                 )
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .goalClarifier:
-                        GoalClarifierView {
-                            homePath.append(HomeRoute.walk(.climateAnxiety))
-                        }
-                    case .walk(let path):
-                        WalkPathFlowView(
-                            path: path,
-                            onDestinationAction: { action, _ in
-                                handleDestination(action)
-                            },
-                            onClosing: { walk in
-                                closingSheet = ClosingSheetPayload(path: walk)
-                            }
+                        GoalClarifierView(
+                            onSelectPath: { slug in homePath.append(HomeRoute.path(slug)) },
+                            onThreeCardSession: { p in homePath.append(HomeRoute.threeCard(p)) }
                         )
+                    case .path(let slug):
+                        PathView(slug: slug)
+                    case .threeCard(let pillar):
+                        ThreeCardSessionView(topicFilter: pillar)
                     case .territoryMap:
                         TerritoryMapPlaceholderView()
                     }
@@ -78,7 +67,7 @@ struct RootView: View {
             .tag(MainTab.nearby)
 
             NavigationStack {
-                ProfilePlaceholderView()
+                ProfileView()
             }
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")
@@ -89,41 +78,18 @@ struct RootView: View {
         .sheet(isPresented: $showSearch) {
             SearchPlaceholderView()
         }
-        .sheet(item: $closingSheet) { payload in
-            ClosingSessionSheet(path: payload.path) {
-                closingSheet = nil
-            }
-            .presentationDetents([.medium, .large])
-        }
-    }
-
-    private func handleDestination(_ action: String) {
-        switch action {
-        case "campfire":
-            tab = .campfire
-        case "nearby", "event":
-            tab = .nearby
-        case "territory":
-            tab = .home
-            homePath.append(HomeRoute.territoryMap)
-        case "entry":
-            tab = .home
-            homePath = NavigationPath()
-        default:
-            break
-        }
     }
 }
 
-// MARK: - Entry (`UA` in the web bundle)
-
 struct PrototypeEntryView: View {
     var onSearch: () -> Void
-    var onProfile: () -> Void
     var onGoalClarifier: () -> Void
-    var onFirstWalk: () -> Void
-    var onResume: () -> Void
+    var onPathSlug: (String) -> Void
+    var onThreeCard: (Pillar?) -> Void
     var onTerritoryMap: () -> Void
+
+    @State private var featured: [PathRecord] = []
+    @State private var loadError: String?
 
     private var greeting: String {
         let h = Calendar.current.component(.hour, from: Date())
@@ -146,17 +112,41 @@ struct PrototypeEntryView: View {
 
                 entryCard(
                     title: "I have a goal",
-                    subtitle: "Find a community, understand an issue, contribute to a thread",
+                    subtitle: "Find a community, understand an issue, or pick a path that’s already live",
                     action: onGoalClarifier
                 )
 
                 entryCard(
-                    title: "Help me begin",
-                    subtitle: "I'm not sure where to start — take me on a guided walk",
-                    action: onFirstWalk
+                    title: "Your first exploration",
+                    subtitle: "A short, gentle path to try (when `first-exploration` is live in the project)",
+                    action: { onPathSlug("first-exploration") }
                 )
 
-                resumeCard
+                threeCardCTA
+
+                if !featured.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Featured paths")
+                            .font(.subheadline.weight(.semibold))
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(alignment: .top, spacing: 12) {
+                                ForEach(featured) { p in
+                                    featuredTile(p)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Text("Paths coming soon")
+                        .font(.caption)
+                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                }
+
+                if let loadError {
+                    Text(loadError)
+                        .font(.caption2)
+                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                }
 
                 Button(action: onTerritoryMap) {
                     HStack(spacing: 6) {
@@ -176,6 +166,7 @@ struct PrototypeEntryView: View {
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationBarTitleDisplayMode(.inline)
+        .task { await loadFeatured() }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("undrmnd")
@@ -185,23 +176,64 @@ struct PrototypeEntryView: View {
                     .tracking(0.08)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 14) {
-                    Button(action: onSearch) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.subheadline)
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    }
-                    .accessibilityLabel("Search")
-
-                    Button(action: onProfile) {
-                        Image(systemName: "person.circle")
-                            .font(.subheadline)
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    }
-                    .accessibilityLabel("Profile")
+                Button(action: onSearch) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.subheadline)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 }
+                .accessibilityLabel("Search")
             }
         }
+    }
+
+    private var threeCardCTA: some View {
+        Button {
+            onThreeCard(nil)
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Three open questions, then a full stop")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                Text("A short, finite set — no “one more” here.")
+                    .font(.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .background(UndrmndPrototypeTheme.panel)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func featuredTile(_ p: PathRecord) -> some View {
+        Button {
+            onPathSlug(p.slug)
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                if let s = p.subtitle, !s.isEmpty {
+                    Text(s)
+                        .font(.caption2)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .lineLimit(2)
+                }
+                Text(p.title)
+                    .font(.subheadline.weight(.medium))
+                    .multilineTextAlignment(.leading)
+            }
+            .frame(width: 200, alignment: .leading)
+            .padding(12)
+            .background(UndrmndPrototypeTheme.panel)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private func entryCard(title: String, subtitle: String, action: @escaping () -> Void) -> some View {
@@ -226,39 +258,12 @@ struct PrototypeEntryView: View {
         .buttonStyle(.plain)
     }
 
-    private var resumeCard: some View {
-        let p = SavedPathProgress.demoResume
-        return Button(action: onResume) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Resume my path")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
-                Text("\(p.title) — \(p.completedNodes) of \(p.totalNodes) nodes")
-                    .font(.caption)
-                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
-
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(UndrmndPrototypeTheme.divider)
-                        Rectangle()
-                            .fill(UndrmndPrototypeTheme.primary)
-                            .frame(width: geo.size.width * CGFloat(p.completedNodes) / CGFloat(max(p.totalNodes, 1)))
-                    }
-                }
-                .frame(height: 3)
-                .accessibilityLabel("Path progress \(p.completedNodes) of \(p.totalNodes)")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
-            .background(UndrmndPrototypeTheme.panel)
-            .overlay(
-                RoundedRectangle(cornerRadius: 4)
-                    .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-            )
+    private func loadFeatured() async {
+        do {
+            featured = try await PathService.fetchFeaturedPaths(limit: 10)
+        } catch {
+            loadError = error.localizedDescription
         }
-        .buttonStyle(.plain)
-        .accessibilityHint("Continues your in-progress path")
     }
 }
 

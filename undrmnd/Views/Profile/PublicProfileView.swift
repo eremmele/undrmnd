@@ -1,20 +1,90 @@
 import SwiftUI
 
-/// Read-only profile from a `contributed by @handle` line. Full layout in ProfileView pass.
 struct PublicProfileView: View {
     let username: String
+    @State private var profile: Profile?
+    @State private var cards: [ContentListRow] = []
+    @State private var pathNodes: [PathNodeRow] = []
+    @State private var pathTitles: [UUID: String] = [:]
+    @State private var error: String?
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                Text("@\(username)")
-                    .font(.title2)
-                    .padding()
-                Spacer()
+        Group {
+            if let p = profile {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(p.displayName ?? p.username)
+                                .font(.title2)
+                            Text("@\(p.username)")
+                                .font(.subheadline)
+                                .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        }
+                        if let b = p.bio, !b.isEmpty { Text(b).font(.body) }
+                        if !p.pillarsFollowing.isEmpty {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Following")
+                                    .font(.caption)
+                                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                                ForEach(p.pillarsFollowing.map(\.displayName), id: \.self) { t in
+                                    Text(t)
+                                        .font(.caption)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(UndrmndPrototypeTheme.panel)
+                                }
+                            }
+                        }
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Contributions")
+                                .font(.headline)
+                            ForEach(cards) { c in
+                                NavigationLink {
+                                    ContentDetailReadOnlyView(contentId: c.id)
+                                } label: {
+                                    Text(c.title)
+                                        .font(.subheadline)
+                                }
+                            }
+                        }
+                        if !pathNodes.isEmpty {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("On paths")
+                                    .font(.headline)
+                                ForEach(pathNodes) { n in
+                                    let title = pathTitles[n.pathId] ?? "Path"
+                                    Text("\(title) — \(n.branchPrompt ?? "node")")
+                                        .font(.caption)
+                                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                }
+            } else if let error {
+                Text(error).padding()
+            } else {
+                ProgressView()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(UndrmndPrototypeTheme.paper)
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .task { await load() }
+    }
+
+    private func load() async {
+        do {
+            profile = try await ProfileService.fetchProfile(username: username)
+            if let p = profile {
+                cards = try await ProfileService.fetchContributedCards(username: p.username)
+                pathNodes = try await ProfileService.fetchAuthoredPathNodes(username: p.username)
+                pathTitles = try await ProfileService.pathTitles(for: pathNodes.map(\.pathId))
+            }
+        } catch {
+            self.error = "Profile not found or unavailable."
         }
     }
 }
