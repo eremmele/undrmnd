@@ -38,6 +38,13 @@
 		E7D10026 /* PathService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10027 /* PathService.swift */; };
 		E7D10028 /* ContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10029 /* ContentService.swift */; };
 		E7D1002A /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D1002B /* ProfileService.swift */; };
+		E7D20010 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D20011 /* SafariView.swift */; };
+		E7D20012 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D20013 /* CardView.swift */; };
+		E7D20014 /* BranchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D20015 /* BranchView.swift */; };
+		E7D20016 /* EndpointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D20017 /* EndpointView.swift */; };
+		E7D20018 /* PathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D20019 /* PathView.swift */; };
+		E7D2001A /* PathMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D2001B /* PathMapView.swift */; };
+		E7D2001C /* PublicProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D2001D /* PublicProfileView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +90,13 @@
 		E7D10027 /* PathService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathService.swift; sourceTree = "<group>"; };
 		E7D10029 /* ContentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentService.swift; sourceTree = "<group>"; };
 		E7D1002B /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
+		E7D20011 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
+		E7D20013 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		E7D20015 /* BranchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BranchView.swift; sourceTree = "<group>"; };
+		E7D20017 /* EndpointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointView.swift; sourceTree = "<group>"; };
+		E7D20019 /* PathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathView.swift; sourceTree = "<group>"; };
+		E7D2001B /* PathMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMapView.swift; sourceTree = "<group>"; };
+		E7D2001D /* PublicProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicProfileView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +135,7 @@
 				A1000011245A1B000000000D /* App */,
 				A1000012245A1B000000000E /* Features */,
 				E7LEG0001 /* Legacy */,
+				E7D2000F /* Views */,
 				A1000013245A1B000000000F /* Patterns */,
 				A1000014245A1B0000000010 /* Models */,
 				A1000015245A1B0000000011 /* Services */,
@@ -175,6 +190,36 @@
 				E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */,
 			);
 			path = Legacy;
+			sourceTree = "<group>";
+		};
+		E7D2000F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E7D2000E /* Path */,
+				E7D2000D /* Profile */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E7D2000E /* Path */ = {
+			isa = PBXGroup;
+			children = (
+				E7D20011 /* SafariView.swift */,
+				E7D20013 /* CardView.swift */,
+				E7D20015 /* BranchView.swift */,
+				E7D20017 /* EndpointView.swift */,
+				E7D20019 /* PathView.swift */,
+				E7D2001B /* PathMapView.swift */,
+			);
+			path = Path;
+			sourceTree = "<group>";
+		};
+		E7D2000D /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				E7D2001D /* PublicProfileView.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		E7V2GRP00 /* v2 */ = {
@@ -373,6 +418,13 @@
 				E7D10026 /* PathService.swift in Sources */,
 				E7D10028 /* ContentService.swift in Sources */,
 				E7D1002A /* ProfileService.swift in Sources */,
+				E7D20010 /* SafariView.swift in Sources */,
+				E7D20012 /* CardView.swift in Sources */,
+				E7D20014 /* BranchView.swift in Sources */,
+				E7D20016 /* EndpointView.swift in Sources */,
+				E7D20018 /* PathView.swift in Sources */,
+				E7D2001A /* PathMapView.swift in Sources */,
+				E7D2001C /* PublicProfileView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
