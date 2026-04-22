@@ -59,11 +59,10 @@ struct IntroInterstitialView: View {
             VStack {
                 Spacer(minLength: 0)
                     .allowsHitTesting(false)
-                // Compact, glassy control — not full-bleed; white label on a soft blurred pill.
+                // Compact glassy control, not full-bleed; white label on a soft blurred pill.
                 Button(action: onContinue) {
                     Text("Continue")
-                        .font(.system(.subheadline, design: .default).weight(.semibold))
-                        .foregroundStyle(.white)
+                        .undrmndShellCtaTextStyleOnDark()
                         .padding(.horizontal, 22)
                         .padding(.vertical, 9)
                         .background {

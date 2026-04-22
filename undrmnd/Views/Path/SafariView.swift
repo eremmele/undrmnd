@@ -1,7 +1,7 @@
 import SafariServices
 import SwiftUI
 
-/// In-app browser for `source_url` / `action_url` handoff; no data leaves the device through custom trackers.
+/// In-app browser for `source_url` / `action_url` handoff. No custom tracking layer in the app on top of Safari.
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
 

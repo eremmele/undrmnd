@@ -44,7 +44,7 @@ enum AppFont {
     static var branchPrompt: Font { .custom(PostScript.semibold, size: 20, relativeTo: .title3) }
     static var largeIntroTitle: Font { .custom(PostScript.semibold, size: 34, relativeTo: .largeTitle) }
 
-    /// Nav bar wordmark — same size/weight as `navigationTitle` on other tabs (headline metrics + MD Lórien).
+    /// Nav bar wordmark, same size/weight as `navigationTitle` on other tabs (headline metrics + MD Lórien).
     static var brandWordmark: Font { headline }
 
     /// Map / closing-sheet micro labels: scales with Dynamic Type

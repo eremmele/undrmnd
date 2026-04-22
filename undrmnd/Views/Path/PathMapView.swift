@@ -106,8 +106,7 @@ struct PathMapView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: { dismiss() }) {
                         Text("Done")
-                            .font(.system(.body))
-                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            .undrmndShellCtaTextStyle()
                     }
                 }
             }

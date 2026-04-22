@@ -195,8 +195,7 @@ struct TerritoryMapPlaceholderView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: onMapDismiss) {
                         Text("Done")
-                            .font(.system(.body))
-                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            .undrmndShellCtaTextStyle()
                     }
                 }
             }
@@ -215,13 +214,9 @@ private struct PublicEventRow: Identifiable {
 }
 
 struct NearbyEventsView: View {
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
-
     private let events: [PublicEventRow] = [
         PublicEventRow(
-            title: "Astronomy on Tap — public talks at a local pub",
+            title: "Astronomy on Tap: public talks at a local pub",
             whenWhere: "Next Tuesday · 7:00 PM · River District",
             source: "Meetup",
             url: URL(string: "https://www.meetup.com/find/?source=EVENTS&location=astronomy")!
@@ -233,13 +228,13 @@ struct NearbyEventsView: View {
             url: URL(string: "https://www.eventbrite.com/d/online/nature/")!
         ),
         PublicEventRow(
-            title: "Civic data night — map the noise with open tools",
+            title: "Civic data night: map the noise with open tools",
             whenWhere: "First Thursday · 6:30 PM · Public library",
             source: "Meetup",
             url: URL(string: "https://www.meetup.com/find/?source=EVENTS&location=civic%20data")!
         ),
         PublicEventRow(
-            title: "“Ask a scientist” — middle school Q&A (volunteer hosts)",
+            title: "“Ask a scientist”: middle school Q&A (volunteer hosts)",
             whenWhere: "Virtual · RSVP for link",
             source: "Eventbrite",
             url: URL(string: "https://www.eventbrite.com/d/online/science/")!
@@ -287,14 +282,11 @@ struct NearbyEventsView: View {
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitleBrand("Nearby")
-        .toolbar {
-            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
-        }
     }
 
     private func sourceListColor(_ source: String) -> Color {
         if source == "Meetup" {
-            return UndrmndPrototypeTheme.secondary.opacity(0.92)
+            return UndrmndPrototypeTheme.secondary
         }
         return UndrmndPrototypeTheme.muted
     }
@@ -310,7 +302,7 @@ struct ProfilePlaceholderView: View {
                     .font(AppFont.title2)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
 
-                Text("Minimal account details only — aligned with the project’s privacy rules.")
+                Text("Minimal account details only, in line with the project’s privacy rules.")
                     .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
             }
@@ -392,12 +384,12 @@ struct SearchPlaceholderView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: { dismiss() }) {
                         Text("Done")
-                            .font(.system(.body))
-                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            .undrmndShellCtaTextStyle()
                     }
                 }
             }
         }
+        .appShellNavigationToolbar()
     }
 }
 
@@ -473,7 +465,7 @@ struct ClosingSessionSheet: View {
                     Text("What will you remember from today?")
                         .font(AppFont.caption)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    TextField("Optional — for you, not for us", text: $reflection, axis: .vertical)
+                    TextField("Optional. For you, not for us", text: $reflection, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(3...6)
                         .font(AppFont.caption)
@@ -516,7 +508,7 @@ struct ClosingSessionSheet: View {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.circle")
                             .font(AppFont.caption)
-                        Text("Noted for your own reference — no automatic reminders from the app.")
+                        Text("Noted for your own reference. The app will not nudge you with reminders.")
                             .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                             .fixedSize(horizontal: false, vertical: true)

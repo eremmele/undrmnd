@@ -1,6 +1,6 @@
 import Foundation
 
-// MARK: - PathMap — decoded response from the `get_path(slug)` RPC
+// MARK: - PathMap (decoded from `get_path(slug)` RPC)
 
 struct PathMap: Codable {
     let path: PathRecord?

@@ -18,7 +18,7 @@ struct ContentPreview: Codable, Identifiable, Hashable {
         case actionUrl = "action_url"
     }
 
-    /// Explicit memberwise init — required because `init(from: ContentItem)` suppresses the synthesized one.
+    /// Explicit memberwise init, required because `init(from: ContentItem)` suppresses the synthesized one.
     init(
         id: UUID,
         title: String,
@@ -53,7 +53,7 @@ struct ContentPreview: Codable, Identifiable, Hashable {
 
     /// Offline / empty-catalog fallback so three-card sessions still work when the RPC returns no active rows.
     static let sessionFallback: [ContentPreview] = {
-        // Placeholder UUIDs — detail fetches will fail silently; card copy still works from preview fields.
+        // Placeholder UUIDs. Detail fetches will fail silently; card copy still works from preview fields.
         let a = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         let b = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
         let c = UUID(uuidString: "00000000-0000-0000-0000-000000000003")!
@@ -81,7 +81,7 @@ struct ContentPreview: Codable, Identifiable, Hashable {
             ContentPreview(
                 id: c,
                 title: "Why is the replication crisis not a scandal?",
-                hook: "Somewhere between 36% and 65% of published psychology findings don’t replicate. That’s not a failure — it’s the system working.",
+                hook: "Somewhere between 36% and 65% of published psychology findings don’t replicate. That’s not a failure. It’s the system working.",
                 interactionType: .reflect,
                 sourceUrl: nil,
                 actionUrl: nil,

@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct UndrmndApp: App {
-    /// Shown on each new process launch until Continue. (Persists only for this run — not UserDefaults — so you always see the splash after a full quit and relaunch.)
+    /// Shown on each new process launch until Continue. (In-memory for this run only, not UserDefaults, so a full quit and relaunch shows the splash again.)
     @State private var showIntroSplash = true
 
     init() {

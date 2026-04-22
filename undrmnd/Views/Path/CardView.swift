@@ -43,7 +43,7 @@ struct CardView: View {
             }
 
             if item.interactionType == .reflect {
-                TextField("Optional: one line, stays on this device", text: $reflectDraft, axis: .vertical)
+                TextField("Optional: one line, private in this app", text: $reflectDraft, axis: .vertical)
                     .lineLimit(1...3)
                     .textFieldStyle(.plain)
                     .padding(10)
@@ -53,7 +53,7 @@ struct CardView: View {
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
                     )
                     .font(AppFont.subheadline)
-                    .accessibilityLabel("Private reflection, not sent to the server")
+                    .accessibilityLabel("Private reflection, not shared")
             }
 
             VStack(alignment: .leading, spacing: 10) {
@@ -151,18 +151,11 @@ struct CardView: View {
     private var continueButton: some View {
         Button(action: onContinue) {
             Text("Continue")
-                .font(.system(.body, design: .default))
-                .fontWeight(.semibold)
+                .undrmndShellCtaTextStyle()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(UndrmndPrototypeTheme.divider.opacity(0.45), lineWidth: 1)
-                )
         }
         .buttonStyle(.plain)
-        .foregroundStyle(UndrmndPrototypeTheme.accent)
         .accessibilityLabel("Continue on this path")
     }
 

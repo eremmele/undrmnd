@@ -1,6 +1,6 @@
 import Foundation
 
-// MARK: - PathMapLayout — Canvas-style map layout
+// MARK: - PathMapLayout (Canvas-style map layout)
 
 struct PathMapLayout {
     struct Position: Hashable {

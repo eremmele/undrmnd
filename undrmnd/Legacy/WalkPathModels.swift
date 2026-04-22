@@ -1,6 +1,6 @@
 import Foundation
 
-// DEPRECATED — see v2-artifacts/undrmnd_content_rubric_v2.md. Use v2 `Path` / `PathMap` from `Models/v2/`.
+// DEPRECATED: see v2-artifacts/undrmnd_content_rubric_v2.md. Use v2 `Path` / `PathMap` from `Models/v2/`.
 
 struct WalkGuide: Equatable, Hashable {
     var name: String
@@ -71,7 +71,7 @@ struct WalkPath: Identifiable, Equatable, Hashable {
             .spark(
                 id: "spark-1",
                 title: "75% of young people report feeling anxious about climate change",
-                content: "But anxiety isn't the whole story — understanding what drives it can change how you respond.",
+                content: "But anxiety isn't the whole story. Understanding what drives it can change how you respond.",
                 footprints: 47,
                 handoff: WalkHandoff(
                     user: "jm_rivers",
@@ -87,7 +87,7 @@ struct WalkPath: Identifiable, Equatable, Hashable {
             .branch(
                 id: "branch-1",
                 title: "Where do you want to go next?",
-                compassRose: "Before you choose — what do you think is the bigger driver of climate anxiety: the science itself, or the feeling of powerlessness?",
+                compassRose: "Before you choose: what do you think is the bigger driver of climate anxiety, the science itself, or the feeling of powerlessness?",
                 branches: [
                     WalkBranchOption(id: "science", label: "The science behind it", preview: "Tipping points, IPCC findings"),
                     WalkBranchOption(id: "community", label: "What communities are doing", preview: "Local groups, collective action"),
@@ -97,7 +97,7 @@ struct WalkPath: Identifiable, Equatable, Hashable {
             .nugget(
                 id: "nugget-2",
                 title: "Tipping points, explained",
-                content: "Climate tipping points are thresholds where small changes cause large, often irreversible shifts — ice sheet collapse, permafrost thaw, Amazon dieback. Several systems are approaching these thresholds simultaneously.",
+                content: "Climate tipping points are thresholds where small changes cause large, often irreversible shifts: ice sheet collapse, permafrost thaw, Amazon dieback. Several systems are approaching these thresholds simultaneously.",
                 source: "Nature Climate Change"
             ),
             .nugget(
@@ -140,17 +140,17 @@ struct WalkPath: Identifiable, Equatable, Hashable {
             .spark(
                 id: "fw-spark",
                 title: "It's okay not to know where to begin",
-                content: "This is a short walk — just 4 stops. Think of it as practice. You can't get lost here.",
+                content: "This is a short walk, just 4 stops. Think of it as practice. You can't get lost here.",
                 footprints: 312,
                 handoff: WalkHandoff(
                     user: "amara_k",
-                    text: "I was nervous to start too. Just keep going — it gets easier."
+                    text: "I was nervous to start too. Just keep going. It gets easier."
                 )
             ),
             .nugget(
                 id: "fw-nugget-1",
                 title: "How your phone is designed to keep you scrolling",
-                content: "Social media platforms use positive intermittent reinforcement — the same mechanic as slot machines. You never know when the next reward is coming, so you keep pulling.",
+                content: "Social media platforms use positive intermittent reinforcement, the same mechanic as slot machines. You never know when the next reward is coming, so you keep pulling.",
                 source: "Center for Humane Technology"
             ),
             .branch(
@@ -204,13 +204,13 @@ extension WalkPath {
         if id == WalkPath.climateAnxiety.id {
             return "Every fraction of a degree matters for reducing risks to people and ecosystems."
         }
-        return "You followed a trail with a beginning and an end — that shape matters."
+        return "You followed a trail with a beginning and an end. That shape matters."
     }
 
     var closingTerritoryBlurb: String {
         if id == WalkPath.climateAnxiety.id {
             return "You've explored 1 path across 1 topic. Your territory now includes climate anxiety and eco-psychology."
         }
-        return "You've completed a guided walk. Your map will grow as you finish more paths — always finite, never an endless feed."
+        return "You've completed a guided walk. Your map will grow as you finish more paths. Always finite, never an endless feed."
     }
 }

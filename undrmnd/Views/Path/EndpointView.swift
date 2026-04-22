@@ -11,9 +11,12 @@ struct EndpointView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .fixedSize(horizontal: false, vertical: true)
-            Button("Done", action: onDone)
-                .buttonStyle(LargeProminentPathButtonStyle())
-                .accessibilityLabel("Done with this path")
+            Button(action: onDone) {
+                Text("Done")
+                    .undrmndShellCtaTextStyle()
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Done with this path")
         }
         .frame(maxWidth: .infinity)
     }

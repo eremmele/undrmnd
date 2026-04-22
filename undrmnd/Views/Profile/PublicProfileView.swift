@@ -53,7 +53,7 @@ struct PublicProfileView: View {
                                     .font(AppFont.headline)
                                 ForEach(pathNodes) { n in
                                     let title = pathTitles[n.pathId] ?? "Path"
-                                    Text("\(title) — \(n.branchPrompt ?? "node")")
+                                    Text("\(title) · \(n.branchPrompt ?? "node")")
                                         .font(AppFont.caption)
                                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                                 }

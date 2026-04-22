@@ -28,13 +28,11 @@ struct RootView: View {
         TabView(selection: $tab) {
             NavigationStack(path: $explorePath) {
                 PrototypeEntryView(
-                    onSearch: { showSearch = true },
-                    onOpenMap: { showExploreMap = true },
-                    onOpenAlerts: { showAlerts = true },
                     onGoalClarifier: { explorePath.append(HomeRoute.goalClarifier) },
                     onPathSlug: { slug in explorePath.append(HomeRoute.path(slug)) },
                     onThreeCard: { p in explorePath.append(HomeRoute.threeCard(p)) },
                     onTerritoryMap: { explorePath.append(HomeRoute.territoryMap) },
+                    onOpenMap: { showExploreMap = true },
                     onOpenContribute: { tab = .contribute },
                     onAbout: { explorePath.append(HomeRoute.about) }
                 )
@@ -58,6 +56,7 @@ struct RootView: View {
                     }
                 }
             }
+            .appShellNavigationToolbar()
             .tabItem {
                 Label("Explore", systemImage: "sparkles")
             }
@@ -66,6 +65,7 @@ struct RootView: View {
             NavigationStack {
                 ContributeView()
             }
+            .appShellNavigationToolbar()
             .tabItem {
                 Label("Contribute", systemImage: "bubble.left.and.bubble.right")
             }
@@ -74,6 +74,7 @@ struct RootView: View {
             NavigationStack {
                 NearbyEventsView()
             }
+            .appShellNavigationToolbar()
             .tabItem {
                 Label("Nearby", systemImage: "mappin.and.ellipse")
             }
@@ -82,6 +83,7 @@ struct RootView: View {
             NavigationStack {
                 ProfileView()
             }
+            .appShellNavigationToolbar()
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")
             }
@@ -98,6 +100,7 @@ struct RootView: View {
                 tab = .explore
                 explorePath.append(route)
             }
+            .environmentObject(alertsStore)
         }
         .sheet(isPresented: $showExploreMap) {
             NavigationStack {
@@ -110,6 +113,8 @@ struct RootView: View {
                     onMapDismiss: { showExploreMap = false }
                 )
             }
+            .appShellNavigationToolbar()
+            .environmentObject(alertsStore)
         }
         .sheet(isPresented: $showAlerts) {
             AlertsPanelView()
@@ -119,15 +124,11 @@ struct RootView: View {
 }
 
 struct PrototypeEntryView: View {
-    @EnvironmentObject private var alertsStore: AlertsStore
-
-    var onSearch: () -> Void
-    var onOpenMap: () -> Void
-    var onOpenAlerts: () -> Void
     var onGoalClarifier: () -> Void
     var onPathSlug: (String) -> Void
     var onThreeCard: (Pillar?) -> Void
     var onTerritoryMap: () -> Void
+    var onOpenMap: () -> Void
     var onOpenContribute: () -> Void
     var onAbout: () -> Void
 
@@ -172,8 +173,8 @@ struct PrototypeEntryView: View {
                     )
 
                     entryCard(
-                        title: "Why undrmnd",
-                        subtitle: "Short about cards: what this is, what it’s not, and how your attention is treated.",
+                        title: "What is undrmnd?",
+                        subtitle: "A little context before you explore.",
                         action: onAbout
                     )
                 }
@@ -189,38 +190,6 @@ struct PrototypeEntryView: View {
                 Text("undrmnd")
                     .font(AppFont.brandWordmark)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
-            }
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                HStack(spacing: 8) {
-                    ToolbarPillButton(
-                        systemName: "magnifyingglass",
-                        accessibilityLabel: "Search",
-                        action: onSearch
-                    )
-                    ToolbarPillButton(
-                        systemName: "map",
-                        accessibilityLabel: "Open your topic map",
-                        action: onOpenMap
-                    )
-                    if alertsStore.unreadCount > 0 {
-                        Button(action: onOpenAlerts) {
-                            Image(systemName: "bell")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                                .frame(width: 40, height: 40)
-                                .background { ToolbarPillBackground() }
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Open alerts, \(alertsStore.unreadCount) unread")
-                        .badge(alertsStore.unreadCount)
-                    } else {
-                        ToolbarPillButton(
-                            systemName: "bell",
-                            accessibilityLabel: "Open alerts",
-                            action: onOpenAlerts
-                        )
-                    }
-                }
             }
         }
     }
@@ -307,37 +276,60 @@ extension EnvironmentValues {
         set { self[OpenTopicSearchKey.self] = newValue }
     }
 
-    /// Present the in-app **alerts** panel (on-device copy only; not remote push).
+    /// Present the in-app **alerts** panel (local content, not remote push).
     var openAlertsFromShell: () -> Void {
         get { self[OpenAlertsKey.self] }
         set { self[OpenAlertsKey.self] = newValue }
     }
 }
 
-enum ExploreShellToolbar {
-    @ToolbarContentBuilder
-    static func items(
-        openMap: @escaping () -> Void,
-        openSearch: @escaping () -> Void,
-        openAlerts: @escaping () -> Void = {}
-    ) -> some ToolbarContent {
-        ToolbarItemGroup(placement: .topBarTrailing) {
-            HStack(spacing: 8) {
-                ToolbarPillButton(
-                    systemName: "magnifyingglass",
-                    accessibilityLabel: "Search topics and paths",
-                    action: openSearch
-                )
-                ToolbarPillButton(
-                    systemName: "map",
-                    accessibilityLabel: "Open your topic map",
-                    action: openMap
-                )
+/// Search + map + alerts dock. Applied **once** on each `NavigationStack` root (see `appShellNavigationToolbar()`), not on every pushed screen, so the chrome does not re-mount and flicker.
+struct AppShellToolbarTrailing: View {
+    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
+    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
+    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+    @EnvironmentObject private var alerts: AlertsStore
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ToolbarPillButton(
+                systemName: "magnifyingglass",
+                accessibilityLabel: "Search topics and paths",
+                action: openTopicSearch
+            )
+            ToolbarPillButton(
+                systemName: "map",
+                accessibilityLabel: "Open your topic map",
+                action: openTerritoryMap
+            )
+            if alerts.unreadCount > 0 {
+                Button(action: openAlertsFromShell) {
+                    Image(systemName: "bell")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .frame(width: 40, height: 40)
+                        .background { ToolbarPillBackground() }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open alerts, \(alerts.unreadCount) unread")
+                .badge(alerts.unreadCount)
+            } else {
                 ToolbarPillButton(
                     systemName: "bell",
                     accessibilityLabel: "Open alerts",
-                    action: openAlerts
+                    action: openAlertsFromShell
                 )
+            }
+        }
+    }
+}
+
+extension View {
+    /// Fixed shell dock (search, map, alerts) for the given navigation stack. Attach to `NavigationStack`, not to individual destinations.
+    func appShellNavigationToolbar() -> some View {
+        toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                AppShellToolbarTrailing()
             }
         }
     }

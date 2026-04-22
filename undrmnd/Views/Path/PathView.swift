@@ -15,9 +15,6 @@ struct PathView: View {
     let slug: String
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
 
     @State private var pathMap: PathMap?
     @State private var loadError: String?
@@ -53,46 +50,21 @@ struct PathView: View {
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitleBrand(pathMap?.path?.title ?? "Path")
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Close") { dismiss() }
-                    .tint(UndrmndPrototypeTheme.secondary)
-            }
             ToolbarItemGroup(placement: .topBarTrailing) {
-                HStack(spacing: 8) {
-                    ToolbarPillButton(
-                        systemName: "magnifyingglass",
-                        accessibilityLabel: "Search topics and paths",
-                        action: openTopicSearch
-                    )
-                    ToolbarPillButton(
-                        systemName: "map",
-                        accessibilityLabel: "Open your topic map",
-                        action: openTerritoryMap
-                    )
-                    ToolbarPillButton(
-                        systemName: "bell",
-                        accessibilityLabel: "Open alerts",
-                        action: openAlertsFromShell
-                    )
-                    Button {
-                        isMapOpen = true
-                    } label: {
-                        Image(systemName: "arrow.triangle.branch")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                            .frame(width: 40, height: 40)
-                            .background {
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .fill(UndrmndPrototypeTheme.panel)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                            .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 0.5)
-                                    )
-                            }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Open this path’s layout map")
+                Button {
+                    isMapOpen = true
+                } label: {
+                    Image(systemName: "arrow.triangle.branch")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .frame(width: 40, height: 40)
+                        .background {
+                            Circle()
+                                .fill(Color.white)
+                        }
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open this path’s layout map")
             }
         }
         .task { await load() }

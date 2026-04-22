@@ -4,10 +4,6 @@ import SwiftUI
 struct ContentDetailReadOnlyView: View {
     let contentId: UUID
 
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
-
     @State private var item: ContentItem?
     @State private var error: String?
 
@@ -38,9 +34,6 @@ struct ContentDetailReadOnlyView: View {
             }
         }
         .background(UndrmndPrototypeTheme.paper)
-        .toolbar {
-            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
-        }
         .task { await load() }
     }
 

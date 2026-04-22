@@ -35,10 +35,6 @@ struct GoalClarifierView: View {
     var onSelectPath: (String) -> Void
     var onThreeCardSession: (Pillar?) -> Void
 
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
-
     @State private var activePaths: [PathRecord] = []
     @State private var loadError: String?
     @State private var searchText: String = ""
@@ -79,7 +75,7 @@ struct GoalClarifierView: View {
                         .font(AppFont.title2)
                         .foregroundStyle(UndrmndPrototypeTheme.primary)
                     Text(
-                        "You don’t need a polished question. Type a word, a hunch, or a full sentence — we’ll surface paths, pillars, and short open-question runs that sit close to what you typed."
+                        "You don’t need a polished question right now. Try a fragment or a full sentence to search open topics, or contribute one of your own."
                     )
                     .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
@@ -175,35 +171,6 @@ struct GoalClarifierView: View {
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 }
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Or: open topics, by pillar")
-                        .font(AppFont.subheadlineEmphasis)
-                    ForEach(Pillar.allCases) { pillar in
-                        Button {
-                            onThreeCardSession(pillar)
-                        } label: {
-                            Text("Explore \(pillar.displayName) — three cards, then stop")
-                                .font(AppFont.caption)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .buttonStyle(.plain)
-                        .padding(10)
-                        .background(UndrmndPrototypeTheme.panel)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-                        )
-                    }
-                    Button {
-                        onThreeCardSession(nil)
-                    } label: {
-                        Text("No pillar filter — three cards, then stop")
-                            .font(AppFont.caption)
-                    }
-                    .buttonStyle(.plain)
-                    .padding(10)
-                }
-
                 if let loadError {
                     Text(loadError)
                         .font(AppFont.caption)
@@ -215,19 +182,13 @@ struct GoalClarifierView: View {
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitleBrand("Your goal")
-        .toolbar {
-            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
-        }
         .task { await load() }
     }
 
     private var suggestedBrowseSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Try a few staged topics")
+            Text("Recent topics")
                 .font(AppFont.subheadlineEmphasis)
-            Text("These match the v2 open-question set — tap to run three short cards in that pillar.")
-                .font(AppFont.caption)
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
             let chips: [(String, Pillar)] = [
                 ("Dark matter & cosmology", .cosmos),
                 ("Speed of the universe (Hubble tension)", .cosmos),

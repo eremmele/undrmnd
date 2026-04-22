@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-// DEPRECATED — see v2-artifacts/undrmnd_content_rubric_v2.md. Use `Views/Path/PathView`.
+// DEPRECATED: see v2-artifacts/undrmnd_content_rubric_v2.md. Use `Views/Path/PathView`.
 
-/// Linear path experience ported from the web prototype’s `LA` screen (spark → nugget → branch → … → destination).
+/// Linear path experience ported from the web flow’s `LA` screen (spark → nugget → branch → … → destination).
 struct WalkPathFlowView: View {
     let path: WalkPath
     var onDestinationAction: (String, WalkPath) -> Void
@@ -153,7 +153,7 @@ struct WalkPathFlowView: View {
                         .font(AppFont.caption)
                         .italic()
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    Text("— \(handoff.user), who walked this path before you")
+                    Text("From \(handoff.user), who walked this path before you")
                         .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
@@ -410,7 +410,7 @@ struct WalkPathFlowView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "cup.and.saucer.fill")
                         .font(AppFont.caption)
-                    Text("\(title) — \(content)")
+                    Text("\(title): \(content)")
                         .font(AppFont.caption)
                         .multilineTextAlignment(.leading)
                 }
@@ -549,11 +549,11 @@ struct WalkPathFlowView: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Text("Continue")
-                    .font(AppFont.caption)
+                    .undrmndShellCtaTextStyle()
                 Image(systemName: "arrow.right")
-                    .font(AppFont.caption)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(UndrmndPrototypeTheme.accent)
             }
-            .foregroundStyle(UndrmndPrototypeTheme.secondary)
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .leading)

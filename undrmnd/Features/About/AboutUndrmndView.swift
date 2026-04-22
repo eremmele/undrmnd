@@ -1,16 +1,12 @@
 import SwiftUI
 
-// MARK: - “About” — why this app exists (short cards; calm, not a marketing wall)
+// MARK: - About (short cards; calm, not a marketing wall)
 
 struct AboutUndrmndView: View {
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
-
     private let cards: [(String, String)] = [
         (
             "What undrmnd is for",
-            "undrmnd is a mindful place to explore ideas and science without the pull of an endless feed. It’s built for real curiosity, short sessions, and small contributions to learning — not for maximizing time in the app."
+            "undrmnd is a mindful place to explore ideas and science without the pull of an endless feed. It’s built for real curiosity, short sessions, and small contributions to learning, not for maximizing time in the app."
         ),
         (
             "Doomscrolling, by design, isn’t here",
@@ -22,7 +18,7 @@ struct AboutUndrmndView: View {
         ),
         (
             "Your privacy",
-            "We don’t add tracking SDKs. Account details stay minimal, and the product is built to respect attention and consent — you’ll see that in how the app is wired, not in fine print you have to hunt for."
+            "We don’t add tracking SDKs. Account details stay minimal, and the product is built to respect attention and consent. You’ll see that in how the app is wired, not in fine print you have to hunt for."
         )
     ]
 
@@ -59,14 +55,13 @@ struct AboutUndrmndView: View {
                     )
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(20)
-            .padding(.bottom, 32)
+            .padding(.bottom, 64)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitleBrand("About")
-        .toolbar {
-            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
-        }
     }
 }
 

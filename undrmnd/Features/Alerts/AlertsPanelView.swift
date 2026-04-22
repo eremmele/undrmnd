@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-// MARK: - Model (on-device only; no remote push)
+// MARK: - Model (local alerts only; not remote push)
 
 struct AppAlertItem: Identifiable, Hashable, Codable {
     let id: UUID
@@ -17,7 +17,7 @@ struct AppAlertItem: Identifiable, Hashable, Codable {
 final class AlertsStore: ObservableObject {
     @Published private(set) var items: [AppAlertItem] = []
 
-    private let readIdsKey = "app_alert_read_ids_v1"
+    private let readIdsKey = "app_alert_read_ids_v3"
 
     var unreadCount: Int { items.filter { !$0.isRead }.count }
 
@@ -36,16 +36,16 @@ final class AlertsStore: ObservableObject {
                 isRead: false
             ),
             AppAlertItem(
-                id: UUID(uuidString: "C0000001-0000-4000-8000-000000000002")!,
-                title: "Paths you open are remembered on this device",
-                body: "“Resume a path” and the path map use local memory only in this build — nothing leaves your phone without you choosing it.",
-                date: cal.date(byAdding: .hour, value: -6, to: now) ?? now,
+                id: UUID(uuidString: "C0000001-0000-4000-8000-000000000004")!,
+                title: "New comment on a topic you added to",
+                body: "“Dark matter in lensing surveys” has a new reply. Open Contribute to read the thread when you’re ready.",
+                date: cal.date(byAdding: .hour, value: -2, to: now) ?? now,
                 isRead: false
             ),
             AppAlertItem(
-                id: UUID(uuidString: "C0000001-0000-4000-8000-000000000003")!,
-                title: "Contribute replies stay local for now",
-                body: "Thread replies are a calm default until shared threads are wired. Nothing is sent to a server in this build.",
+                id: UUID(uuidString: "C0000001-0000-4000-8000-000000000005")!,
+                title: "Someone built on your note",
+                body: "A reader quoted your line in “Ocean microplastics under a microscope” and added a question for the group.",
                 date: now,
                 isRead: false
             )
@@ -105,7 +105,7 @@ struct AlertsPanelView: View {
                     VStack(spacing: 12) {
                         Text("You’re all caught up")
                             .font(AppFont.headline)
-                        Text("When there’s something worth your attention, it will show up here. No badges from us — only what you open.")
+                        Text("When there’s something worth your attention, it will show up here. No badges from us, only what you open.")
                             .font(AppFont.subheadline)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
@@ -137,13 +137,21 @@ struct AlertsPanelView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
-                        .font(.system(.body))
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Done")
+                            .undrmndShellCtaTextStyle()
+                    }
                 }
                 if alerts.unreadCount > 0 {
                     ToolbarItem(placement: .primaryAction) {
-                        Button("Mark all read") { alerts.markAllRead() }
-                            .font(AppFont.subheadline)
+                        Button {
+                            alerts.markAllRead()
+                        } label: {
+                            Text("Mark all read")
+                                .undrmndShellCtaTextStyle()
+                        }
                     }
                 }
             }

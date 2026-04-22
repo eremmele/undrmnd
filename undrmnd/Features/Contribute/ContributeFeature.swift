@@ -41,7 +41,7 @@ enum ContributeSeedData {
         PillarDiscussionThread(
             id: makeId("a0000001-0000-4000-8000-000000000001"),
             pillar: .cosmos,
-            titleQuestion: "If WIMPs keep not showing up, what would you bet on next — and why?",
+            titleQuestion: "If WIMPs keep not showing up, what would you bet on next, and why?",
             contentItems: [
                 ThreadContentItemRef(
                     databaseId: nil,
@@ -60,7 +60,7 @@ enum ContributeSeedData {
                 ThreadReply(
                     id: makeId("b0000001-0000-4000-8000-000000000001"),
                     authorHandle: "sage_m",
-                    body: "I’m not betting money — but axion radio searches and stellar streams are where I’d look first, because they stress-test different failure modes of ΛCDM than direct-detection.",
+                    body: "I’m not betting money, but axion radio searches and stellar streams are where I’d look first, because they stress-test different failure modes of ΛCDM than direct-detection.",
                     timeLabel: "4 days ago"
                 ),
                 ThreadReply(
@@ -164,7 +164,7 @@ enum ContributeSeedData {
                 ThreadContentItemRef(
                     databaseId: nil,
                     title: "Why is the replication crisis not a scandal?",
-                    hook: "Somewhere between 36% and 65% of published psychology findings don’t replicate. That’s not a failure — it’s the system working.",
+                    hook: "Somewhere between 36% and 65% of published psychology findings don’t replicate. That’s not a failure. It’s the system working.",
                     contributedBy: "ilhan_b"
                 ),
                 ThreadContentItemRef(
@@ -178,7 +178,7 @@ enum ContributeSeedData {
                 ThreadReply(
                     id: makeId("b0000001-0000-4000-8000-000000000030"),
                     authorHandle: "sage_m",
-                    body: "I’d disbelieve it if the pipeline can’t show me dropped rows, consent boundaries, and who can’t participate — not if one kid’s outlier is uncomfortable.",
+                    body: "I’d disbelieve it if the pipeline can’t show me dropped rows, consent boundaries, and who can’t participate, not if one kid’s outlier is uncomfortable.",
                     timeLabel: "6 days ago"
                 )
             ],
@@ -189,13 +189,59 @@ enum ContributeSeedData {
     private static func makeId(_ s: String) -> UUID { UUID(uuidString: s)! }
 }
 
+// MARK: - Pillar bar (scrollable; avoids clipped segment titles)
+
+private struct ContributePillarBar: View {
+    @Binding var selection: Pillar
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(Pillar.allCases) { pillar in
+                    pillarChip(pillar)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+        }
+        .background {
+            Capsule(style: .continuous)
+                .fill(UndrmndPrototypeTheme.panel)
+                .overlay(
+                    Capsule(style: .continuous)
+                        .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 0.5)
+                )
+        }
+    }
+
+    private func pillarChip(_ pillar: Pillar) -> some View {
+        let selected = selection == pillar
+        return Button {
+            selection = pillar
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        } label: {
+            Text(pillar.displayName)
+                .font(AppFont.subheadline)
+                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.88)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background {
+                    Capsule(style: .continuous)
+                        .fill(selected ? Color.white : Color.clear)
+                        .shadow(color: selected ? Color.black.opacity(0.06) : .clear, radius: 2, y: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(pillar.displayName) pillar")
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
 // MARK: - Hub
 
 struct ContributeView: View {
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
-
     @State private var selectedPillar: Pillar = .cosmos
     private var filtered: [PillarDiscussionThread] {
         ContributeSeedData.threads.filter { $0.pillar == selectedPillar }
@@ -204,18 +250,12 @@ struct ContributeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Pillar-scoped discussions: each thread is a question, with replies in a simple canvas. Threads tie to one or more open-question cards so responses stay grounded.")
+                Text("Each thread is an open discussion. Threads tie to one or more open-question cards so responses stay grounded.")
                     .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Picker("Pillar", selection: $selectedPillar) {
-                    ForEach(Pillar.allCases) { p in
-                        Text(p.displayName).tag(p)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .accessibilityLabel("Choose pillar: Cosmos, Living World, Mind and Brain, or How we know")
+                ContributePillarBar(selection: $selectedPillar)
 
                 if filtered.isEmpty {
                     Text("No threads in this pillar yet.")
@@ -235,13 +275,10 @@ struct ContributeView: View {
                 }
             }
             .padding(20)
-            .padding(.bottom, 48)
+            .padding(.bottom, 64)
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitleBrand("Contribute")
-        .toolbar {
-            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
-        }
     }
 }
 
@@ -293,122 +330,138 @@ private struct CanvasThreadRowCard: View {
 struct ContributeThreadDetailView: View {
     let thread: PillarDiscussionThread
 
-    @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
-    @Environment(\.openTopicSearchFromShell) private var openTopicSearch
-    @Environment(\.openAlertsFromShell) private var openAlertsFromShell
-
     @State private var extraReplies: [ThreadReply] = []
     @State private var draft: String = ""
     @FocusState private var replyFieldFocused: Bool
 
     private var allReplies: [ThreadReply] { thread.seedReplies + extraReplies }
+    private var canSendReply: Bool { !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(thread.pillar.displayName.uppercased())
-                        .font(AppFont.caption2Emphasis)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
-                    Text(thread.titleQuestion)
-                        .font(AppFont.title3)
-                        .foregroundStyle(UndrmndPrototypeTheme.primary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(thread.pillar.displayName.uppercased())
+                            .font(AppFont.caption2Emphasis)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                        Text(thread.titleQuestion)
+                            .font(AppFont.title3)
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Open-question cards in this thread")
-                        .font(AppFont.subheadlineEmphasis)
-                    Text("Replies are meant in the context of these cards. Multiple cards are allowed so the same conversation can sit across a short path of readings.")
-                        .font(AppFont.caption)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
-                    ForEach(thread.contentItems) { ref in
-                        if let db = ref.databaseId {
-                            NavigationLink {
-                                ContentDetailReadOnlyView(contentId: db)
-                            } label: {
-                                contentCardBlock(ref, isLink: true)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Open-question cards in this thread")
+                            .font(AppFont.subheadlineEmphasis)
+                        Text("Replies are meant in the context of these cards. Multiple cards are allowed so the same conversation can sit across a short path of readings.")
+                            .font(AppFont.caption)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                        ForEach(thread.contentItems) { ref in
+                            if let db = ref.databaseId {
+                                NavigationLink {
+                                    ContentDetailReadOnlyView(contentId: db)
+                                } label: {
+                                    contentCardBlock(ref, isLink: true)
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                contentCardBlock(ref, isLink: false)
                             }
-                            .buttonStyle(.plain)
-                        } else {
-                            contentCardBlock(ref, isLink: false)
                         }
                     }
-                }
 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Replies")
-                        .font(AppFont.subheadlineEmphasis)
-                        .padding(.bottom, 8)
-                    ForEach(allReplies) { r in
-                        forumReplyRow(r)
-                    }
-                }
-                .padding(.top, 8)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Add a reply")
-                        .font(AppFont.subheadlineEmphasis)
-                    Text("Stored on this device for now — a calm default until shared threads are wired.")
-                        .font(AppFont.caption2)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
-                    TextField("Write a thoughtful reply…", text: $draft, axis: .vertical)
-                        .lineLimit(3...8)
-                        .focused($replyFieldFocused)
-                        .padding(10)
-                        .background(UndrmndPrototypeTheme.panel)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-                        )
-                        .id("replyField")
-                    Button {
-                        let t = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-                        guard !t.isEmpty else { return }
-                        let me = "you" // not sent remotely in this build
-                        extraReplies.append(
-                            ThreadReply(
-                                id: UUID(),
-                                authorHandle: "@\(me)",
-                                body: t,
-                                timeLabel: "just now"
-                            )
-                        )
-                        draft = ""
-                        replyFieldFocused = false
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        withAnimation(.easeOut(duration: 0.25)) {
-                            proxy.scrollTo("replyConfirm", anchor: .bottom)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Replies")
+                            .font(AppFont.subheadlineEmphasis)
+                            .padding(.bottom, 8)
+                        ForEach(allReplies) { r in
+                            forumReplyRow(r)
                         }
-                    } label: {
-                        Text("Post reply")
-                            .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(LargeProminentPathButtonStyle())
-                    .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Color.clear.frame(height: 1).id("replyConfirm")
+                    .padding(.top, 8)
+
+                    Color.clear.frame(height: 1).id("threadBottom")
                 }
-                .padding(.top, 4)
-            }
-            .padding(20)
-            .padding(.bottom, 56)
+                .padding(20)
+                .padding(.bottom, 8)
             }
             .scrollDismissesKeyboard(.interactively)
             .onChange(of: replyFieldFocused) { _, on in
                 if on {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         withAnimation {
-                            proxy.scrollTo("replyField", anchor: .bottom)
+                            proxy.scrollTo("threadBottom", anchor: .bottom)
                         }
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                messagesStyleReplyBar(proxy: proxy)
+            }
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ExploreShellToolbar.items(openMap: openTerritoryMap, openSearch: openTopicSearch, openAlerts: openAlertsFromShell)
+    }
+
+    @ViewBuilder
+    private func messagesStyleReplyBar(proxy: ScrollViewProxy) -> some View {
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(UndrmndPrototypeTheme.divider)
+                .frame(height: 0.5)
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("Reply", text: $draft, axis: .vertical)
+                    .lineLimit(1...6)
+                    .textFieldStyle(.plain)
+                    .font(AppFont.subheadline)
+                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    .focused($replyFieldFocused)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(UndrmndPrototypeTheme.panel)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                    )
+                    .accessibilityLabel("Reply")
+                    .accessibilityHint("Type your message, then double tap Send to post")
+                Button {
+                    postReply(proxy: proxy)
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundStyle(canSendReply ? UndrmndPrototypeTheme.accent : UndrmndPrototypeTheme.muted)
+                }
+                .buttonStyle(.plain)
+                .disabled(!canSendReply)
+                .accessibilityLabel("Send reply")
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+            .padding(.bottom, 14)
+        }
+        .background(UndrmndPrototypeTheme.paper)
+    }
+
+    private func postReply(proxy: ScrollViewProxy) {
+        let t = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return }
+        let me = "you"
+        extraReplies.append(
+            ThreadReply(
+                id: UUID(),
+                authorHandle: "@\(me)",
+                body: t,
+                timeLabel: "just now"
+            )
+        )
+        draft = ""
+        replyFieldFocused = false
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        withAnimation(.easeOut(duration: 0.25)) {
+            proxy.scrollTo("threadBottom", anchor: .bottom)
         }
     }
 
@@ -420,7 +473,7 @@ struct ContributeThreadDetailView: View {
             Text(ref.hook)
                 .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
-            Text("— @\(ref.contributedBy)")
+            Text("· @\(ref.contributedBy)")
                 .font(AppFont.caption2)
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
             if isLink {
