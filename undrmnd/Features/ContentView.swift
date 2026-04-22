@@ -37,9 +37,6 @@ struct RootView: View {
                     onOpenContribute: { tab = .contribute },
                     onAbout: { explorePath.append(HomeRoute.about) }
                 )
-                .environment(\.openArticleForContent) { id in
-                    explorePath.append(HomeRoute.articleForCard(id))
-                }
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .goalClarifier:
@@ -61,6 +58,10 @@ struct RootView: View {
                         AboutUndrmndView()
                     }
                 }
+            }
+            // Must be on the stack, not only the root, so `PathView` / `ThreeCardSessionView` (pushed) inherit the action.
+            .environment(\.openArticleForContent) { id in
+                explorePath.append(HomeRoute.articleForCard(id))
             }
             .appShellNavigationToolbar()
             .tabItem {

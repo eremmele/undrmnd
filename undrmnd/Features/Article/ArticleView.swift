@@ -325,12 +325,17 @@ struct ArticleView: View {
             let b = try await ArticleService.fetchForCard(contentId: contentId)
             bundle = b
         } catch let e as ArticleServiceError {
-            _ = e
+            #if DEBUG
+            print("ArticleView: ArticleServiceError for contentId \(contentId): \(e)")
+            #endif
             // Reads are expected to be public; any service error still reads as a load failure in UI.
             loadError = "Could not load the article. Try again in a moment."
         } catch let url as URLError where url.code == .notConnectedToInternet {
             loadError = "You appear to be offline. Check your connection, then try again."
         } catch {
+            #if DEBUG
+            print("ArticleView: failed to load article for contentId \(contentId): \(error)")
+            #endif
             loadError = "Could not load the article. Try again in a moment."
         }
         isLoading = false
@@ -376,6 +381,7 @@ struct ArticleEditSheet: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                            .allowsHitTesting(false)
                     )
                 Text("Commit message (optional, max 280 characters)")
                     .font(AppFont.caption)
@@ -431,7 +437,7 @@ struct ArticleForkSheet: View {
 
     @State private var title: String
     @State private var slug: String
-    @State private var body = ""
+    @State private var bodyText = ""
     @State private var inlineError: String?
     @State private var isSaving = false
 
@@ -467,7 +473,7 @@ struct ArticleForkSheet: View {
                     .autocorrectionDisabled()
                 Text("Body")
                     .font(AppFont.caption)
-                TextEditor(text: $body)
+                TextEditor(text: $bodyText)
                     .font(AppFont.body)
                     .frame(minHeight: 200)
                     .padding(8)
@@ -498,7 +504,7 @@ struct ArticleForkSheet: View {
                 branchId: branch.id,
                 title: title,
                 slug: slug,
-                body: body
+                body: bodyText
             )
             onClose()
         } catch ArticleServiceError.signInRequired {

@@ -1,8 +1,9 @@
 import Foundation
 import Supabase
 
+/// Must match the PostgREST function signature: `public.get_article_for_card(card_id uuid)`.
 private struct GetArticleForCardParams: Encodable, Sendable {
-    let content_id: UUID
+    let card_id: UUID
 }
 
 private struct GetArticleParams: Encodable, Sendable {
@@ -67,7 +68,7 @@ enum ArticleService {
         client: SupabaseClient = SupabaseService.shared.client
     ) async throws -> ArticleBundle {
         let res: PostgrestResponse<ArticleBundle> = try await client
-            .rpc("get_article_for_card", params: GetArticleForCardParams(content_id: contentId))
+            .rpc("get_article_for_card", params: GetArticleForCardParams(card_id: contentId))
             .execute()
         return res.value
     }

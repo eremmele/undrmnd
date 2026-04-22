@@ -65,12 +65,25 @@ struct ThreeCardSessionView: View {
             openArticleForContent(contentId)
         } label: {
             Text("Open the work")
-                .font(AppFont.bodySemibold)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
         }
         .buttonStyle(OpenTheWorkCTAButtonStyle())
         .accessibilityLabel("Open the work, full article")
+    }
+
+    /// Design-only sample links for the first card in a set. Replace with real `content_items` / article URLs when available.
+    @ViewBuilder
+    private func openingCardPrimarySourceLinks() -> some View {
+        HStack(alignment: .center, spacing: 8) {
+            if let u1 = URL(string: "https://en.wikipedia.org/wiki/Dark_matter"),
+               let u2 = URL(string: "https://en.wikipedia.org/wiki/Weakly_interacting_massive_particles") {
+                Link("primary source 1", destination: u1)
+                    .openTopicsPrimarySourcePill()
+                Link("primary source 2", destination: u2)
+                    .openTopicsPrimarySourcePill()
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 4)
     }
 
     @ViewBuilder
@@ -86,9 +99,6 @@ struct ThreeCardSessionView: View {
             }
         } label: {
             Text(step == 2 ? "Finish" : "Next")
-                .font(AppFont.bodySemibold)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
         }
         .buttonStyle(LargeProminentPathButtonStyle())
         .accessibilityLabel(step == 2 ? "Finish this set" : "Next card")
@@ -119,6 +129,9 @@ struct ThreeCardSessionView: View {
                             .font(AppFont.title3)
                         Text(preview.hook)
                             .font(AppFont.subheadline)
+                    }
+                    if step == 0 {
+                        openingCardPrimarySourceLinks()
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -182,5 +195,18 @@ struct ThreeCardSessionView: View {
         if let d = try? await ContentService.fetchCardDetail(id: p.id) {
             detail = d
         }
+    }
+}
+
+// MARK: - Open topics primary source pills (first card)
+
+private extension View {
+    func openTopicsPrimarySourcePill() -> some View {
+        self
+            .font(AppFont.caption2Emphasis)
+            .foregroundStyle(UndrmndPrototypeTheme.paper)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(UndrmndPrototypeTheme.accent, in: Capsule())
     }
 }

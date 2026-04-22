@@ -54,6 +54,7 @@ struct CardView: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                            .allowsHitTesting(false)
                     )
                     .font(AppFont.subheadline)
                     .accessibilityLabel("Private reflection, not shared")
@@ -170,9 +171,6 @@ struct CardView: View {
     private var continueButton: some View {
         Button(action: onContinue) {
             Text("Continue")
-                .undrmndShellCtaTextStyle()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
         }
         .buttonStyle(LargeProminentPathButtonStyle())
         .accessibilityLabel("Continue on this path")
@@ -181,9 +179,6 @@ struct CardView: View {
     private func openTheWorkCTA(action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text("Open the work")
-                .font(AppFont.bodySemibold)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
         }
         .buttonStyle(OpenTheWorkCTAButtonStyle())
         .accessibilityLabel("Open the work, full article")
@@ -209,16 +204,24 @@ struct CardView: View {
     }
 }
 
+/// Shared vertical padding for path / open-topic CTAs (keep in sync across both styles).
+private let pathCTAPillVerticalPadding: CGFloat = 14
+
 /// Outlined CTA: paper fill, thin ink border (pair with `LargeProminentPathButtonStyle` for primary).
 struct OpenTheWorkCTAButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .font(AppFont.bodySemibold)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, pathCTAPillVerticalPadding)
             .foregroundStyle(UndrmndPrototypeTheme.primary)
             .background(UndrmndPrototypeTheme.paper)
             .overlay(
                 RoundedRectangle(cornerRadius: 4, style: .continuous)
                     .strokeBorder(UndrmndPrototypeTheme.primary, lineWidth: 1)
             )
+            .contentShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
             .opacity(configuration.isPressed ? 0.9 : 1)
     }
 }
@@ -227,10 +230,12 @@ struct LargeProminentPathButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(AppFont.bodySemibold)
+            .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, pathCTAPillVerticalPadding)
             .background(UndrmndPrototypeTheme.accent)
             .foregroundStyle(UndrmndPrototypeTheme.paper)
+            .contentShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
             .opacity(configuration.isPressed ? 0.85 : 1)
     }
 }
