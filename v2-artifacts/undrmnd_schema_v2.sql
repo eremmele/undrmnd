@@ -63,31 +63,18 @@ create index if not exists content_items_open_question_active_idx
   where is_open_question = true and is_active = true;
 
 -- ============================================================
--- 2. get_random_cards — open-question filter
+-- 2. get_random_cards — open-question filter (full content_items row)
 -- ============================================================
+-- The iOS app decodes a subset as `ContentPreview` (id, title, hook, interaction_type, …).
 
 create or replace function get_random_cards(n int default 3)
-returns table (
-  id uuid,
-  title text,
-  hook text,
-  interaction_type text,
-  source_url text,
-  action_url text,
-  topic text,
-  contributed_by text
-)
+returns setof content_items
 language sql
 stable
 as $$
-  select
-    c.id, c.title, c.hook, c.interaction_type,
-    c.source_url, c.action_url, c.topic, c.contributed_by
-  from content_items c
-  where c.is_active = true
-    and c.is_open_question = true
-  order by random()
-  limit greatest(1, n);
+  select * from content_items
+  where is_active = true and is_open_question = true
+  order by random() limit greatest(1, n);
 $$;
 
 -- ============================================================

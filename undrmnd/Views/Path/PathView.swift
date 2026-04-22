@@ -31,7 +31,7 @@ struct PathView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let err = loadError {
                 Text(err)
-                    .font(.subheadline)
+                    .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     .padding(20)
             } else if let m = pathMap, let nodeId = currentId, let node = m.node(nodeId) {
@@ -112,11 +112,11 @@ struct PathView: View {
                     ForEach(Array(labels.enumerated()), id: \.offset) { i, t in
                         if i > 0 {
                             Image(systemName: "chevron.compact.right")
-                                .font(.caption2)
+                                .font(AppFont.caption2)
                                 .foregroundStyle(UndrmndPrototypeTheme.divider)
                         }
                         Text(t)
-                            .font(.caption2)
+                            .font(AppFont.caption2)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                     }
                 }
@@ -185,6 +185,7 @@ struct PathView: View {
         do {
             let m = try await PathService.fetchPath(slug: slug)
             pathMap = m
+            PathResumeStore.recordPathOpened(slug: slug)
             guard let root = m.rootNodes.first else {
                 loadError = "This path has no start."
                 return

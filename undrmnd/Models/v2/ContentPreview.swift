@@ -1,6 +1,6 @@
 import Foundation
 
-/// Row shape returned by `get_random_cards(n)` — no `body` or `estimated_time_minutes`.
+/// Decodes a subset of the `content_items` row from `get_random_cards(n)` (no `body` or `estimated_time_minutes`).
 struct ContentPreview: Codable, Identifiable, Hashable {
     let id: UUID
     let title: String

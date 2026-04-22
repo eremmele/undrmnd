@@ -17,9 +17,9 @@ struct ThreeCardSessionView: View {
             if isDone {
                 VStack(alignment: .center, spacing: 16) {
                     Text("You’re done for now.")
-                        .font(.title3.weight(.medium))
+                        .font(AppFont.title3)
                     Text("There isn’t another card lined up. When you want more, go home and start a new session—on purpose.")
-                        .font(.subheadline)
+                        .font(AppFont.subheadline)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     Button("Back to home") { dismiss() }
@@ -47,23 +47,23 @@ struct ThreeCardSessionView: View {
     private func stepView(preview: ContentPreview) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Card \(step + 1) of 3")
-                .font(.caption)
+                .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
             if let d = detail {
                 Text(d.title)
-                    .font(.title3.weight(.medium))
+                    .font(AppFont.title3)
                 Text(d.hook)
-                    .font(.subheadline)
+                    .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 if let b = d.body, !b.isEmpty {
                     Text(b)
-                        .font(.body)
+                        .font(AppFont.body)
                 }
             } else {
                 Text(preview.title)
-                    .font(.title3.weight(.medium))
+                    .font(AppFont.title3)
                 Text(preview.hook)
-                    .font(.subheadline)
+                    .font(AppFont.subheadline)
             }
             Spacer()
             Button {

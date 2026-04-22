@@ -28,7 +28,7 @@ struct ProfileEditView: View {
                     TextField("One line (140 characters)", text: $bio, axis: .vertical)
                         .lineLimit(2...4)
                     Text("\(bio.count) / 140")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
                 Section("Pillars you follow") {
@@ -52,7 +52,7 @@ struct ProfileEditView: View {
             }
             if let error {
                 Text(error)
-                    .font(.caption)
+                    .font(AppFont.caption)
                     .foregroundStyle(.red)
                     .padding()
             }

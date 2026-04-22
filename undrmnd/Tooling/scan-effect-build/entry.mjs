@@ -4,7 +4,28 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 // IIFE for WKWebView: video + scan shader, cover UVs, touch scan spotlight. Ready = decoded frames + buffer + WebGL warm-up.
+// Video load starts first so it overlaps Three.js / WebGL init (was previously gated entirely behind renderer setup).
 (async () => {
+  const video = document.createElement("video");
+  video.src = "./video.mp4";
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+  video.preload = "auto";
+
+  const videoReady = (async () => {
+    try {
+      await new Promise((resolve, reject) => {
+        video.addEventListener("canplaythrough", resolve, { once: true });
+        video.addEventListener("error", reject, { once: true });
+        video.load();
+      });
+      await video.play();
+    } catch (_) {}
+  })();
+
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
   camera.position.z = 1;
@@ -17,23 +38,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   document.body.appendChild(renderer.domElement);
 
-  const video = document.createElement("video");
-  video.src = "./video.mp4";
-  video.muted = true;
-  video.loop = true;
-  video.playsInline = true;
-  video.setAttribute("playsinline", "");
-  video.setAttribute("webkit-playsinline", "");
-  video.preload = "auto";
-
-  try {
-    await new Promise((resolve, reject) => {
-      video.addEventListener("canplaythrough", resolve, { once: true });
-      video.addEventListener("error", reject, { once: true });
-      video.load();
-    });
-    await video.play();
-  } catch (_) {}
+  await videoReady;
 
   const videoTexture = new THREE.VideoTexture(video);
   videoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -229,10 +234,10 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
     try {
       const d = v.duration;
       if (Number.isFinite(d) && d > 0 && d < 6) {
-        return Math.max(0.55, Math.min(1.2, d * 0.42));
+        return Math.max(0.5, Math.min(1.05, d * 0.38));
       }
     } catch (_) {}
-    return 1.2;
+    return 0.95;
   }
 
   let didReveal = false;
@@ -297,9 +302,9 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
         ? performance.now() - playWarmStartMs
         : 0;
       // Wall-clock after first frames: GPU + video decode pipeline often still stutters without this.
-      const wallOk = msSincePlayWarm >= 3200;
-      const decodedOk = !hasRvfc || videoFramesDecoded >= 32;
-      const glOk = glWarmupFrames >= 32;
+      const wallOk = msSincePlayWarm >= 2200;
+      const decodedOk = !hasRvfc || videoFramesDecoded >= 24;
+      const glOk = glWarmupFrames >= 24;
 
       if (
         playing &&

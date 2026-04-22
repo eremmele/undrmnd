@@ -9,12 +9,12 @@ struct BranchView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(prompt)
-                .font(.system(size: 20, design: .serif).weight(.medium))
+                .font(AppFont.branchPrompt)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .fixedSize(horizontal: false, vertical: true)
             if let c = compass, !c.isEmpty {
                 Text(c)
-                    .font(.caption)
+                    .font(AppFont.caption)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
             }
             VStack(alignment: .leading, spacing: 10) {
@@ -24,11 +24,11 @@ struct BranchView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(e.choiceLabel ?? "Choose")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFont.subheadlineEmphasis)
                                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                             if let p = e.choicePreview, !p.isEmpty {
                                 Text(p)
-                                    .font(.caption)
+                                    .font(AppFont.caption)
                                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                                     .fixedSize(horizontal: false, vertical: true)
                             }

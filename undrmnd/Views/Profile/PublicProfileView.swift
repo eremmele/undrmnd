@@ -15,20 +15,20 @@ struct PublicProfileView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(p.displayName ?? p.username)
-                                .font(.title2)
+                                .font(AppFont.title2)
                             Text("@\(p.username)")
-                                .font(.subheadline)
+                                .font(AppFont.subheadline)
                                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         }
-                        if let b = p.bio, !b.isEmpty { Text(b).font(.body) }
+                        if let b = p.bio, !b.isEmpty { Text(b).font(AppFont.body) }
                         if !p.pillarsFollowing.isEmpty {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Following")
-                                    .font(.caption)
+                                    .font(AppFont.caption)
                                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                                 ForEach(p.pillarsFollowing.map(\.displayName), id: \.self) { t in
                                     Text(t)
-                                        .font(.caption)
+                                        .font(AppFont.caption)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
                                         .background(UndrmndPrototypeTheme.panel)
@@ -37,24 +37,24 @@ struct PublicProfileView: View {
                         }
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Contributions")
-                                .font(.headline)
+                                .font(AppFont.headline)
                             ForEach(cards) { c in
                                 NavigationLink {
                                     ContentDetailReadOnlyView(contentId: c.id)
                                 } label: {
                                     Text(c.title)
-                                        .font(.subheadline)
+                                        .font(AppFont.subheadline)
                                 }
                             }
                         }
                         if !pathNodes.isEmpty {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("On paths")
-                                    .font(.headline)
+                                    .font(AppFont.headline)
                                 ForEach(pathNodes) { n in
                                     let title = pathTitles[n.pathId] ?? "Path"
                                     Text("\(title) — \(n.branchPrompt ?? "node")")
-                                        .font(.caption)
+                                        .font(AppFont.caption)
                                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                                 }
                             }

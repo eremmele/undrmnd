@@ -12,13 +12,13 @@ struct ContentDetailReadOnlyView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(item.title)
-                            .font(.title3.weight(.medium))
+                            .font(AppFont.title3)
                         Text(item.hook)
-                            .font(.subheadline)
+                            .font(AppFont.subheadline)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         if let b = item.body, !b.isEmpty {
                             Text(b)
-                                .font(.body)
+                                .font(AppFont.body)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

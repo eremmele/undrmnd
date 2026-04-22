@@ -15,25 +15,25 @@ struct CardView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text(item.topic.displayName)
-                    .font(.caption)
+                    .font(AppFont.caption)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 Spacer(minLength: 0)
             }
 
             Text(item.title)
-                .font(.system(size: 22, design: .serif).weight(.medium))
+                .font(AppFont.cardOrBranchTitle)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(item.hook)
-                .font(.subheadline)
+                .font(AppFont.subheadline)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
 
             if let body = item.body, !body.isEmpty {
                 Text(body)
-                    .font(.body)
+                    .font(AppFont.body)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -48,7 +48,7 @@ struct CardView: View {
                         RoundedRectangle(cornerRadius: 4)
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
                     )
-                    .font(.subheadline)
+                    .font(AppFont.subheadline)
                     .accessibilityLabel("Private reflection, not sent to the server")
             }
 
@@ -64,11 +64,11 @@ struct CardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     if let u = item.sourceUrl.flatMap({ URL(string: $0) }) {
                         Link(cite, destination: u)
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     } else {
                         Text(cite)
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     }
                 }
@@ -147,7 +147,7 @@ struct CardView: View {
     private var continueButton: some View {
         Button(action: onContinue) {
             Text("Continue")
-                .font(.body.weight(.medium))
+                .font(AppFont.bodyMedium)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
         }
@@ -166,7 +166,7 @@ struct CardView: View {
                 onOpenContributor?(h)
             } label: {
                 Text("contributed by @\(h)")
-                    .font(.caption2)
+                    .font(AppFont.caption2)
                     .foregroundStyle(UndrmndPrototypeTheme.muted)
             }
             .buttonStyle(.plain)
@@ -179,7 +179,7 @@ struct CardView: View {
 struct LargeProminentPathButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.body.weight(.semibold))
+            .font(AppFont.bodySemibold)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(UndrmndPrototypeTheme.accent)

@@ -60,7 +60,7 @@ struct PathMapView: View {
                             )
                             let mid = CGPoint(x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2)
                             Text(lab)
-                                .font(.system(size: 8))
+                                .font(AppFont.mapLabel(approxSize: 8, mapWeight: .regular))
                                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                                 .position(mid)
                         }
@@ -138,7 +138,7 @@ struct PathMapView: View {
                     }
                 }
                 Text(label)
-                    .font(.system(size: 8))
+                    .font(AppFont.mapLabel(approxSize: 8, mapWeight: .regular))
                     .foregroundStyle(UndrmndPrototypeTheme.muted)
                     .lineLimit(1)
             }

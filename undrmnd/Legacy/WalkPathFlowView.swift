@@ -82,10 +82,10 @@ struct WalkPathFlowView: View {
         return HStack(spacing: 6) {
             ForEach(Array(crumbs.enumerated()), id: \.offset) { _, label in
                 Text(label)
-                    .font(.caption2.weight(.medium))
+                    .font(AppFont.caption2Medium)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.semibold))
+                    .font(AppFont.caption2Emphasis)
                     .foregroundStyle(UndrmndPrototypeTheme.muted)
             }
         }
@@ -140,9 +140,9 @@ struct WalkPathFlowView: View {
             if let footprints {
                 HStack(spacing: 5) {
                     Image(systemName: "shoeprints.fill")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                     Text("\(footprints) people have walked this path")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                 }
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .accessibilityLabel("\(footprints) people have walked this path")
@@ -151,11 +151,11 @@ struct WalkPathFlowView: View {
             if let handoff {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("“\(handoff.text)”")
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .italic()
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     Text("— \(handoff.user), who walked this path before you")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
                 .padding(14)
@@ -169,7 +169,7 @@ struct WalkPathFlowView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("SPARK")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(AppFont.mapLabel(approxSize: 9, mapWeight: .semibold))
                     .tracking(0.06)
                     .foregroundStyle(UndrmndPrototypeTheme.paper)
                     .padding(.horizontal, 6)
@@ -178,17 +178,17 @@ struct WalkPathFlowView: View {
 
                 if let guide = path.guide {
                     Text("\(guide.name) completed this path \(guide.completed)")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
 
                 Text(title)
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFont.subheadlineEmphasis)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(content)
-                    .font(.caption)
+                    .font(AppFont.caption)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -222,27 +222,27 @@ struct WalkPathFlowView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(alignment: .top) {
                         Text(title)
-                            .font(.subheadline.weight(.medium))
+                            .font(AppFont.subheadlineEmphasis)
                             .foregroundStyle(UndrmndPrototypeTheme.primary)
                             .fixedSize(horizontal: false, vertical: true)
                         Spacer(minLength: 8)
                         if marginNotes[id] != nil {
                             Image(systemName: "pencil.line")
-                                .font(.caption2)
+                                .font(AppFont.caption2)
                                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                                 .accessibilityHidden(true)
                         }
                     }
 
                     Text(content)
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         .lineLimit(expanded ? nil : 3)
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let source {
                         Text("\(source) · \(expanded ? "Show less" : "Read more")")
-                            .font(.caption2)
+                            .font(AppFont.caption2)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                     }
                 }
@@ -264,7 +264,7 @@ struct WalkPathFlowView: View {
                             TextField("Your annotation…", text: $marginNoteDraft, axis: .vertical)
                                 .textFieldStyle(.roundedBorder)
                                 .lineLimit(3...6)
-                                .font(.caption)
+                                .font(AppFont.caption)
 
                             HStack(spacing: 8) {
                                 Button("Save note") {
@@ -272,20 +272,20 @@ struct WalkPathFlowView: View {
                                     marginNoteEditingID = nil
                                     marginNoteDraft = ""
                                 }
-                                .font(.caption)
+                                .font(AppFont.caption)
                                 .buttonStyle(.bordered)
 
                                 Button("Cancel") {
                                     marginNoteEditingID = nil
                                     marginNoteDraft = ""
                                 }
-                                .font(.caption)
+                                .font(AppFont.caption)
                                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                             }
                         }
                     } else if let note = marginNotes[id] {
                         Text("Your note: “\(note)”")
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .italic()
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     } else {
@@ -295,9 +295,9 @@ struct WalkPathFlowView: View {
                         } label: {
                             HStack(spacing: 4) {
                                 Image(systemName: "pencil.line")
-                                    .font(.caption2)
+                                    .font(AppFont.caption2)
                                 Text("Write in the margin")
-                                    .font(.caption)
+                                    .font(AppFont.caption)
                             }
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                         }
@@ -338,9 +338,9 @@ struct WalkPathFlowView: View {
                 } label: {
                     HStack(spacing: 5) {
                         Image(systemName: "safari")
-                            .font(.caption2)
+                            .font(AppFont.caption2)
                         Text("A question before you choose…")
-                            .font(.caption)
+                            .font(AppFont.caption)
                     }
                     .italic()
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
@@ -351,12 +351,12 @@ struct WalkPathFlowView: View {
             if showCompassRose, let compassRose {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(compassRose)
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .italic()
                         .foregroundStyle(UndrmndPrototypeTheme.primary)
                         .fixedSize(horizontal: false, vertical: true)
                     Text("No right answer. Just something to carry with you.")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
                 .padding(14)
@@ -369,7 +369,7 @@ struct WalkPathFlowView: View {
             }
 
             Text(title)
-                .font(.caption.weight(.medium))
+                .font(AppFont.captionEmphasis)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
 
             FlowPillStack(
@@ -390,7 +390,7 @@ struct WalkPathFlowView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     ForEach(branches) { b in
                         Text("\(b.label): \(b.preview)")
-                            .font(.caption2)
+                            .font(AppFont.caption2)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                     }
                 }
@@ -410,9 +410,9 @@ struct WalkPathFlowView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "cup.and.saucer.fill")
-                        .font(.caption)
+                        .font(AppFont.caption)
                     Text("\(title) — \(content)")
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .multilineTextAlignment(.leading)
                 }
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
@@ -439,31 +439,31 @@ struct WalkPathFlowView: View {
     private func contributeBlock(title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.caption.weight(.medium))
+                .font(AppFont.captionEmphasis)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
             Text(content)
-                .font(.caption)
+                .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             TextField("A resource, an experience, a counterpoint…", text: $contributeDraft, axis: .vertical)
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(3...6)
-                .font(.caption)
+                .font(AppFont.caption)
 
             HStack(spacing: 8) {
                 Button("Share") {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     advance()
                 }
-                .font(.caption)
+                .font(AppFont.caption)
                 .buttonStyle(.bordered)
                 .disabled(contributeDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
                 Button("Skip") {
                     advance()
                 }
-                .font(.caption)
+                .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
             }
         }
@@ -488,22 +488,22 @@ struct WalkPathFlowView: View {
 
             VStack(spacing: 4) {
                 Text("You've reached the end of this branch.")
-                    .font(.caption2)
+                    .font(AppFont.caption2)
                     .foregroundStyle(UndrmndPrototypeTheme.muted)
                 Text("What would you like to do?")
-                    .font(.title3.weight(.medium))
+                    .font(AppFont.title3)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
 
             Text(title)
-                .font(.headline)
+                .font(AppFont.headline)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(content)
-                .font(.caption)
+                .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -520,7 +520,7 @@ struct WalkPathFlowView: View {
                                         .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
                                 )
                             Text(action.label)
-                                .font(.subheadline)
+                                .font(AppFont.subheadline)
                                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                             Spacer()
                         }
@@ -550,9 +550,9 @@ struct WalkPathFlowView: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Text("Continue")
-                    .font(.caption)
+                    .font(AppFont.caption)
                 Image(systemName: "arrow.right")
-                    .font(.caption)
+                    .font(AppFont.caption)
             }
             .foregroundStyle(UndrmndPrototypeTheme.secondary)
         }
@@ -638,7 +638,7 @@ private struct FlexiblePillRow: View {
             onSelect(branch.id)
         } label: {
             Text(branch.label)
-                .font(.caption2.weight(.medium))
+                .font(AppFont.caption2Medium)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .foregroundStyle(muted ? UndrmndPrototypeTheme.muted : (isSelected ? UndrmndPrototypeTheme.paper : UndrmndPrototypeTheme.primary))

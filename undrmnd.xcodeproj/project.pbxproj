@@ -50,6 +50,10 @@
 		E7D30005 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D30006 /* ProfileEditView.swift */; };
 		E7D30007 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D30008 /* ProfileView.swift */; };
 		E7D30009 /* ContentDetailReadOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D3000A /* ContentDetailReadOnlyView.swift */; };
+		E7D40012 /* PathResumeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D40011 /* PathResumeStore.swift */; };
+		E7D50001 /* ContributeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D50002 /* ContributeFeature.swift */; };
+		E7AF1002 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AF1001 /* AppFont.swift */; };
+		E7FN0012 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E7FN0011 /* Fonts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +111,11 @@
 		E7D30006 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		E7D30008 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		E7D3000A /* ContentDetailReadOnlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentDetailReadOnlyView.swift; sourceTree = "<group>"; };
+		E7D40010 /* undrmnd.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = undrmnd.entitlements; sourceTree = "<group>"; };
+		E7D40011 /* PathResumeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathResumeStore.swift; sourceTree = "<group>"; };
+		E7D50002 /* ContributeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeFeature.swift; sourceTree = "<group>"; };
+		E7AF1001 /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
+		E7FN0011 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +160,7 @@
 				A1000015245A1B0000000011 /* Services */,
 				A1000016245A1B0000000012 /* Resources */,
 				A1000017245A1B0000000013 /* Info.plist */,
+				E7D40010 /* undrmnd.entitlements */,
 			);
 			path = undrmnd;
 			sourceTree = "<group>";
@@ -189,8 +199,17 @@
 				E7D30002 /* ThreeCardSessionView.swift */,
 				E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */,
 				E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */,
+				E7D50003 /* Contribute */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		E7D50003 /* Contribute */ = {
+			isa = PBXGroup;
+			children = (
+				E7D50002 /* ContributeFeature.swift */,
+			);
+			path = Contribute;
 			sourceTree = "<group>";
 		};
 		E7LEG0001 /* Legacy */ = {
@@ -267,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */,
+				E7AF1001 /* AppFont.swift */,
 				E7V2GRP00 /* v2 */,
 			);
 			path = Models;
@@ -279,6 +299,7 @@
 				E7D10027 /* PathService.swift */,
 				E7D10029 /* ContentService.swift */,
 				E7D1002B /* ProfileService.swift */,
+				E7D40011 /* PathResumeStore.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -287,6 +308,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000006245A1B0000000003 /* Assets.xcassets */,
+				E7FN0011 /* Fonts */,
 				E7B8SCAN01 /* ScanEffect */,
 			);
 			path = Resources;
@@ -389,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000005245A1B0000000003 /* Assets.xcassets in Resources */,
+				E7FN0012 /* Fonts in Resources */,
 				E7B8SCAN02 /* ScanEffect in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -445,6 +468,9 @@
 				E7D30005 /* ProfileEditView.swift in Sources */,
 				E7D30007 /* ProfileView.swift in Sources */,
 				E7D30009 /* ContentDetailReadOnlyView.swift in Sources */,
+				E7D40012 /* PathResumeStore.swift in Sources */,
+				E7D50001 /* ContributeFeature.swift in Sources */,
+				E7AF1002 /* AppFont.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,6 +619,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = undrmnd/undrmnd.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -622,6 +649,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = undrmnd/undrmnd.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";

@@ -7,7 +7,7 @@ struct EndpointView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 24) {
             Text(note)
-                .font(.body)
+                .font(AppFont.body)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .fixedSize(horizontal: false, vertical: true)

@@ -32,15 +32,15 @@ struct IntroInterstitialView: View {
                 Spacer(minLength: 0)
 
                 Text("undrmnd")
-                    .font(.system(.largeTitle, design: .default, weight: .semibold))
+                    .font(AppFont.largeIntroTitle)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.85)
                     .lineLimit(2)
                     .tracking(0.3)
 
-                Text("A short, finite set of cards to explore, contribute, and then log off feeling lighter.")
-                    .font(.body)
+                Text("Explore anything, the room is yours.")
+                    .font(AppFont.body)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.white.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)
@@ -82,7 +82,7 @@ struct IntroInterstitialView: View {
                             .tint(.white)
                             .scaleEffect(1.15)
                         Text("Preparing intro…")
-                            .font(.subheadline)
+                            .font(AppFont.subheadline)
                             .foregroundStyle(.white.opacity(0.85))
                     }
                 }

@@ -21,7 +21,7 @@ struct ProfileView: View {
                 VStack(spacing: 20) {
                     Spacer()
                     Text("Sign in to claim a handle")
-                        .font(.headline)
+                        .font(AppFont.headline)
                     Button {
                         showSignIn = true
                     } label: {
@@ -43,8 +43,21 @@ struct ProfileView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await refreshSession() }
         .onChange(of: isSignedIn) { _, _ in Task { await load() } }
+        .onChange(of: showSignIn) { _, isShowing in
+            if !isShowing { Task { await refreshSession(); await load() } }
+        }
         .sheet(isPresented: $showSignIn) {
             SignInView()
+        }
+        .toolbar {
+            if isSignedIn {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Sign out") {
+                        Task { await signOut() }
+                    }
+                    .tint(UndrmndPrototypeTheme.secondary)
+                }
+            }
         }
         .sheet(isPresented: $isEditing) {
             if let p = myProfile {
@@ -58,7 +71,7 @@ struct ProfileView: View {
     private var claimForm: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Claim your handle")
-                .font(.title2.weight(.medium))
+                .font(AppFont.title2)
             TextField("handle (2–24: a–z, 0–9, _)", text: $handle)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -66,7 +79,7 @@ struct ProfileView: View {
             TextField("Bio, one line (optional, 140 max)", text: $bio, axis: .vertical)
                 .lineLimit(2...3)
             Text("Pillars to follow")
-                .font(.caption)
+                .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
             ForEach(Pillar.allCases) { pillar in
                 Toggle(pillar.displayName, isOn: bindingPillar(pillar))
@@ -88,9 +101,9 @@ struct ProfileView: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(p.displayName ?? p.username)
-                            .font(.title2)
+                            .font(AppFont.title2)
                         Text("@\(p.username)")
-                            .font(.subheadline)
+                            .font(AppFont.subheadline)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     }
                     Spacer()
@@ -98,25 +111,25 @@ struct ProfileView: View {
                 }
                 if let b = p.bio, !b.isEmpty {
                     Text(b)
-                        .font(.body)
+                        .font(AppFont.body)
                 }
                 if !p.pillarsFollowing.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Following")
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         FlowPillChips(titles: p.pillarsFollowing.map(\.displayName))
                     }
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Contributions")
-                        .font(.headline)
+                        .font(AppFont.headline)
                     ForEach(cards) { c in
                         NavigationLink {
                             ContentDetailReadOnlyView(contentId: c.id)
                         } label: {
                             Text(c.title)
-                                .font(.subheadline)
+                                .font(AppFont.subheadline)
                                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                         }
                     }
@@ -124,11 +137,11 @@ struct ProfileView: View {
                 if !pathNodes.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("On paths")
-                            .font(.headline)
+                            .font(AppFont.headline)
                         ForEach(pathNodes) { n in
                             let title = pathTitles[n.pathId] ?? "Path"
                             Text("\(title) — \(n.branchPrompt ?? "node")")
-                                .font(.caption)
+                                .font(AppFont.caption)
                                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         }
                     }
@@ -150,6 +163,16 @@ struct ProfileView: View {
     private func refreshSession() async {
         isSignedIn = SupabaseService.shared.client.auth.currentSession != nil
             && (SupabaseService.shared.client.auth.currentSession?.isExpired == false)
+    }
+
+    private func signOut() async {
+        do {
+            try await SupabaseService.shared.client.auth.signOut()
+            myProfile = nil
+            isSignedIn = false
+        } catch {
+            loadError = error.localizedDescription
+        }
     }
 
     private func load() async {
@@ -199,7 +222,7 @@ private struct FlowPillChips: View {
         VStack(alignment: .leading, spacing: 6) {
             ForEach(titles, id: \.self) { t in
                 Text(t)
-                    .font(.caption)
+                    .font(AppFont.caption)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(UndrmndPrototypeTheme.panel)

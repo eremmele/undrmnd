@@ -3,7 +3,35 @@ import UIKit
 
 // MARK: - Territory map (ported from `TerritoryMapScreen` in `undrmnd-screens.tsx`)
 
+/// Tap targets for nodes on the sketch map; coordinates match the 260×300 canvas, then the stack is scaled.
+private struct MapDot: Identifiable {
+    let id: String
+    let x: CGFloat
+    let y: CGFloat
+    let hitRadius: CGFloat
+    let pillar: Pillar
+    let accessLabel: String
+}
+
 private struct TerritoryMapViteGraphic: View {
+    let onSelectPillar: (Pillar) -> Void
+
+    private static let baseDots: [MapDot] = [
+        MapDot(id: "lw-40", x: 130, y: 40, hitRadius: 20, pillar: .livingWorld, accessLabel: "Living World topic"),
+        MapDot(id: "lw-90", x: 130, y: 90, hitRadius: 18, pillar: .livingWorld, accessLabel: "Living World topic"),
+        MapDot(id: "lw-140", x: 130, y: 140, hitRadius: 18, pillar: .livingWorld, accessLabel: "Living World topic"),
+        MapDot(id: "lw-80-180", x: 80, y: 180, hitRadius: 18, pillar: .livingWorld, accessLabel: "Living World topic"),
+        MapDot(id: "hwk-180", x: 130, y: 180, hitRadius: 16, pillar: .howWeKnow, accessLabel: "How we know topic"),
+        MapDot(id: "mb-180", x: 180, y: 180, hitRadius: 16, pillar: .mindAndBrain, accessLabel: "Mind and brain topic"),
+        MapDot(id: "here", x: 80, y: 210, hitRadius: 22, pillar: .livingWorld, accessLabel: "You are here, Living World"),
+        MapDot(id: "mb-60", x: 200, y: 60, hitRadius: 16, pillar: .mindAndBrain, accessLabel: "Mind and brain topic"),
+        MapDot(id: "mb-100", x: 200, y: 100, hitRadius: 16, pillar: .mindAndBrain, accessLabel: "Mind and brain topic"),
+        MapDot(id: "mb-140", x: 200, y: 140, hitRadius: 16, pillar: .mindAndBrain, accessLabel: "Mind and brain topic"),
+        MapDot(id: "cs-50", x: 50, y: 260, hitRadius: 14, pillar: .cosmos, accessLabel: "Cosmos topic"),
+        MapDot(id: "hwk-270", x: 80, y: 270, hitRadius: 14, pillar: .howWeKnow, accessLabel: "How we know topic"),
+        MapDot(id: "cs-110", x: 110, y: 265, hitRadius: 14, pillar: .cosmos, accessLabel: "Cosmos topic")
+    ]
+
     var body: some View {
         ZStack {
             Canvas { context, _ in
@@ -23,7 +51,7 @@ private struct TerritoryMapViteGraphic: View {
                     )
                 }
 
-                // Example cluster A
+                // Cluster A
                 strokeLine(130, 40, 130, 90, color: UndrmndPrototypeTheme.secondary, width: 1.5)
                 strokeLine(130, 90, 130, 140, color: UndrmndPrototypeTheme.secondary, width: 1.5)
                 strokeLine(130, 140, 80, 180, color: UndrmndPrototypeTheme.primary, width: 1.5)
@@ -31,7 +59,7 @@ private struct TerritoryMapViteGraphic: View {
                 strokeLine(130, 140, 180, 180, color: UndrmndPrototypeTheme.divider, width: 1)
                 strokeLine(80, 180, 80, 210, color: UndrmndPrototypeTheme.primary, width: 1.5)
 
-                // Example cluster B
+                // Cluster B
                 strokeLine(200, 60, 200, 100, color: UndrmndPrototypeTheme.muted, width: 1, dash: [3, 3])
                 strokeLine(200, 100, 200, 140, color: UndrmndPrototypeTheme.muted, width: 1, dash: [3, 3])
 
@@ -70,116 +98,174 @@ private struct TerritoryMapViteGraphic: View {
             }
 
             Text("Living World")
-                .font(.system(size: 10, weight: .medium))
+                .font(AppFont.mapLabel(approxSize: 10, mapWeight: .medium))
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 .position(x: 130, y: 28)
 
             Text("You are here")
-                .font(.system(size: 8, weight: .medium))
+                .font(AppFont.mapLabel(approxSize: 8, mapWeight: .medium))
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .position(x: 80, y: 228)
 
             Text("Mind & Brain")
-                .font(.system(size: 9))
+                .font(AppFont.mapLabel(approxSize: 9, mapWeight: .regular))
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .position(x: 200, y: 48)
 
             Text("2 / 5")
-                .font(.system(size: 8))
+                .font(AppFont.mapLabel(approxSize: 8, mapWeight: .regular))
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .position(x: 200, y: 158)
 
             Text("Communities")
-                .font(.system(size: 7))
+                .font(AppFont.mapLabel(approxSize: 7, mapWeight: .regular))
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .position(x: 130, y: 196)
 
             Text("Coping")
-                .font(.system(size: 7))
+                .font(AppFont.mapLabel(approxSize: 7, mapWeight: .regular))
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .position(x: 180, y: 196)
 
             Text("Adjacent paths…")
-                .font(.system(size: 8))
+                .font(AppFont.mapLabel(approxSize: 8, mapWeight: .regular))
                 .foregroundStyle(UndrmndPrototypeTheme.muted)
                 .position(x: 80, y: 290)
+
+            ForEach(Self.baseDots) { dot in
+                Button {
+                    onSelectPillar(dot.pillar)
+                } label: {
+                    Color.clear
+                        .frame(width: dot.hitRadius * 2, height: dot.hitRadius * 2)
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .position(x: dot.x, y: dot.y)
+                .accessibilityLabel(Text(dot.accessLabel))
+            }
         }
         .frame(width: 260, height: 300)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Territory map sketch with two example topic clusters")
+        .scaleEffect(1.35)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Territory map sketch; tap a dot for a topic.")
     }
 }
 
 struct TerritoryMapPlaceholderView: View {
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TerritoryMapViteGraphic()
+    var onSelectPillar: (Pillar) -> Void = { _ in }
+    /// When non-nil, shows a **Done** button (e.g. when the map is presented in a sheet).
+    var onMapDismiss: (() -> Void)? = nil
 
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .bottom) {
+                VStack {
+                    Spacer(minLength: 0)
+                    TerritoryMapViteGraphic(onSelectPillar: onSelectPillar)
+                        .frame(maxWidth: .infinity)
+                        .frame(maxHeight: max(360, geo.size.height * 0.72))
+                    Spacer(minLength: 0)
+                }
                 VStack(spacing: 4) {
                     Text("Your accumulated understanding")
-                        .font(.caption.weight(.medium))
+                        .font(AppFont.captionEmphasis)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     Text("2 topics · 1 completed branch · 1 in progress")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                 }
                 .multilineTextAlignment(.center)
+                .padding(16)
+                .frame(maxWidth: .infinity)
+                .background(UndrmndPrototypeTheme.panel)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 4)
             }
-            .frame(maxWidth: .infinity)
-            .padding(24)
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitle("Your Map")
         .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-// MARK: - Campfire
-
-struct CampfirePlaceholderView: View {
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Spacer(minLength: 0)
-                    Text("Open question")
-                        .font(.system(size: 9))
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+        .toolbar {
+            if let onMapDismiss {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done", action: onMapDismiss)
                 }
-
-                Text("What makes a good open question?")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text("Thread placeholder — no live data in this build")
-                    .font(.caption2)
-                    .foregroundStyle(UndrmndPrototypeTheme.muted)
-
-                Text("Thread bodies and replies will load from your backend later — this headline matches the Vite prototype.")
-                    .font(.subheadline)
-                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(20)
         }
-        .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle("Campfire")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-// MARK: - Nearby
+// MARK: - Nearby (local meetup / event links)
 
-struct NearbyPlaceholderView: View {
+private struct PublicEventRow: Identifiable {
+    let id = UUID()
+    let title: String
+    let whenWhere: String
+    let source: String
+    let url: URL
+}
+
+struct NearbyEventsView: View {
+    private let events: [PublicEventRow] = [
+        PublicEventRow(
+            title: "Astronomy on Tap — public talks at a local pub",
+            whenWhere: "Next Tuesday · 7:00 PM · River District",
+            source: "Meetup",
+            url: URL(string: "https://www.meetup.com/find/?source=EVENTS&location=astronomy")!
+        ),
+        PublicEventRow(
+            title: "Field sketching: winter buds & ID tips",
+            whenWhere: "Saturday · 10:00 AM · City botanical garden",
+            source: "Eventbrite",
+            url: URL(string: "https://www.eventbrite.com/d/online/nature/")!
+        ),
+        PublicEventRow(
+            title: "Civic data night — map the noise with open tools",
+            whenWhere: "First Thursday · 6:30 PM · Public library",
+            source: "Meetup",
+            url: URL(string: "https://www.meetup.com/find/?source=EVENTS&location=civic%20data")!
+        ),
+        PublicEventRow(
+            title: "“Ask a scientist” — middle school Q&A (volunteer hosts)",
+            whenWhere: "Virtual · RSVP for link",
+            source: "Eventbrite",
+            url: URL(string: "https://www.eventbrite.com/d/online/science/")!
+        )
+    ]
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Communities and events near you will show up here with explicit consent — never silent tracking.")
-                    .font(.subheadline)
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Meetup and Eventbrite-style listings; open a link in your browser. The app does not use your location in the background.")
+                    .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+
+                ForEach(events) { e in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(e.title)
+                            .font(AppFont.headline)
+                        Text(e.whenWhere)
+                            .font(AppFont.subheadline)
+                        Text(e.source)
+                            .font(AppFont.caption2)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                        Link("View listing in browser", destination: e.url)
+                            .font(AppFont.captionEmphasis)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(UndrmndPrototypeTheme.panel)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                    )
+                }
             }
             .padding(20)
         }
@@ -196,11 +282,11 @@ struct ProfilePlaceholderView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Profile")
-                    .font(.title2.weight(.medium))
+                    .font(AppFont.title2)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
 
                 Text("Minimal account details only — aligned with the project’s privacy rules.")
-                    .font(.subheadline)
+                    .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
             }
             .padding(20)
@@ -216,7 +302,16 @@ struct ProfilePlaceholderView: View {
 struct SearchPlaceholderView: View {
     @Environment(\.dismiss) private var dismiss
 
-    private let recent = ["Cosmos", "Living World", "How We Know"]
+    /// Tapping a term opens the matching in-app “content page” (pillar session or goal flow).
+    var onNavigate: (HomeRoute) -> Void
+
+    private let presets: [(String, HomeRoute)] = [
+        ("Cosmos", .threeCard(.cosmos)),
+        ("Living World", .threeCard(.livingWorld)),
+        ("Mind & Brain", .threeCard(.mindAndBrain)),
+        ("How We Know", .threeCard(.howWeKnow)),
+        ("Set a goal and find a path", .goalClarifier)
+    ]
 
     var body: some View {
         NavigationStack {
@@ -224,7 +319,7 @@ struct SearchPlaceholderView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Search paths, topics, communities…")
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                     }
                     .padding(14)
@@ -235,21 +330,34 @@ struct SearchPlaceholderView: View {
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
                     )
 
-                    Text("Recent")
-                        .font(.caption2)
+                    Text("Jump to a topic or flow")
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
 
-                    ForEach(recent, id: \.self) { term in
-                        Text(term)
-                            .font(.subheadline)
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 8)
-                            .overlay(alignment: .bottom) {
-                                Rectangle()
-                                    .fill(UndrmndPrototypeTheme.divider)
-                                    .frame(height: 1)
+                    ForEach(presets, id: \.0) { label, route in
+                        Button {
+                            onNavigate(route)
+                            dismiss()
+                        } label: {
+                            HStack {
+                                Text(label)
+                                    .font(AppFont.subheadline)
+                                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(AppFont.caption)
+                                    .foregroundStyle(UndrmndPrototypeTheme.muted)
                             }
+                            .padding(.vertical, 10)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Open \(label)")
+                        .overlay(alignment: .bottom) {
+                            Rectangle()
+                                .fill(UndrmndPrototypeTheme.divider)
+                                .frame(height: 1)
+                        }
                     }
                 }
                 .padding(16)
@@ -286,23 +394,23 @@ struct ClosingSessionSheet: View {
 
                 VStack(spacing: 8) {
                     Text("SESSION COMPLETE")
-                        .font(.system(size: 10, weight: .medium))
+                        .font(AppFont.mapLabel(approxSize: 10, mapWeight: .medium))
                         .tracking(0.08)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                     Text(path.title)
-                        .font(.title3.weight(.medium))
+                        .font(AppFont.title3)
                         .foregroundStyle(UndrmndPrototypeTheme.primary)
                 }
                 .frame(maxWidth: .infinity)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("WHAT YOU EXPLORED")
-                        .font(.system(size: 10, weight: .medium))
+                        .font(AppFont.mapLabel(approxSize: 10, mapWeight: .medium))
                         .tracking(0.05)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     ForEach(Array(path.exploredNuggetTitles.prefix(3).enumerated()), id: \.offset) { _, title in
                         Text("· \(title)")
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.primary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -317,10 +425,10 @@ struct ClosingSessionSheet: View {
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Something to carry with you")
-                        .font(.caption2)
+                        .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                     Text("“\(path.carryQuote)”")
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .italic()
                         .foregroundStyle(UndrmndPrototypeTheme.primary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -335,12 +443,12 @@ struct ClosingSessionSheet: View {
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("What will you remember from today?")
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     TextField("Optional — for you, not for us", text: $reflection, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(3...6)
-                        .font(.caption)
+                        .font(AppFont.caption)
                 }
 
                 if !trailheadChosen {
@@ -350,9 +458,9 @@ struct ClosingSessionSheet: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "clock")
-                                    .font(.caption)
+                                    .font(AppFont.caption)
                                 Text("Set a time to return")
-                                    .font(.caption)
+                                    .font(AppFont.caption)
                             }
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         }
@@ -361,7 +469,7 @@ struct ClosingSessionSheet: View {
                     } else {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("When would you like to continue?")
-                                .font(.caption.weight(.medium))
+                                .font(AppFont.captionEmphasis)
                                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                             FlowTrailheadTags(options: trailheadOptions) {
                                 trailheadChosen = true
@@ -379,9 +487,9 @@ struct ClosingSessionSheet: View {
                 } else {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.circle")
-                            .font(.caption)
+                            .font(AppFont.caption)
                         Text("Noted for your own reference — no automatic reminders from the app.")
-                            .font(.caption)
+                            .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -389,10 +497,10 @@ struct ClosingSessionSheet: View {
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("YOUR MAP IS GROWING")
-                        .font(.system(size: 10, weight: .medium))
+                        .font(AppFont.mapLabel(approxSize: 10, mapWeight: .medium))
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                     Text(path.closingTerritoryBlurb)
-                        .font(.caption)
+                        .font(AppFont.caption)
                         .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -408,7 +516,7 @@ struct ClosingSessionSheet: View {
                     onDismiss()
                 } label: {
                     Text("Close session")
-                        .font(.subheadline.weight(.medium))
+                        .font(AppFont.subheadlineEmphasis)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .foregroundStyle(UndrmndPrototypeTheme.paper)
@@ -436,7 +544,7 @@ private struct FlowTrailheadTags: View {
                     onSelect()
                 } label: {
                     Text(option)
-                        .font(.caption2.weight(.medium))
+                        .font(AppFont.caption2Medium)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
                         .foregroundStyle(UndrmndPrototypeTheme.primary)
