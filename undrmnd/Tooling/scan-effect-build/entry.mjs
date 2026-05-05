@@ -1,68 +1,34 @@
+/**
+ * Intro background: layered particle nebula (no video). Same pointer field for mouse / touch —
+ * unified NDC coords so touch follows the streak the way mouse-follow does on desktop.
+ * Not derived from marketplace components; mindful motion only (respects prefers-reduced-motion).
+ */
 import * as THREE from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
-// IIFE for WKWebView: video + scan shader, cover UVs, touch scan spotlight. Ready = decoded frames + buffer + WebGL warm-up.
-// Video load starts first so it overlaps Three.js / WebGL init (was previously gated entirely behind renderer setup).
 (async () => {
-  const video = document.createElement("video");
-  video.src = "./video.mp4";
-  video.muted = true;
-  video.loop = true;
-  video.playsInline = true;
-  video.setAttribute("playsinline", "");
-  video.setAttribute("webkit-playsinline", "");
-  video.preload = "auto";
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
-  const videoReady = (async () => {
-    try {
-      await new Promise((resolve, reject) => {
-        video.addEventListener("canplaythrough", resolve, { once: true });
-        video.addEventListener("error", reject, { once: true });
-        video.load();
-      });
-      await video.play();
-    } catch (_) {}
-  })();
+  /** Pointer in normalized screen space: x,y in [0,1], strength 0..1. */
+  const pointerUv = new THREE.Vector2(0.5, 0.5);
+  let pointerStrength = 0;
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
-  camera.position.z = 1;
-  const renderer = new THREE.WebGLRenderer({
-    antialias: false,
-    powerPreference: "default",
-    failIfMajorPerformanceCaveat: false,
-  });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-  document.body.appendChild(renderer.domElement);
-
-  await videoReady;
-
-  const videoTexture = new THREE.VideoTexture(video);
-  videoTexture.colorSpace = THREE.SRGBColorSpace;
-  videoTexture.minFilter = THREE.LinearFilter;
-  videoTexture.magFilter = THREE.LinearFilter;
-
-  const touchUv = new THREE.Vector2(0.5, 0.5);
-  let touchStrength = 0;
-
-  function setTouchUvFromClient(clientX, clientY) {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    if (w <= 0 || h <= 0) return;
-    touchUv.x = clientX / w;
-    touchUv.y = 1.0 - clientY / h;
+  function setPointerFromClient(clientX, clientY) {
+    pointerUv.x = clientX / window.innerWidth;
+    pointerUv.y = 1 - clientY / Math.max(window.innerHeight, 1);
   }
 
   window.addEventListener(
     "touchstart",
     (e) => {
-      touchStrength = 1;
-      if (e.touches.length > 0) {
+      pointerStrength = 1;
+      if (e.touches?.length > 0) {
         const t = e.touches[0];
-        setTouchUvFromClient(t.clientX, t.clientY);
+        setPointerFromClient(t.clientX, t.clientY);
       }
     },
     { passive: true }
@@ -70,194 +36,164 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
   window.addEventListener(
     "touchmove",
     (e) => {
-      if (e.touches.length > 0) {
+      if (e.touches?.length > 0) {
         const t = e.touches[0];
-        setTouchUvFromClient(t.clientX, t.clientY);
+        pointerStrength = 1;
+        setPointerFromClient(t.clientX, t.clientY);
       }
     },
     { passive: true }
   );
-  window.addEventListener("touchend", () => { touchStrength = 0; }, { passive: true });
-  window.addEventListener("touchcancel", () => { touchStrength = 0; }, { passive: true });
+  window.addEventListener("touchend", () => {
+    pointerStrength = 0;
+  }, { passive: true });
+  window.addEventListener("touchcancel", () => {
+    pointerStrength = 0;
+  }, { passive: true });
 
-  const vw = video.videoWidth > 0 ? video.videoWidth : 804;
-  const vh = video.videoHeight > 0 ? video.videoHeight : 1748;
-  const sw = window.innerWidth;
-  const sh = window.innerHeight;
+  window.addEventListener("mousemove", (e) => {
+    pointerStrength = 1;
+    setPointerFromClient(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseleave", () => {
+    pointerStrength = 0;
+  });
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x04040a);
+
+  const camera = new THREE.PerspectiveCamera(
+    52,
+    window.innerWidth / Math.max(window.innerHeight, 1),
+    0.08,
+    80
+  );
+  camera.position.z = 6.2;
+
+  const renderer = new THREE.WebGLRenderer({
+    antialias: false,
+    powerPreference: "default",
+    failIfMajorPerformanceCaveat: false,
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  document.body.appendChild(renderer.domElement);
+
+  const raycaster = new THREE.Raycaster();
+  const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+  const planeHit = new THREE.Vector3();
+  const ndc = new THREE.Vector2();
+
+  function targetOnPlane() {
+    ndc.x = pointerUv.x * 2 - 1;
+    ndc.y = pointerUv.y * 2 - 1;
+    raycaster.setFromCamera(ndc, camera);
+    if (raycaster.ray.intersectPlane(planeZ, planeHit)) return planeHit;
+    return null;
+  }
+
+  const area = window.innerWidth * window.innerHeight;
+  const n = reduceMotion
+    ? 1400
+    : window.innerWidth < 420
+      ? 3200
+      : Math.min(8800, Math.floor(area / 420));
+
+  const positions = new Float32Array(n * 3);
+  const rest = new Float32Array(n * 3);
+  const vel = new Float32Array(n * 3);
+  const phase = new Float32Array(n);
+  const hueJ = new Float32Array(n);
+
+  const spreadX = 7.2;
+  const spreadY = 10.5;
+  const spreadZ = 4.2;
+
+  for (let i = 0; i < n; i++) {
+    const i3 = i * 3;
+    const x = (Math.random() - 0.5) * spreadX;
+    const y = (Math.random() - 0.5) * spreadY;
+    const z = (Math.random() - 0.5) * spreadZ;
+    positions[i3] = x;
+    positions[i3 + 1] = y;
+    positions[i3 + 2] = z;
+    rest[i3] = x;
+    rest[i3 + 1] = y;
+    rest[i3 + 2] = z;
+    phase[i] = Math.random() * Math.PI * 2;
+    hueJ[i] = Math.random();
+  }
+
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute("aPhase", new THREE.BufferAttribute(phase, 1));
+  geom.setAttribute("aHueJ", new THREE.BufferAttribute(hueJ, 1));
 
   const material = new THREE.ShaderMaterial({
     uniforms: {
-      uMap: { value: videoTexture },
-      uProgress: { value: 0.0 },
-      uTexelSize: { value: new THREE.Vector2(1 / vw, 1 / vh) },
-      uScanWidth: { value: 0.028 },
-      uViewAspect: { value: sh > 0 ? sw / sh : 1.0 },
-      uVideoAspect: { value: vh > 0 ? vw / vh : 1.0 },
-      uTouchUv: { value: new THREE.Vector2(0.5, 0.5) },
-      uTouchStrength: { value: 0.0 },
+      uTime: { value: 0 },
+      uPointScale: { value: reduceMotion ? 1.2 : 1.55 },
     },
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
     vertexShader: `
-    varying vec2 vUv;
-    void main(){ vUv=uv; gl_Position=vec4(position,1.0); }
-  `,
+      uniform float uTime;
+      uniform float uPointScale;
+      attribute float aPhase;
+      attribute float aHueJ;
+      varying float vAlpha;
+      varying vec3 vColor;
+
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        float tw = uTime * (0.35 + aHueJ * 0.25);
+        float pulse = 0.78 + 0.22 * sin(tw + aPhase);
+        vAlpha = 0.22 + 0.55 * pulse * (0.35 + aHueJ);
+
+        vec3 deep = vec3(0.28, 0.38, 1.0);
+        vec3 aqua = vec3(0.42, 0.85, 1.0);
+        vec3 mist = vec3(0.88, 0.92, 1.0);
+        vColor = mix(mix(deep, aqua, aHueJ), mist, 0.18 + 0.25 * pulse);
+
+        gl_PointSize = uPointScale * (220.0 / -mv.z) * (0.75 + aHueJ * 0.8);
+        gl_Position = projectionMatrix * mv;
+      }
+    `,
     fragmentShader: `
-    precision highp float;
-    uniform sampler2D uMap;
-    uniform float uProgress;
-    uniform vec2 uTexelSize;
-    uniform float uScanWidth;
-    uniform float uViewAspect;
-    uniform float uVideoAspect;
-    uniform vec2 uTouchUv;
-    uniform float uTouchStrength;
-    varying vec2 vUv;
-
-    vec2 coverUv(vec2 uv) {
-      float sa = uViewAspect;
-      float va = max(uVideoAspect, 0.0001);
-      float eps = 0.0005;
-      if (abs(sa - va) < eps) return uv;
-      if (sa > va) {
-        float s = sa / va;
-        uv.x = (uv.x - 0.5) / s + 0.5;
-      } else {
-        float s = va / sa;
-        uv.y = (uv.y - 0.5) / s + 0.5;
+      precision highp float;
+      varying float vAlpha;
+      varying vec3 vColor;
+      void main() {
+        vec2 q = gl_PointCoord * 2.0 - 1.0;
+        float r = dot(q, q);
+        if (r > 1.0) discard;
+        float soft = pow(1.0 - r, 2.2);
+        gl_FragColor = vec4(vColor, vAlpha * soft);
       }
-      return uv;
-    }
-
-    float luma(vec3 c) {
-      return dot(c, vec3(0.299, 0.587, 0.114));
-    }
-
-    float sobelEdge(vec2 uv) {
-      vec2 ts = uTexelSize * 2.0;
-      float tl = luma(texture2D(uMap, uv + vec2(-ts.x, ts.y)).rgb);
-      float t  = luma(texture2D(uMap, uv + vec2(0.0, ts.y)).rgb);
-      float tr = luma(texture2D(uMap, uv + vec2(ts.x, ts.y)).rgb);
-      float l  = luma(texture2D(uMap, uv + vec2(-ts.x, 0.0)).rgb);
-      float r  = luma(texture2D(uMap, uv + vec2(ts.x, 0.0)).rgb);
-      float bl = luma(texture2D(uMap, uv + vec2(-ts.x, -ts.y)).rgb);
-      float b  = luma(texture2D(uMap, uv + vec2(0.0, -ts.y)).rgb);
-      float br = luma(texture2D(uMap, uv + vec2(ts.x, -ts.y)).rgb);
-      float gx = -tl - 2.0*l - bl + tr + 2.0*r + br;
-      float gy = -tl - 2.0*t - tr + bl + 2.0*b + br;
-      return sqrt(gx*gx + gy*gy);
-    }
-
-    vec3 screenBlend(vec3 base, vec3 blend) {
-      return 1.0 - (1.0 - base) * (1.0 - blend);
-    }
-
-    void main() {
-      vec2 uv = coverUv(vUv);
-      vec3 raw = texture2D(uMap, uv).rgb;
-      float depth = pow(luma(raw), 0.7);
-      vec3 color = raw * 0.5;
-      float edge = clamp(sobelEdge(uv) * 5.0, 0.0, 1.0);
-      float flatArea = 1.0 - edge;
-      float flow = 1.0 - smoothstep(0.0, uScanWidth, abs(depth - uProgress));
-
-      float touchSpot = 1.0;
-      if (uTouchStrength > 0.001) {
-        vec2 d = vUv - uTouchUv;
-        float r2 = dot(d, d);
-        touchSpot = 1.0 + uTouchStrength * 2.4 * exp(-r2 * 58.0);
-      }
-
-      vec3 mask = vec3(flatArea) * flow * vec3(7.0, 7.0, 7.0) * touchSpot;
-      vec3 result = screenBlend(color, mask);
-      gl_FragColor = vec4(result, 1.0);
-    }
-  `,
+    `,
   });
 
-  function updateAspectUniforms() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    if (h > 0) material.uniforms.uViewAspect.value = w / h;
-    const iw = video.videoWidth;
-    const ih = video.videoHeight;
-    if (ih > 0) material.uniforms.uVideoAspect.value = iw / ih;
-  }
-
-  const updateTexelFromVideo = () => {
-    const w = video.videoWidth;
-    const h = video.videoHeight;
-    if (w > 0 && h > 0) {
-      material.uniforms.uTexelSize.value.set(1 / w, 1 / h);
-      material.uniforms.uVideoAspect.value = w / h;
-    }
-  };
-  video.addEventListener("loadeddata", () => {
-    updateTexelFromVideo();
-    updateAspectUniforms();
-  });
-
-  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-  scene.add(quad);
+  const points = new THREE.Points(geom, material);
+  scene.add(points);
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
   composer.addPass(
     new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      1.2,
-      0.55,
-      0.85
+      reduceMotion ? 0.45 : 0.72,
+      0.36,
+      0.72
     )
   );
 
   const clock = new THREE.Clock();
-  const SCAN_CYCLE = 10.0;
-  const SCAN_SWEEP = 6.0;
+  const posAttr = geom.getAttribute("position");
 
-  function bufferedSecondsAhead(v) {
-    try {
-      if (!v.buffered || v.buffered.length === 0) return 0;
-      const t = v.currentTime;
-      let best = 0;
-      for (let i = 0; i < v.buffered.length; i++) {
-        const start = v.buffered.start(i);
-        const end = v.buffered.end(i);
-        if (t >= start && t <= end) best = Math.max(best, end - t);
-      }
-      return best;
-    } catch {
-      return 0;
-    }
-  }
-
-  /** Seconds of media ahead of playhead we require before hiding the loader (avoids early choppy frames). */
-  function minBufferSecondsAhead(v) {
-    try {
-      const d = v.duration;
-      if (Number.isFinite(d) && d > 0 && d < 6) {
-        return Math.max(0.5, Math.min(1.05, d * 0.38));
-      }
-    } catch (_) {}
-    return 0.95;
-  }
-
+  let frames = 0;
+  const minFramesBeforeReveal = reduceMotion ? 4 : 10;
   let didReveal = false;
-  let glWarmupFrames = 0;
-  let videoFramesDecoded = 0;
-  let rvfcChainStarted = false;
-  /** performance.now() when we first saw steady playback (decoder + compositor warm-up). */
-  let playWarmStartMs = 0;
-  const hasRvfc = typeof video.requestVideoFrameCallback === "function";
-
-  function startVideoFrameCounting() {
-    if (!hasRvfc || rvfcChainStarted || didReveal) return;
-    rvfcChainStarted = true;
-    const step = () => {
-      if (didReveal) return;
-      videoFramesDecoded += 1;
-      video.requestVideoFrameCallback(step);
-    };
-    video.requestVideoFrameCallback(step);
-  }
 
   function revealWhenReady() {
     if (didReveal) return;
@@ -268,65 +204,80 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
     } catch (_) {}
   }
 
+  function resize() {
+    const w = window.innerWidth;
+    const h = Math.max(window.innerHeight, 1);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    composer.setSize(w, h);
+  }
+  window.addEventListener("resize", resize);
+
   setTimeout(() => {
-    if (!didReveal) revealWhenReady();
-  }, 16000);
+    revealWhenReady();
+  }, 9000);
 
   function animate() {
     requestAnimationFrame(animate);
-    const elapsed = clock.getElapsedTime();
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
+    material.uniforms.uTime.value = t;
 
-    const ct = elapsed % SCAN_CYCLE;
-    const progress =
-      ct < SCAN_SWEEP ? 1.0 - Math.pow(1.0 - ct / SCAN_SWEEP, 2) : 1.1;
+    const target = pointerStrength > 0.02 ? targetOnPlane() : null;
 
-    material.uniforms.uProgress.value = progress;
-    material.uniforms.uTouchUv.value.copy(touchUv);
-    material.uniforms.uTouchStrength.value = touchStrength;
+    const pull = pointerStrength > 0.02 ? 12.8 * pointerStrength : 0;
+    const damp = reduceMotion ? 0.965 : 0.988;
+    const restK = reduceMotion ? 0.032 : 0.055;
+    const idleAmp = reduceMotion ? 0.012 : 0.055;
+
+    for (let i = 0; i < n; i++) {
+      const i3 = i * 3;
+      let px = posAttr.array[i3];
+      let py = posAttr.array[i3 + 1];
+      let pz = posAttr.array[i3 + 2];
+
+      const rx = rest[i3];
+      const ry = rest[i3 + 1];
+      const rz = rest[i3 + 2];
+
+      let ax =
+        Math.sin(t * 0.38 + phase[i]) * idleAmp -
+        restK * (px - rx);
+      let ay =
+        Math.cos(t * 0.31 + phase[i] * 1.1) * idleAmp -
+        restK * (py - ry);
+      let az =
+        Math.sin(t * 0.22 + hueJ[i]) * idleAmp * 0.85 -
+        restK * (pz - rz);
+
+      if (target) {
+        const dx = target.x - px;
+        const dy = target.y - py;
+        const dz = target.z - pz;
+        const d2 = dx * dx + dy * dy + dz * dz + 0.45;
+        const f = pull / d2;
+        ax += dx * f;
+        ay += dy * f;
+        az += dz * f * 0.55;
+      }
+
+      vel[i3] = (vel[i3] + ax * dt * 62) * damp;
+      vel[i3 + 1] = (vel[i3 + 1] + ay * dt * 62) * damp;
+      vel[i3 + 2] = (vel[i3 + 2] + az * dt * 62) * damp;
+
+      posAttr.array[i3] = px + vel[i3] * dt * 52;
+      posAttr.array[i3 + 1] = py + vel[i3 + 1] * dt * 52;
+      posAttr.array[i3 + 2] = pz + vel[i3 + 2] * dt * 52;
+    }
+
+    posAttr.needsUpdate = true;
 
     composer.render();
-
-    if (!didReveal) {
-      const playing = !video.paused && video.readyState >= 3;
-      const t = video.currentTime;
-      if (playing && t > 0.02) {
-        if (!playWarmStartMs) playWarmStartMs = performance.now();
-        glWarmupFrames += 1;
-        startVideoFrameCounting();
-      }
-
-      const ahead = bufferedSecondsAhead(video);
-      const needAhead = minBufferSecondsAhead(video);
-      const bufferOk = ahead >= needAhead;
-      const msSincePlayWarm = playWarmStartMs
-        ? performance.now() - playWarmStartMs
-        : 0;
-      // Wall-clock after first frames: GPU + video decode pipeline often still stutters without this.
-      const wallOk = msSincePlayWarm >= 2200;
-      const decodedOk = !hasRvfc || videoFramesDecoded >= 24;
-      const glOk = glWarmupFrames >= 24;
-
-      if (
-        playing &&
-        t > 0.05 &&
-        bufferOk &&
-        wallOk &&
-        glOk &&
-        decodedOk
-      ) {
-        revealWhenReady();
-      }
-    }
+    frames += 1;
+    if (frames >= minFramesBeforeReveal) revealWhenReady();
   }
   animate();
-
-  window.addEventListener("resize", () => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    renderer.setSize(w, h);
-    composer.setSize(w, h);
-    updateAspectUniforms();
-  });
 })().catch(() => {
   document.getElementById("loading")?.classList.add("hidden");
   try {

@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Intro screen with bundled scan-effect (video + WebGL) behind copy and continue (see `UndrmndApp`).
-/// Only **Continue** is hit-tested; other touches pass through for the scan touch highlight in the WebView.
+/// Intro screen with bundled Three.js particle background behind copy and continue (see `UndrmndApp`).
+/// Only **Continue** is hit-tested; other touches pass through to the WebView so the nebula can react to touch.
 struct IntroInterstitialView: View {
     var onContinue: () -> Void
 
