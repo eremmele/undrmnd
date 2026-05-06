@@ -1,6 +1,8 @@
 # Xcode
 build/
 DerivedData/
+# Local DerivedData when using `xcodebuild -derivedDataPath` (e.g. workspace / CI / sandbox)
+.derivedDataCursor/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
