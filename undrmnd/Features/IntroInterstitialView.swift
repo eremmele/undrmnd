@@ -5,21 +5,41 @@ import SwiftUI
 struct IntroInterstitialView: View {
     var onContinue: () -> Void
 
-    @State private var scanBackgroundReady = false
+    /// E‑reader‑toned parchment + grayscale torus; keep in sync with `ScanEffect/index.html` and `ScanEffectWebView`.
+    private enum IntroEInkPaper {
+        static let paperTop = Color(red: 244 / 255, green: 240 / 255, blue: 232 / 255)
+        static let paperBottom = Color(red: 228 / 255, green: 223 / 255, blue: 212 / 255)
+        static let vignetteWarm = Color(red: 218 / 255, green: 212 / 255, blue: 200 / 255)
+        static let headline = Color(red: 48 / 255, green: 46 / 255, blue: 43 / 255)
+        static let body = Color(red: 72 / 255, green: 69 / 255, blue: 62 / 255)
+        static let ctaInk = UndrmndPrototypeTheme.accent
+        static let ctaFill = Color.black.opacity(0.06)
+        static let ctaStroke = Color.black.opacity(0.12)
+    }
+
+    /// WebGL readiness does not gate the splash; WKWebView is mounted after first frame so Cold launch stays responsive.
+    @State private var scanBackgroundReady = true
+    @State private var scanBackdropMounted = false
 
     var body: some View {
         ZStack {
-            Color.black
-                .ignoresSafeArea()
+            LinearGradient(
+                colors: [IntroEInkPaper.paperTop, IntroEInkPaper.paperBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
-            ScanEffectWebView(isBackgroundReady: $scanBackgroundReady)
-                .ignoresSafeArea()
-                .accessibilityHidden(true)
+            if scanBackdropMounted {
+                ScanEffectWebView(isBackgroundReady: $scanBackgroundReady)
+                    .ignoresSafeArea()
+                    .accessibilityHidden(true)
+            }
 
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.22),
-                    Color.black.opacity(0.78)
+                    IntroEInkPaper.paperTop.opacity(0.2),
+                    IntroEInkPaper.vignetteWarm.opacity(0.55)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -33,7 +53,7 @@ struct IntroInterstitialView: View {
 
                 Text("undrmnd")
                     .font(AppFont.largeIntroTitle)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(IntroEInkPaper.headline)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.85)
                     .lineLimit(2)
@@ -42,7 +62,7 @@ struct IntroInterstitialView: View {
                 Text("Explore anything, the room is yours.")
                     .font(AppFont.body)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.white.opacity(0.92))
+                    .foregroundStyle(IntroEInkPaper.body)
                     .fixedSize(horizontal: false, vertical: true)
                     .minimumScaleFactor(0.8)
                     .lineSpacing(3)
@@ -59,25 +79,21 @@ struct IntroInterstitialView: View {
             VStack {
                 Spacer(minLength: 0)
                     .allowsHitTesting(false)
-                // Compact glassy control, not full-bleed; white label on a soft blurred pill.
                 Button(action: onContinue) {
                     Text("Continue")
-                        .undrmndShellCtaTextStyleOnDark()
+                        .font(.system(.body, design: .default))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(IntroEInkPaper.ctaInk)
                         .padding(.horizontal, 22)
                         .padding(.vertical, 9)
                         .background {
-                            ZStack {
-                                Capsule()
-                                    .fill(Color.white.opacity(0.07))
-                                Capsule()
-                                    .fill(.ultraThinMaterial)
-                                    .opacity(0.42)
-                            }
+                            Capsule()
+                                .fill(IntroEInkPaper.ctaFill)
                         }
                         .clipShape(Capsule())
                         .overlay(
                             Capsule()
-                                .strokeBorder(Color.white.opacity(0.24), lineWidth: 0.5)
+                                .strokeBorder(IntroEInkPaper.ctaStroke, lineWidth: 0.5)
                         )
                 }
                 .buttonStyle(.plain)
@@ -87,27 +103,12 @@ struct IntroInterstitialView: View {
                 .padding(.bottom, 22)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-
-            if !scanBackgroundReady {
-                ZStack {
-                    Color.black
-                        .ignoresSafeArea()
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .tint(.white)
-                            .scaleEffect(1.15)
-                        Text("Preparing intro…")
-                            .font(AppFont.subheadline)
-                            .foregroundStyle(.white.opacity(0.85))
-                    }
-                }
-                .allowsHitTesting(true)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Loading intro background")
-                .transition(.opacity)
-            }
         }
         .animation(.easeOut(duration: 0.45), value: scanBackgroundReady)
+        .task {
+            await Task.yield()
+            scanBackdropMounted = true
+        }
     }
 }
 

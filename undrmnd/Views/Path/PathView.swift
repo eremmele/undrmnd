@@ -96,6 +96,8 @@ struct PathView: View {
                     )
                 } else {
                     Text("Map loading…")
+                        .font(AppFont.subheadline)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
                 }
             }
         }

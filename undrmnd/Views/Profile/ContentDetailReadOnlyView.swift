@@ -28,7 +28,13 @@ struct ContentDetailReadOnlyView: View {
                     .padding(.vertical, 22)
                 }
             } else if let error {
-                Text(error).padding()
+                Text(error)
+                    .font(AppFont.body)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .padding(28)
             } else {
                 ProgressView()
             }

@@ -94,12 +94,16 @@ struct GoalClarifierView: View {
                             .textFieldStyle(.plain)
                             .font(AppFont.body)
                             .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.search)
+                            .keyboardType(.default)
                     }
                     .padding(16)
                     .background(UndrmndPrototypeTheme.panel)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                            .allowsHitTesting(false)
                     )
                 }
 
@@ -108,6 +112,7 @@ struct GoalClarifierView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("No direct matches")
                                 .font(AppFont.subheadlineEmphasis)
+                                .foregroundStyle(UndrmndPrototypeTheme.primary)
                             Text("Try a shorter word, a pillar name (Cosmos, Living World…), or clear the field to browse suggestions below.")
                                 .font(AppFont.caption)
                                 .foregroundStyle(UndrmndPrototypeTheme.muted)

@@ -75,7 +75,11 @@ struct SignInView: View {
                 .autocorrectionDisabled()
                 .padding(12)
                 .background(UndrmndPrototypeTheme.panel)
-                .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(UndrmndPrototypeTheme.divider))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .strokeBorder(UndrmndPrototypeTheme.divider)
+                        .allowsHitTesting(false)
+                )
 
             if codeRequestSent {
                 TextField("6-digit code from email", text: $otpCode)
@@ -83,7 +87,11 @@ struct SignInView: View {
                     .keyboardType(.numberPad)
                     .padding(12)
                     .background(UndrmndPrototypeTheme.panel)
-                    .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(UndrmndPrototypeTheme.divider))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(UndrmndPrototypeTheme.divider)
+                            .allowsHitTesting(false)
+                    )
             }
 
             Button {

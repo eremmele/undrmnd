@@ -28,19 +28,17 @@
 		<false/>
 	</dict>
 	<key>UILaunchScreen</key>
-	<dict/>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchScreenBackground</string>
+	</dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fonts/MDLorienTrial-Black.otf</string>
-		<string>Fonts/MDLorienTrial-BlackItalic.otf</string>
+		<!-- Runtime `AppFont` only references Book / Regular / Semibold / Bold; fewer faces = quicker cold-start font registration. -->
 		<string>Fonts/MDLorienTrial-Bold.otf</string>
-		<string>Fonts/MDLorienTrial-BoldItalic.otf</string>
 		<string>Fonts/MDLorienTrial-Book.otf</string>
-		<string>Fonts/MDLorienTrial-BookItalic.otf</string>
-		<string>Fonts/MDLorienTrial-Italic.otf</string>
 		<string>Fonts/MDLorienTrial-Regular.otf</string>
 		<string>Fonts/MDLorienTrial-Semibold.otf</string>
-		<string>Fonts/MDLorienTrial-SemiboldItalic.otf</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>

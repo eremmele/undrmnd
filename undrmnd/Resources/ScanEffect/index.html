@@ -6,17 +6,16 @@
 <title>Intro nebula</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{width:100%;height:100%;overflow:hidden;background:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:#ebe7de}
   canvas{display:block;width:100%;height:100%}
-  #loading{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:100;transition:opacity .6s ease}
+  /* No spinner DOM: WKWebKit + Shader compile can take many seconds—avoid implying a loading hang before first paint. */
+  #loading{position:fixed;inset:0;background:#ebe7de;z-index:100;transition:opacity .45s ease;pointer-events:none;opacity:0}
   #loading.hidden{opacity:0;pointer-events:none}
-  #loading .ping{width:24px;height:24px;background:rgba(255,255,255,.4);border-radius:50%;animation:ping 1s cubic-bezier(0,0,.2,1) infinite}
-  @keyframes ping{75%,100%{transform:scale(2);opacity:0}}
 </style>
 </head>
 <body>
-<div id="loading"><div class="ping"></div></div>
+<div id="loading"></div>
 <!-- Rebuild: undrmnd/Tooling/scan-effect-build → npm i && npx esbuild entry.mjs --bundle --format=iife --outfile=../../Resources/ScanEffect/scan-effect-bundle.js --legal-comments=none --minify -->
-<script src="./scan-effect-bundle.js"></script>
+<script defer src="ScanEffect/scan-effect-bundle.js?v=eink1"></script>
 </body>
 </html>

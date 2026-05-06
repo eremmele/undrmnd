@@ -1,7 +1,7 @@
 import SwiftUI
 import WebKit
 
-/// Full-screen Three.js particle nebula for the intro. Posts `scanBackgroundReady` after a brief WebGL warm-up.
+/// Full‑screen Quantum Nebula **Torus** (bundled Three.js). Posts native `scanBackgroundReady` after warm‑up.
 ///
 /// **Console noise:** Log lines such as slow GPU/WebContent process launch, sandbox extension, `CARenderServer`,
 /// or WebPrivacy “query parameters” come from WebKit and the OS (often amplified on Simulator). They are not
@@ -26,27 +26,36 @@ struct ScanEffectWebView: UIViewRepresentable {
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
 
+        /// Matches intro e‑reader parchment (`ScanEffect/index.html`); avoids WK flashing white behind the torus layer.
+        let paintPaperBackdrop = WKUserScript(
+            source: "document.documentElement.style.backgroundColor='#ebe7de';",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        )
+        config.userContentController.addUserScript(paintPaperBackdrop)
+
         let coordinator = context.coordinator
         config.userContentController.add(coordinator, name: "scanBackgroundReady")
         coordinator.userContentController = config.userContentController
 
+        let parchment = UIColor(red: 235 / 255, green: 231 / 255, blue: 222 / 255, alpha: 1)
         let webView = WKWebView(frame: .zero, configuration: config)
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
+        webView.isOpaque = true
+        webView.backgroundColor = parchment
+        webView.scrollView.backgroundColor = parchment
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
         webView.scrollView.contentInsetAdjustmentBehavior = .never
-        webView.underPageBackgroundColor = .clear
+        webView.underPageBackgroundColor = parchment
 
         guard let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "ScanEffect") else {
             return webView
         }
-        let folderURL = indexURL.deletingLastPathComponent()
         guard let html = try? String(contentsOf: indexURL, encoding: .utf8) else {
             return webView
         }
-        webView.loadHTMLString(html, baseURL: folderURL)
+        let bundleRoot = Bundle.main.bundleURL
+        webView.loadHTMLString(html, baseURL: bundleRoot)
         return webView
     }
 

@@ -321,6 +321,9 @@ struct SearchPlaceholderView: View {
     /// Tapping a term opens the matching in-app “content page” (pillar session or goal flow).
     var onNavigate: (HomeRoute) -> Void
 
+    @State private var searchQuery: String = ""
+    @FocusState private var isSearchFieldFocused: Bool
+
     private let presets: [(String, HomeRoute)] = [
         ("Cosmos", .threeCard(.cosmos)),
         ("Living World", .threeCard(.livingWorld)),
@@ -329,28 +332,56 @@ struct SearchPlaceholderView: View {
         ("Set a goal and find a path", .goalClarifier)
     ]
 
+    private var filteredPresets: [(String, HomeRoute)] {
+        let t = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.isEmpty { return presets }
+        return presets.filter { $0.0.localizedCaseInsensitiveContains(t) }
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Search paths, topics, communities…")
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Search paths, topics, communities")
                             .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
+                        HStack(spacing: 10) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                            TextField("Type to filter, or open a result below", text: $searchQuery)
+                                .textFieldStyle(.plain)
+                                .font(AppFont.body)
+                                .focused($isSearchFieldFocused)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                                .submitLabel(.search)
+                                .keyboardType(.default)
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(UndrmndPrototypeTheme.panel)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                                .allowsHitTesting(false)
+                        )
                     }
-                    .padding(14)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(UndrmndPrototypeTheme.panel)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4)
-                            .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-                    )
 
                     Text("Jump to a topic or flow")
                         .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
 
-                    ForEach(presets, id: \.0) { label, route in
+                    if filteredPresets.isEmpty, !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text("No matches for that search.")
+                            .font(AppFont.caption)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 8)
+                    }
+
+                    ForEach(filteredPresets, id: \.0) { label, route in
                         Button {
                             onNavigate(route)
                             dismiss()
@@ -380,6 +411,12 @@ struct SearchPlaceholderView: View {
             }
             .background(UndrmndPrototypeTheme.paper)
             .navigationTitleBrand("Search")
+            .onAppear {
+                // After the sheet has presented; otherwise focus can fail during transition.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                    isSearchFieldFocused = true
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: { dismiss() }) {

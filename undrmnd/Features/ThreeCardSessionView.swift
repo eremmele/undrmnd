@@ -45,7 +45,15 @@ struct ThreeCardSessionView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             } else if let err = error {
-                Text(err).padding()
+                VStack(spacing: 12) {
+                    Text(err)
+                        .font(AppFont.body)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .padding(28)
             } else if items.isEmpty {
                 ProgressView("Loading topics…")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

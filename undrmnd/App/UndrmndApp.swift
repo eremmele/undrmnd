@@ -7,16 +7,25 @@ struct UndrmndApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if showIntroSplash {
-                    IntroInterstitialView {
-                        showIntroSplash = false
+            ZStack {
+                Color.black
+                    .ignoresSafeArea()
+                Group {
+                    if showIntroSplash {
+                        IntroInterstitialView {
+                            showIntroSplash = false
+                        }
+                    } else {
+                        // Main chrome is paper-toned prototypes; forcing light mode here keeps semantic
+                        // `.primary`/field defaults legible against `UndrmndPrototypeTheme.paper` even though
+                        // the window prefers dark for the intro WebGL shell.
+                        RootView()
+                            .environment(\.colorScheme, .light)
                     }
-                } else {
-                    RootView()
                 }
             }
             .environment(\.font, AppFont.body)
+            .preferredColorScheme(.dark)
         }
     }
 }

@@ -417,6 +417,8 @@ struct ContributeThreadDetailView: View {
                     .font(AppFont.subheadline)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
                     .focused($replyFieldFocused)
+                    .submitLabel(.send)
+                    .keyboardType(.default)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(UndrmndPrototypeTheme.panel)
@@ -424,6 +426,7 @@ struct ContributeThreadDetailView: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 20, style: .continuous)
                             .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                            .allowsHitTesting(false)
                     )
                     .accessibilityLabel("Reply")
                     .accessibilityHint("Type your message, then double tap Send to post")

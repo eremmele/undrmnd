@@ -16,26 +16,44 @@ struct ProfileView: View {
     @State private var pathTitles: [UUID: String] = [:]
 
     var body: some View {
-        Group {
-            if !isSignedIn {
-                VStack(spacing: 20) {
-                    Spacer()
-                    Text("Sign in to claim a handle")
-                        .font(AppFont.headline)
-                    Button {
-                        showSignIn = true
-                    } label: {
-                        Text("Open sign in")
+        VStack(spacing: 0) {
+            if isSignedIn, let err = loadError {
+                Text(err)
+                    .font(AppFont.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 11)
+                    .background(UndrmndPrototypeTheme.panel)
+                    .overlay(
+                        Rectangle()
+                            .fill(UndrmndPrototypeTheme.divider)
+                            .frame(height: 1),
+                        alignment: .bottom
+                    )
+                    .accessibilityLabel("Profile error")
+            }
+            Group {
+                if !isSignedIn {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        Text("Sign in to claim a handle")
+                            .font(AppFont.headline)
+                        Button {
+                            showSignIn = true
+                        } label: {
+                            Text("Open sign in")
+                        }
+                        .buttonStyle(LargeProminentPathButtonStyle())
+                        Spacer()
                     }
-                    .buttonStyle(LargeProminentPathButtonStyle())
-                    Spacer()
+                    .frame(maxWidth: .infinity)
+                    .padding(24)
+                } else if let p = myProfile {
+                    profileBody(p)
+                } else {
+                    claimForm
                 }
-                .frame(maxWidth: .infinity)
-                .padding(24)
-            } else if let p = myProfile {
-                profileBody(p)
-            } else {
-                claimForm
             }
         }
         .background(UndrmndPrototypeTheme.paper)
@@ -74,9 +92,13 @@ struct ProfileView: View {
             TextField("handle (2–24: a–z, 0–9, _)", text: $handle)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .keyboardType(.asciiCapable)
             TextField("Display name (optional)", text: $displayName)
+                .keyboardType(.default)
+                .submitLabel(.done)
             TextField("Bio, one line (optional, 140 max)", text: $bio, axis: .vertical)
                 .lineLimit(2...3)
+                .keyboardType(.default)
             Text("Pillars to follow")
                 .font(AppFont.caption)
                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
