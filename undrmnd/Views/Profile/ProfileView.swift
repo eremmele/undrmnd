@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @Environment(\.returnToIntroSplash) private var returnToIntroSplash
+
     @State private var myProfile: Profile?
     @State private var isSignedIn = false
     @State private var loadError: String?
@@ -55,8 +57,13 @@ struct ProfileView: View {
                     claimForm
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .background(UndrmndPrototypeTheme.paper)
+        /// Keeps the control above the tab bar and out of scroll views; without this it often sits under the tab chrome.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            quietLogoutFooter
+        }
         .navigationTitleBrand("Profile")
         .task { await refreshSession() }
         .onChange(of: isSignedIn) { _, _ in Task { await load() } }
@@ -65,16 +72,6 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showSignIn) {
             SignInView()
-        }
-        .toolbar {
-            if isSignedIn {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Sign out") {
-                        Task { await signOut() }
-                    }
-                    .tint(UndrmndPrototypeTheme.secondary)
-                }
-            }
         }
         .sheet(isPresented: $isEditing) {
             if let p = myProfile {
@@ -181,19 +178,45 @@ struct ProfileView: View {
         )
     }
 
+    /// Subdued but legible row above the tab bar; clears session (if any) and returns to the scan interstitial.
+    private var quietLogoutFooter: some View {
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(UndrmndPrototypeTheme.divider)
+                .frame(height: 1)
+                .allowsHitTesting(false)
+
+            Button {
+                Task { await logoutAndReturnToIntro() }
+            } label: {
+                Text("Log out")
+                    .font(AppFont.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(UndrmndPrototypeTheme.panel.opacity(0.92))
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Log out")
+            .accessibilityHint("Ends your session if you are signed in, then opens the introductory screen.")
+        }
+        .background(UndrmndPrototypeTheme.paper)
+    }
+
+    private func logoutAndReturnToIntro() async {
+        try? await SupabaseService.shared.client.auth.signOut()
+        await MainActor.run {
+            loadError = nil
+            myProfile = nil
+            isSignedIn = false
+            returnToIntroSplash()
+        }
+    }
+
     private func refreshSession() async {
         isSignedIn = SupabaseService.shared.client.auth.currentSession != nil
             && (SupabaseService.shared.client.auth.currentSession?.isExpired == false)
-    }
-
-    private func signOut() async {
-        do {
-            try await SupabaseService.shared.client.auth.signOut()
-            myProfile = nil
-            isSignedIn = false
-        } catch {
-            loadError = error.localizedDescription
-        }
     }
 
     private func load() async {

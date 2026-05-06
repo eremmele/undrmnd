@@ -274,6 +274,10 @@ private struct OpenArticleForContentKey: EnvironmentKey {
     static let defaultValue: (UUID) -> Void = { _ in }
 }
 
+private struct ReturnToIntroSplashKey: EnvironmentKey {
+    static let defaultValue: () -> Void = {}
+}
+
 extension EnvironmentValues {
     /// Present the territory map sheet (same as Explore toolbar map).
     var openTerritoryMapFromShell: () -> Void {
@@ -297,6 +301,12 @@ extension EnvironmentValues {
     var openArticleForContent: (UUID) -> Void {
         get { self[OpenArticleForContentKey.self] }
         set { self[OpenArticleForContentKey.self] = newValue }
+    }
+
+    /// Dismiss main shell and show the scan intro again (wired from `UndrmndApp`).
+    var returnToIntroSplash: () -> Void {
+        get { self[ReturnToIntroSplashKey.self] }
+        set { self[ReturnToIntroSplashKey.self] = newValue }
     }
 }
 

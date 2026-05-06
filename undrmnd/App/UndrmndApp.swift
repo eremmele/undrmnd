@@ -21,6 +21,9 @@ struct UndrmndApp: App {
                         // the window prefers dark for the intro WebGL shell.
                         RootView()
                             .environment(\.colorScheme, .light)
+                            .environment(\.returnToIntroSplash) {
+                                showIntroSplash = true
+                            }
                     }
                 }
             }

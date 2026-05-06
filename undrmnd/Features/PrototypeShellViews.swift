@@ -52,19 +52,19 @@ private struct TerritoryMapViteGraphic: View {
                 }
 
                 // Cluster A
-                strokeLine(130, 40, 130, 90, color: UndrmndPrototypeTheme.secondary, width: 1.5)
-                strokeLine(130, 90, 130, 140, color: UndrmndPrototypeTheme.secondary, width: 1.5)
-                strokeLine(130, 140, 80, 180, color: UndrmndPrototypeTheme.primary, width: 1.5)
-                strokeLine(130, 140, 130, 180, color: UndrmndPrototypeTheme.divider, width: 1)
-                strokeLine(130, 140, 180, 180, color: UndrmndPrototypeTheme.divider, width: 1)
-                strokeLine(80, 180, 80, 210, color: UndrmndPrototypeTheme.primary, width: 1.5)
+                strokeLine(130, 40, 130, 90, color: InstrumentMapChrome.graphSecondary, width: 1.5)
+                strokeLine(130, 90, 130, 140, color: InstrumentMapChrome.graphSecondary, width: 1.5)
+                strokeLine(130, 140, 80, 180, color: InstrumentMapChrome.graphAccent, width: 1.5)
+                strokeLine(130, 140, 130, 180, color: InstrumentMapChrome.graphMuted, width: 1)
+                strokeLine(130, 140, 180, 180, color: InstrumentMapChrome.graphMuted, width: 1)
+                strokeLine(80, 180, 80, 210, color: InstrumentMapChrome.graphAccent, width: 1.5)
 
                 // Cluster B
-                strokeLine(200, 60, 200, 100, color: UndrmndPrototypeTheme.muted, width: 1, dash: [3, 3])
-                strokeLine(200, 100, 200, 140, color: UndrmndPrototypeTheme.muted, width: 1, dash: [3, 3])
+                strokeLine(200, 60, 200, 100, color: InstrumentMapChrome.graphMuted, width: 1, dash: [3, 3])
+                strokeLine(200, 100, 200, 140, color: InstrumentMapChrome.graphMuted, width: 1, dash: [3, 3])
 
                 // Cross-link
-                strokeLine(130, 90, 200, 100, color: UndrmndPrototypeTheme.divider, width: 1, dash: [4, 4])
+                strokeLine(130, 90, 200, 100, color: InstrumentMapChrome.graphMuted.opacity(0.85), width: 1, dash: [4, 4])
 
                 func fillCircle(_ cx: CGFloat, _ cy: CGFloat, _ r: CGFloat, color: Color) {
                     let rect = CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2)
@@ -80,56 +80,60 @@ private struct TerritoryMapViteGraphic: View {
                     )
                 }
 
-                fillCircle(130, 40, 7, color: UndrmndPrototypeTheme.secondary)
-                fillCircle(130, 90, 7, color: UndrmndPrototypeTheme.secondary)
-                fillCircle(130, 140, 7, color: UndrmndPrototypeTheme.secondary)
-                fillCircle(80, 180, 7, color: UndrmndPrototypeTheme.secondary)
-                strokeCircle(130, 180, 6, color: UndrmndPrototypeTheme.divider, width: 1.5)
-                strokeCircle(180, 180, 6, color: UndrmndPrototypeTheme.divider, width: 1.5)
-                fillCircle(80, 210, 8, color: UndrmndPrototypeTheme.primary)
+                fillCircle(130, 40, 7, color: InstrumentMapChrome.graphSecondary.opacity(1.05))
+                fillCircle(130, 90, 7, color: InstrumentMapChrome.graphSecondary.opacity(1.05))
+                fillCircle(130, 140, 7, color: InstrumentMapChrome.graphSecondary.opacity(1.05))
+                fillCircle(80, 180, 7, color: InstrumentMapChrome.graphSecondary.opacity(1.05))
+                strokeCircle(130, 180, 6, color: InstrumentMapChrome.gridLine, width: 1.5)
+                strokeCircle(180, 180, 6, color: InstrumentMapChrome.gridLine, width: 1.5)
 
-                fillCircle(200, 60, 5, color: UndrmndPrototypeTheme.muted)
-                fillCircle(200, 100, 5, color: UndrmndPrototypeTheme.muted)
-                strokeCircle(200, 140, 5, color: UndrmndPrototypeTheme.muted, width: 1)
+                fillCircle(200, 60, 5, color: InstrumentMapChrome.graphMuted.opacity(1.05))
+                fillCircle(200, 100, 5, color: InstrumentMapChrome.graphMuted.opacity(1.05))
+                strokeCircle(200, 140, 5, color: InstrumentMapChrome.graphMuted, width: 1)
 
-                strokeCircle(50, 260, 4, color: UndrmndPrototypeTheme.divider, width: 1, dash: [2, 2])
-                strokeCircle(80, 270, 4, color: UndrmndPrototypeTheme.divider, width: 1, dash: [2, 2])
-                strokeCircle(110, 265, 4, color: UndrmndPrototypeTheme.divider, width: 1, dash: [2, 2])
+                strokeCircle(50, 260, 4, color: InstrumentMapChrome.graphMuted.opacity(1.05), width: 1, dash: [2, 2])
+                strokeCircle(80, 270, 4, color: InstrumentMapChrome.graphMuted.opacity(1.05), width: 1, dash: [2, 2])
+                strokeCircle(110, 265, 4, color: InstrumentMapChrome.graphMuted.opacity(1.05), width: 1, dash: [2, 2])
             }
+
+            InstrumentMapBeaconView()
+                .frame(width: 40, height: 40)
+                .position(x: 80, y: 209)
 
             Text("Living World")
                 .font(AppFont.mapLabel(approxSize: 10, mapWeight: .medium))
-                .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                .position(x: 130, y: 28)
+                .foregroundStyle(InstrumentMapChrome.inkSoft.opacity(0.92))
+                .position(x: 130, y: 26)
 
-            Text("You are here")
-                .font(AppFont.mapLabel(approxSize: 8, mapWeight: .medium))
-                .foregroundStyle(UndrmndPrototypeTheme.primary)
-                .position(x: 80, y: 228)
+            Text("YOU ARE HERE")
+                .font(AppFont.mapLabel(approxSize: 7.8, mapWeight: .semibold))
+                .foregroundStyle(InstrumentMapChrome.beaconCore.opacity(0.98))
+                .tracking(0.6)
+                .position(x: 80, y: 239)
 
             Text("Mind & Brain")
                 .font(AppFont.mapLabel(approxSize: 9, mapWeight: .regular))
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
-                .position(x: 200, y: 48)
+                .foregroundStyle(InstrumentMapChrome.footerCaption)
+                .position(x: 200, y: 47)
 
             Text("2 / 5")
                 .font(AppFont.mapLabel(approxSize: 8, mapWeight: .regular))
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                .foregroundStyle(InstrumentMapChrome.footerCaption)
                 .position(x: 200, y: 158)
 
             Text("Communities")
                 .font(AppFont.mapLabel(approxSize: 7, mapWeight: .regular))
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                .foregroundStyle(InstrumentMapChrome.footerCaption)
                 .position(x: 130, y: 196)
 
             Text("Coping")
                 .font(AppFont.mapLabel(approxSize: 7, mapWeight: .regular))
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                .foregroundStyle(InstrumentMapChrome.footerCaption)
                 .position(x: 180, y: 196)
 
             Text("Adjacent paths…")
                 .font(AppFont.mapLabel(approxSize: 8, mapWeight: .regular))
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                .foregroundStyle(InstrumentMapChrome.footerCaption)
                 .position(x: 80, y: 290)
 
             ForEach(Self.baseDots) { dot in
@@ -158,48 +162,66 @@ struct TerritoryMapPlaceholderView: View {
     var onMapDismiss: (() -> Void)? = nil
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .bottom) {
-                VStack {
-                    Spacer(minLength: 0)
-                    TerritoryMapViteGraphic(onSelectPillar: onSelectPillar)
-                        .frame(maxWidth: .infinity)
-                        .frame(maxHeight: max(360, geo.size.height * 0.72))
-                    Spacer(minLength: 0)
+        ZStack {
+            InstrumentMapChrome.canvas
+                .ignoresSafeArea()
+            GeometryReader { geo in
+                ZStack(alignment: .bottom) {
+                    VStack {
+                        Spacer(minLength: 0)
+                        TerritoryMapViteGraphic(onSelectPillar: onSelectPillar)
+                            .frame(maxWidth: .infinity)
+                            .frame(maxHeight: max(360, geo.size.height * 0.72))
+                        Spacer(minLength: 0)
+                    }
+                    VStack(spacing: 6) {
+                        Text("Your accumulated understanding")
+                            .font(AppFont.captionEmphasis)
+                            .foregroundStyle(InstrumentMapChrome.inkSoft.opacity(0.95))
+                        Text("2 topics · 1 completed branch · 1 in progress")
+                            .font(AppFont.caption2)
+                            .foregroundStyle(InstrumentMapChrome.footerCaption)
+                    }
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color.white.opacity(0.05))
+                            .strokeBorder(InstrumentMapChrome.gridLine.opacity(0.55), lineWidth: 0.5)
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
                 }
-                VStack(spacing: 4) {
-                    Text("Your accumulated understanding")
-                        .font(AppFont.captionEmphasis)
-                        .foregroundStyle(UndrmndPrototypeTheme.primary.opacity(0.88))
-                    Text("2 topics · 1 completed branch · 1 in progress")
-                        .font(AppFont.caption2)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                }
-                .multilineTextAlignment(.center)
-                .padding(16)
-                .padding(.bottom, 6)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .background(UndrmndPrototypeTheme.panel)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(UndrmndPrototypeTheme.divider)
-                        .frame(height: 0.5)
-                }
-                .ignoresSafeArea(edges: .bottom)
             }
         }
-        .background(UndrmndPrototypeTheme.paper)
-        .navigationTitleBrand("Your Map")
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(InstrumentMapChrome.canvas, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Your Map")
+                    .font(AppFont.brandWordmark)
+                    .foregroundStyle(InstrumentMapChrome.inkSoft.opacity(0.95))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
             if let onMapDismiss {
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button(action: onMapDismiss) {
                         Text("Done")
-                            .undrmndShellCtaTextStyle()
+                            .font(.system(.body, design: .default))
+                            .fontWeight(.semibold)
+                            .foregroundStyle(InstrumentMapChrome.inkSoft.opacity(0.9))
                     }
+                    .accessibilityLabel("Dismiss map")
                 }
             }
         }
+        .instrumentMapColorSchemeIsolation()
     }
 }
 
