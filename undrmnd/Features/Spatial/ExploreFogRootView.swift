@@ -18,12 +18,8 @@ struct ExploreFogRootView: View {
                 explorePath: .firstIsland(strata: strata, wideRevealFromContribution: false),
                 onThreadTap: { id in openArticleForContent(id) }
             )
-            .ignoresSafeArea(edges: .bottom)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Explore")
-                    .font(AppFont.title3)
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
                 Text("Clear the fog, then tap a lit dot to open a contributed card.")
                     .font(AppFont.caption)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
@@ -62,14 +58,7 @@ struct ExploreFogRootView: View {
             }
         }
         .background(UndrmndPrototypeTheme.paper)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("undrmnd")
-                    .font(AppFont.brandWordmark)
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
-            }
-        }
+        .navigationTitleBrand("Explore")
         .task { await loadStrata() }
     }
 

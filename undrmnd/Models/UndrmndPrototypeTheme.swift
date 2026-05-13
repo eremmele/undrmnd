@@ -138,17 +138,33 @@ struct InstrumentMapNodeTitleTag: View {
 // MARK: - Navigation chrome (inline titles match the Explore “undrmnd” bar: MD Lórien headline)
 
 extension View {
-    /// Same typographic title treatment as the Explore tab’s custom principal label (`AppFont.brandWordmark`).
-    func navigationTitleBrand(_ title: String) -> some View {
-        navigationTitle("")
+    /// Inline navigation bar with **undrmnd** as a small app line and `title` as the screen line (when `showsAppWordmark` is true).
+    /// Pass `showsAppWordmark: false` when this view is not inside a visible navigation bar (rare); the bar itself should be hidden separately.
+    func navigationTitleBrand(_ title: String, showsAppWordmark: Bool = true) -> some View {
+        navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text(title)
-                        .font(AppFont.brandWordmark)
-                        .foregroundStyle(UndrmndPrototypeTheme.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    if showsAppWordmark {
+                        VStack(spacing: 2) {
+                            Text("undrmnd")
+                                .font(AppFont.caption2)
+                                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                            Text(title)
+                                .font(AppFont.brandWordmark)
+                                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("undrmnd, \(title)")
+                    } else {
+                        Text(title)
+                            .font(AppFont.brandWordmark)
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
                 }
             }
     }

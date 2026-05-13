@@ -97,6 +97,8 @@ struct RootView: View {
             .tag(MainTab.profile)
         }
         .tint(UndrmndPrototypeTheme.primary)
+        .toolbarBackground(UndrmndPrototypeTheme.paper, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
         .environmentObject(alertsStore)
         .environment(\.openTerritoryMapFromShell) { showExploreMap = true }
         .environment(\.openTopicSearchFromShell) { showSearch = true }
