@@ -337,14 +337,34 @@ struct ProfilePlaceholderView: View {
 
 // MARK: - Search
 
+enum GlobalSearchPick: Hashable {
+    case home(HomeRoute)
+    case communityThread(UUID)
+}
+
 struct SearchPlaceholderView: View {
     @Environment(\.dismiss) private var dismiss
 
-    /// Tapping a term opens the matching in-app “content page” (pillar session or goal flow).
-    var onNavigate: (HomeRoute) -> Void
+    var onPick: (GlobalSearchPick) -> Void
 
     @State private var searchQuery: String = ""
     @FocusState private var isSearchFieldFocused: Bool
+    @State private var scoredContent: [ScoredContentHit] = []
+    @State private var scoredThreads: [ScoredThreadHit] = []
+    @State private var searchError: String?
+    @State private var isQuerying = false
+
+    private struct ScoredContentHit: Identifiable {
+        let item: ContentItem
+        let score: Double
+        var id: UUID { item.id }
+    }
+
+    private struct ScoredThreadHit: Identifiable {
+        let row: ContributeThreadListRow
+        let score: Double
+        var id: UUID { row.id }
+    }
 
     private let presets: [(String, HomeRoute)] = [
         ("Cosmos", .threeCard(.cosmos)),
@@ -365,14 +385,14 @@ struct SearchPlaceholderView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Search paths, topics, communities")
+                        Text("Search cards, threads, and flows")
                             .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                         HStack(spacing: 10) {
                             Image(systemName: "magnifyingglass")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(UndrmndPrototypeTheme.muted)
-                            TextField("Type to filter, or open a result below", text: $searchQuery)
+                            TextField("Type at least two characters to search the library", text: $searchQuery)
                                 .textFieldStyle(.plain)
                                 .font(AppFont.body)
                                 .focused($isSearchFieldFocused)
@@ -391,12 +411,72 @@ struct SearchPlaceholderView: View {
                         )
                     }
 
+                    if isQuerying {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                    }
+
+                    if let searchError {
+                        Text(searchError)
+                            .font(AppFont.caption)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                    }
+
+                    let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if trimmed.count >= 2 {
+                        if !scoredContent.isEmpty {
+                            sectionHeader("From the library")
+                            ForEach(scoredContent) { hit in
+                                Button {
+                                    onPick(.home(.articleForCard(hit.item.id)))
+                                    dismiss()
+                                } label: {
+                                    searchRow(title: hit.item.title, subtitle: hit.item.hook, chevron: true)
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel("Open card: \(hit.item.title)")
+                            }
+                        }
+
+                        if !scoredThreads.isEmpty {
+                            sectionHeader("Community threads")
+                            ForEach(scoredThreads) { hit in
+                                Button {
+                                    onPick(.communityThread(hit.row.id))
+                                    dismiss()
+                                } label: {
+                                    searchRow(
+                                        title: hit.row.title,
+                                        subtitle: CommunityService.pillar(fromTopicColumn: hit.row.topic).displayName,
+                                        chevron: true
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel("Open thread: \(hit.row.title)")
+                            }
+                        }
+
+                        if scoredContent.isEmpty, scoredThreads.isEmpty, !isQuerying, searchError == nil {
+                            Text("No library or thread matches yet. Try another word or jump to a topic below.")
+                                .font(AppFont.caption)
+                                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Text("Ranking blends Supabase text search with on-device keyword overlap (not generative text).")
+                            .font(AppFont.caption2)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                            .padding(.top, 4)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
                     Text("Jump to a topic or flow")
                         .font(AppFont.caption2)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
 
                     if filteredPresets.isEmpty, !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text("No matches for that search.")
+                        Text("No preset matches for that filter.")
                             .font(AppFont.caption)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -405,20 +485,10 @@ struct SearchPlaceholderView: View {
 
                     ForEach(filteredPresets, id: \.0) { label, route in
                         Button {
-                            onNavigate(route)
+                            onPick(.home(route))
                             dismiss()
                         } label: {
-                            HStack {
-                                Text(label)
-                                    .font(AppFont.subheadline)
-                                    .foregroundStyle(UndrmndPrototypeTheme.primary)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(AppFont.caption)
-                                    .foregroundStyle(UndrmndPrototypeTheme.muted)
-                            }
-                            .padding(.vertical, 10)
-                            .contentShape(Rectangle())
+                            searchRow(title: label, subtitle: nil, chevron: true)
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Open \(label)")
@@ -433,8 +503,10 @@ struct SearchPlaceholderView: View {
             }
             .background(UndrmndPrototypeTheme.paper)
             .navigationTitleBrand("Search")
+            .task(id: searchQuery) {
+                await runLiveSearch()
+            }
             .onAppear {
-                // After the sheet has presented; otherwise focus can fail during transition.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                     isSearchFieldFocused = true
                 }
@@ -448,7 +520,90 @@ struct SearchPlaceholderView: View {
                 }
             }
         }
-        .appShellNavigationToolbar()
+    }
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(AppFont.subheadlineEmphasis)
+            .foregroundStyle(UndrmndPrototypeTheme.primary)
+            .padding(.top, 4)
+    }
+
+    private func searchRow(title: String, subtitle: String?, chevron: Bool) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppFont.subheadline)
+                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    .multilineTextAlignment(.leading)
+                if let subtitle, !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(AppFont.caption)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            Spacer(minLength: 8)
+            if chevron {
+                Image(systemName: "chevron.right")
+                    .font(AppFont.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.muted)
+            }
+        }
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(UndrmndPrototypeTheme.divider)
+                .frame(height: 1)
+        }
+    }
+
+    @MainActor
+    private func runLiveSearch() async {
+        let raw = searchQuery
+        try? await Task.sleep(nanoseconds: 350_000_000)
+        guard !Task.isCancelled else { return }
+
+        let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard t.count >= 2 else {
+            scoredContent = []
+            scoredThreads = []
+            searchError = nil
+            isQuerying = false
+            return
+        }
+
+        isQuerying = true
+        searchError = nil
+        defer { isQuerying = false }
+
+        do {
+            async let itemsTask = ContentService.searchContentItems(query: t, limit: 14)
+            let threads = (try? await CommunityService.listAllThreadsForSearch(limit: 80)) ?? []
+
+            let items = try await itemsTask
+            let docForItem: (ContentItem) -> String = { "\($0.title) \($0.hook)" }
+            scoredContent = items
+                .map { ScoredContentHit(item: $0, score: SemanticSearchRanker.normalizedTokenOverlap(query: t, document: docForItem($0))) }
+                .sorted { $0.score > $1.score }
+
+            let threadHits: [ScoredThreadHit] = threads.compactMap { row in
+                let doc = "\(row.title) \(row.topic) \(row.lastPostHandle ?? "") \(row.createdByHandle ?? "")"
+                let overlap = SemanticSearchRanker.normalizedTokenOverlap(query: t, document: doc)
+                let substring =
+                    row.title.localizedStandardContains(t)
+                    || row.topic.localizedStandardContains(t)
+                guard overlap > 0.04 || substring else { return nil }
+                let score = max(overlap, substring ? 0.1 : 0)
+                return ScoredThreadHit(row: row, score: score)
+            }
+            scoredThreads = threadHits.sorted { $0.score > $1.score }
+        } catch {
+            scoredContent = []
+            scoredThreads = []
+            searchError = "Library search didn’t complete. Check your connection and try again."
+        }
     }
 }
 

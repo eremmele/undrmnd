@@ -32,6 +32,12 @@ struct PillarDiscussionThread: Identifiable, Hashable {
     let contentItems: [ThreadContentItemRef]
     let seedReplies: [ThreadReply]
     let lastActivityLabel: String
+    /// When present (e.g. `list_contribute_threads.post_count`), used for list rows before post bodies load.
+    let listedReplyCount: Int?
+
+    var displayReplyCount: Int {
+        listedReplyCount ?? seedReplies.count
+    }
 }
 
 // MARK: - Seed (copy aligned to v2 open-question cards; `databaseId` can be set once your DB ids are known)
@@ -70,7 +76,8 @@ enum ContributeSeedData {
                     timeLabel: "2 days ago"
                 )
             ],
-            lastActivityLabel: "2 days ago"
+            lastActivityLabel: "2 days ago",
+            listedReplyCount: nil
         ),
         PillarDiscussionThread(
             id: makeId("a0000001-0000-4000-8000-000000000002"),
@@ -92,7 +99,8 @@ enum ContributeSeedData {
                     timeLabel: "1 week ago"
                 )
             ],
-            lastActivityLabel: "1 week ago"
+            lastActivityLabel: "1 week ago",
+            listedReplyCount: nil
         ),
         PillarDiscussionThread(
             id: makeId("a0000001-0000-4000-8000-000000000010"),
@@ -120,7 +128,8 @@ enum ContributeSeedData {
                     timeLabel: "3 days ago"
                 )
             ],
-            lastActivityLabel: "3 days ago"
+            lastActivityLabel: "3 days ago",
+            listedReplyCount: nil
         ),
         PillarDiscussionThread(
             id: makeId("a0000001-0000-4000-8000-000000000020"),
@@ -154,7 +163,8 @@ enum ContributeSeedData {
                     timeLabel: "4 days ago"
                 )
             ],
-            lastActivityLabel: "4 days ago"
+            lastActivityLabel: "4 days ago",
+            listedReplyCount: nil
         ),
         PillarDiscussionThread(
             id: makeId("a0000001-0000-4000-8000-000000000030"),
@@ -182,7 +192,8 @@ enum ContributeSeedData {
                     timeLabel: "6 days ago"
                 )
             ],
-            lastActivityLabel: "6 days ago"
+            lastActivityLabel: "6 days ago",
+            listedReplyCount: nil
         )
     ]
 
@@ -243,8 +254,13 @@ private struct ContributePillarBar: View {
 
 struct ContributeView: View {
     @State private var selectedPillar: Pillar = .cosmos
-    private var filtered: [PillarDiscussionThread] {
-        ContributeSeedData.threads.filter { $0.pillar == selectedPillar }
+    @State private var remoteThreads: [PillarDiscussionThread] = []
+    @State private var remoteListFailed = false
+
+    private var pillarThreads: [PillarDiscussionThread] {
+        let remote = remoteThreads.filter { $0.pillar == selectedPillar }
+        if !remote.isEmpty { return remote }
+        return ContributeSeedData.threads.filter { $0.pillar == selectedPillar }
     }
 
     var body: some View {
@@ -255,19 +271,23 @@ struct ContributeView: View {
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
+                if remoteListFailed {
+                    Text("Showing offline preview threads until the community feed loads.")
+                        .font(AppFont.caption)
+                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                }
+
                 ContributePillarBar(selection: $selectedPillar)
 
-                if filtered.isEmpty {
+                if pillarThreads.isEmpty {
                     Text("No threads in this pillar yet.")
                         .font(AppFont.subheadline)
                         .foregroundStyle(UndrmndPrototypeTheme.muted)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 32)
                 } else {
-                    ForEach(filtered) { thread in
-                        NavigationLink {
-                            ContributeThreadDetailView(thread: thread)
-                        } label: {
+                    ForEach(pillarThreads) { thread in
+                        NavigationLink(value: thread.id) {
                             CanvasThreadRowCard(thread: thread)
                         }
                         .buttonStyle(.plain)
@@ -279,6 +299,20 @@ struct ContributeView: View {
         }
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitleBrand("Contribute")
+        .task(id: selectedPillar) { await loadRemoteThreads() }
+    }
+
+    @MainActor
+    private func loadRemoteThreads() async {
+        remoteListFailed = false
+        remoteThreads = []
+        do {
+            let rows = try await CommunityService.listThreads(pillar: selectedPillar, limit: 50)
+            remoteThreads = rows.map { CommunityService.listRowAsDiscussionThread($0) }
+        } catch {
+            remoteThreads = []
+            remoteListFailed = true
+        }
     }
 }
 
@@ -294,7 +328,7 @@ private struct CanvasThreadRowCard: View {
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .multilineTextAlignment(.leading)
             HStack(spacing: 6) {
-                Text("\(thread.seedReplies.count) replies")
+                Text("\(thread.displayReplyCount) replies")
                     .font(AppFont.caption2)
                 Text("·")
                     .font(AppFont.caption2)
@@ -321,7 +355,7 @@ private struct CanvasThreadRowCard: View {
         )
         .shadow(color: Color.black.opacity(0.04), radius: 2, y: 1)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(thread.pillar.displayName) discussion: \(thread.titleQuestion), \(thread.seedReplies.count) replies, last active \(thread.lastActivityLabel)")
+        .accessibilityLabel("\(thread.pillar.displayName) discussion: \(thread.titleQuestion), \(thread.displayReplyCount) replies, last active \(thread.lastActivityLabel)")
     }
 }
 
@@ -351,22 +385,24 @@ struct ContributeThreadDetailView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Open-question cards in this thread")
-                            .font(AppFont.subheadlineEmphasis)
-                        Text("Replies are meant in the context of these cards. Multiple cards are allowed so the same conversation can sit across a short path of readings.")
-                            .font(AppFont.caption)
-                            .foregroundStyle(UndrmndPrototypeTheme.muted)
-                        ForEach(thread.contentItems) { ref in
-                            if let db = ref.databaseId {
-                                NavigationLink {
-                                    ContentDetailReadOnlyView(contentId: db)
-                                } label: {
-                                    contentCardBlock(ref, isLink: true)
+                    if !thread.contentItems.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Open-question cards in this thread")
+                                .font(AppFont.subheadlineEmphasis)
+                            Text("Replies are meant in the context of these cards. Multiple cards are allowed so the same conversation can sit across a short path of readings.")
+                                .font(AppFont.caption)
+                                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                            ForEach(thread.contentItems) { ref in
+                                if let db = ref.databaseId {
+                                    NavigationLink {
+                                        ContentDetailReadOnlyView(contentId: db)
+                                    } label: {
+                                        contentCardBlock(ref, isLink: true)
+                                    }
+                                    .buttonStyle(.plain)
+                                } else {
+                                    contentCardBlock(ref, isLink: false)
                                 }
-                                .buttonStyle(.plain)
-                            } else {
-                                contentCardBlock(ref, isLink: false)
                             }
                         }
                     }
@@ -524,5 +560,52 @@ struct ContributeThreadDetailView: View {
                 .fill(UndrmndPrototypeTheme.divider)
                 .frame(height: 0.5)
         }
+    }
+}
+
+// MARK: - Remote thread load (Supabase `get_contribute_thread` + seed fallback)
+
+struct ContributeThreadDetailLoader: View {
+    let threadId: UUID
+    @State private var thread: PillarDiscussionThread?
+    @State private var errorText: String?
+
+    var body: some View {
+        Group {
+            if let thread {
+                ContributeThreadDetailView(thread: thread)
+            } else if let errorText {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(errorText)
+                        .font(AppFont.subheadline)
+                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(UndrmndPrototypeTheme.paper)
+                .navigationTitleBrand("Thread")
+            } else {
+                ProgressView("Loading thread…")
+                    .padding(24)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(UndrmndPrototypeTheme.paper)
+            }
+        }
+        .task(id: threadId) { await load() }
+    }
+
+    @MainActor
+    private func load() async {
+        thread = nil
+        errorText = nil
+        if let remote = await CommunityService.loadRemoteDiscussionThread(threadId: threadId) {
+            thread = remote
+            return
+        }
+        if let seed = ContributeSeedData.threads.first(where: { $0.id == threadId }) {
+            thread = seed
+            return
+        }
+        errorText = "This thread isn’t available (removed or offline)."
     }
 }

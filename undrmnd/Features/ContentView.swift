@@ -13,12 +13,12 @@ struct RootView: View {
     enum MainTab: Hashable {
         case explore
         case contribute
-        case nearby
         case profile
     }
 
     @State private var tab: MainTab = .explore
     @State private var explorePath = NavigationPath()
+    @State private var contributePath = NavigationPath()
     @State private var showSearch = false
     @State private var showExploreMap = false
     @State private var showAlerts = false
@@ -28,12 +28,9 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $tab) {
             NavigationStack(path: $explorePath) {
-                PrototypeEntryView(
+                ExploreFogRootView(
                     onGoalClarifier: { explorePath.append(HomeRoute.goalClarifier) },
-                    onPathSlug: { slug in explorePath.append(HomeRoute.path(slug)) },
-                    onThreeCard: { p in explorePath.append(HomeRoute.threeCard(p)) },
                     onTerritoryMap: { explorePath.append(HomeRoute.territoryMap) },
-                    onOpenMap: { showExploreMap = true },
                     onOpenContribute: { tab = .contribute },
                     onAbout: { explorePath.append(HomeRoute.about) }
                 )
@@ -59,7 +56,6 @@ struct RootView: View {
                     }
                 }
             }
-            // Must be on the stack, not only the root, so `PathView` / `ThreeCardSessionView` (pushed) inherit the action.
             .environment(\.openArticleForContent) { id in
                 explorePath.append(HomeRoute.articleForCard(id))
             }
@@ -69,23 +65,17 @@ struct RootView: View {
             }
             .tag(MainTab.explore)
 
-            NavigationStack {
+            NavigationStack(path: $contributePath) {
                 ContributeView()
+                    .navigationDestination(for: UUID.self) { threadId in
+                        ContributeThreadDetailLoader(threadId: threadId)
+                    }
             }
             .appShellNavigationToolbar()
             .tabItem {
                 Label("Contribute", systemImage: "bubble.left.and.bubble.right")
             }
             .tag(MainTab.contribute)
-
-            NavigationStack {
-                NearbyEventsView()
-            }
-            .appShellNavigationToolbar()
-            .tabItem {
-                Label("Nearby", systemImage: "mappin.and.ellipse")
-            }
-            .tag(MainTab.nearby)
 
             NavigationStack {
                 ProfileView()
@@ -102,10 +92,16 @@ struct RootView: View {
         .environment(\.openTopicSearchFromShell) { showSearch = true }
         .environment(\.openAlertsFromShell) { showAlerts = true }
         .sheet(isPresented: $showSearch) {
-            SearchPlaceholderView { route in
+            SearchPlaceholderView { pick in
                 showSearch = false
-                tab = .explore
-                explorePath.append(route)
+                switch pick {
+                case .home(let route):
+                    tab = .explore
+                    explorePath.append(route)
+                case .communityThread(let id):
+                    tab = .contribute
+                    contributePath.append(id)
+                }
             }
             .environmentObject(alertsStore)
         }
@@ -153,39 +149,27 @@ struct PrototypeEntryView: View {
                     .font(AppFont.caption)
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
 
-                Text("Where would you like to start?")
+                Text("Explore")
                     .font(AppFont.title2)
                     .foregroundStyle(UndrmndPrototypeTheme.primary)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 4)
 
-                VStack(alignment: .leading, spacing: 18) {
-                    entryCard(
-                        title: "I want to know something",
-                        subtitle: "Set your goal, ask questions, and find the answers you’re seeking.",
-                        action: onGoalClarifier
-                    )
+                Text("Search topics, open paths, or pick up threads you’ve already started.")
+                    .font(AppFont.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 8)
 
-                    entryCard(
-                        title: "Explore the community",
-                        subtitle: "See what your colleagues are researching.",
-                        action: onOpenContribute
-                    )
-
-                    entryCard(
-                        title: "Resume a path",
-                        subtitle: "Continue where you left off in a previous exploration.",
-                        action: onOpenMap
-                    )
-
-                    entryCard(
-                        title: "What is undrmnd?",
-                        subtitle: "A little context before you explore.",
-                        action: onAbout
-                    )
+                VStack(alignment: .leading, spacing: 14) {
+                    compactRow(title: "Search topics & paths", subtitle: nil, action: onGoalClarifier)
+                    compactRow(title: "Topic map", subtitle: "See how themes connect", action: onTerritoryMap)
+                    compactRow(title: "Community", subtitle: "What others are building", action: onOpenContribute)
+                    compactRow(title: "Resume", subtitle: "Continue a path", action: onOpenMap)
+                    compactRow(title: "About undrmnd", subtitle: nil, action: onAbout)
                 }
-                .padding(.top, 12)
+                .padding(.top, 20)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
@@ -201,24 +185,31 @@ struct PrototypeEntryView: View {
         }
     }
 
-    private func entryCard(title: String, subtitle: String, action: @escaping () -> Void) -> some View {
+    private func compactRow(title: String, subtitle: String?, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(title)
-                    .font(AppFont.subheadlineEmphasis)
-                    .foregroundStyle(UndrmndPrototypeTheme.primary)
-                Text(subtitle)
-                    .font(AppFont.caption)
-                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(AppFont.subheadlineEmphasis)
+                        .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    if let subtitle, !subtitle.isEmpty {
+                        Text(subtitle)
+                            .font(AppFont.caption2)
+                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(UndrmndPrototypeTheme.muted)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
-            .background(UndrmndPrototypeTheme.panel)
-            .overlay(
-                RoundedRectangle(cornerRadius: 4)
-                    .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
-            )
+            .padding(.vertical, 14)
+            .padding(.horizontal, 4)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(UndrmndPrototypeTheme.divider)
+                    .frame(height: 0.5)
+            }
         }
         .buttonStyle(.plain)
     }
