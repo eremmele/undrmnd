@@ -13,6 +13,7 @@ struct RootView: View {
     enum MainTab: Hashable {
         case explore
         case contribute
+        case nearby
         case profile
     }
 
@@ -76,6 +77,15 @@ struct RootView: View {
                 Label("Contribute", systemImage: "bubble.left.and.bubble.right")
             }
             .tag(MainTab.contribute)
+
+            NavigationStack {
+                NearbyEventsView()
+            }
+            .appShellNavigationToolbar()
+            .tabItem {
+                Label("Nearby", systemImage: "mappin.and.ellipse")
+            }
+            .tag(MainTab.nearby)
 
             NavigationStack {
                 ProfileView()

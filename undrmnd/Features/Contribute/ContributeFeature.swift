@@ -367,9 +367,17 @@ struct ContributeThreadDetailView: View {
     @State private var extraReplies: [ThreadReply] = []
     @State private var draft: String = ""
     @FocusState private var replyFieldFocused: Bool
+    @State private var isPosting = false
+    @State private var postError: String?
+
+    private var isSeedOnlyThread: Bool {
+        ContributeSeedData.threads.contains { $0.id == thread.id }
+    }
 
     private var allReplies: [ThreadReply] { thread.seedReplies + extraReplies }
-    private var canSendReply: Bool { !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    private var canSendReply: Bool {
+        !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isPosting
+    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -411,6 +419,13 @@ struct ContributeThreadDetailView: View {
                         Text("Replies")
                             .font(AppFont.subheadlineEmphasis)
                             .padding(.bottom, 8)
+                        if let postError {
+                            Text(postError)
+                                .font(AppFont.caption)
+                                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                                .padding(.bottom, 8)
+                                .accessibilityLabel("Post error: \(postError)")
+                        }
                         ForEach(allReplies) { r in
                             forumReplyRow(r)
                         }
@@ -469,13 +484,20 @@ struct ContributeThreadDetailView: View {
                 Button {
                     postReply(proxy: proxy)
                 } label: {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 32))
-                        .foregroundStyle(canSendReply ? UndrmndPrototypeTheme.accent : UndrmndPrototypeTheme.muted)
+                    Group {
+                        if isPosting {
+                            ProgressView()
+                                .scaleEffect(0.85)
+                        } else {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size: 32))
+                        }
+                    }
+                    .foregroundStyle(canSendReply ? UndrmndPrototypeTheme.accent : UndrmndPrototypeTheme.muted)
                 }
                 .buttonStyle(.plain)
                 .disabled(!canSendReply)
-                .accessibilityLabel("Send reply")
+                .accessibilityLabel(isPosting ? "Sending reply" : "Send reply")
             }
             .padding(.horizontal, 12)
             .padding(.top, 8)
@@ -487,12 +509,21 @@ struct ContributeThreadDetailView: View {
     private func postReply(proxy: ScrollViewProxy) {
         let t = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return }
-        let me = "you"
+        postError = nil
+        if isSeedOnlyThread {
+            appendLocalReply(body: t, proxy: proxy)
+            return
+        }
+        Task { await postRemoteReply(body: t, proxy: proxy) }
+    }
+
+    private func appendLocalReply(body: String, proxy: ScrollViewProxy) {
+        let h = ContributeReplyIdentity.stableHandle(override: nil)
         extraReplies.append(
             ThreadReply(
                 id: UUID(),
-                authorHandle: "@\(me)",
-                body: t,
+                authorHandle: "@\(h)",
+                body: body,
                 timeLabel: "just now"
             )
         )
@@ -501,6 +532,33 @@ struct ContributeThreadDetailView: View {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         withAnimation(.easeOut(duration: 0.25)) {
             proxy.scrollTo("threadBottom", anchor: .bottom)
+        }
+    }
+
+    @MainActor
+    private func postRemoteReply(body: String, proxy: ScrollViewProxy) async {
+        guard !isPosting else { return }
+        isPosting = true
+        defer { isPosting = false }
+        do {
+            let newId = try await CommunityService.createPost(threadId: thread.id, body: body)
+            let h = ContributeReplyIdentity.stableHandle(override: nil)
+            extraReplies.append(
+                ThreadReply(
+                    id: newId,
+                    authorHandle: "@\(h)",
+                    body: body,
+                    timeLabel: "just now"
+                )
+            )
+            draft = ""
+            replyFieldFocused = false
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            withAnimation(.easeOut(duration: 0.25)) {
+                proxy.scrollTo("threadBottom", anchor: .bottom)
+            }
+        } catch {
+            postError = "Couldn’t post to the server. You can try again in a moment."
         }
     }
 

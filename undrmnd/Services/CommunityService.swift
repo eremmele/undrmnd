@@ -12,6 +12,44 @@ private struct GetContributeThreadParams: Encodable, Sendable {
     let thread_id: UUID
 }
 
+private struct CreateContributePostParams: Encodable, Sendable {
+    let p_thread_id: UUID
+    let p_body: String
+    let p_author_handle: String
+}
+
+/// Stable anonymous handle for RPC `create_contribute_post` (must match `^[a-zA-Z0-9_]+$` on server).
+enum ContributeReplyIdentity {
+    private static let defaultsKey = "undrmnd.contribute.handle.v1"
+
+    static func stableHandle(override: String?) -> String {
+        if let override {
+            let t = override.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !t.isEmpty, let s = sanitize(t) { return s }
+        }
+        if let existing = UserDefaults.standard.string(forKey: defaultsKey),
+           let s = sanitize(existing) {
+            return s
+        }
+        let tail = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(8).lowercased()
+        let created = "explorer_\(tail)"
+        UserDefaults.standard.set(created, forKey: defaultsKey)
+        return created
+    }
+
+    private static func sanitize(_ raw: String) -> String? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let strippedAt = trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "@"))
+        guard (1 ... 32).contains(strippedAt.count) else { return nil }
+        guard strippedAt.range(of: "^[a-zA-Z0-9_]+$", options: .regularExpression) != nil else { return nil }
+        return strippedAt
+    }
+}
+
+struct CreateContributePostResult: Decodable, Sendable {
+    let id: UUID
+}
+
 // MARK: - List row (list_contribute_threads)
 
 struct ContributeThreadListRow: Decodable, Sendable {
@@ -186,5 +224,27 @@ enum CommunityService {
         let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if t.hasPrefix("@") { return t }
         return "@\(t)"
+    }
+
+    /// Inserts via `create_contribute_post` (SECURITY DEFINER); respects server validation and RLS on the table for non-RPC access.
+    static func createPost(
+        threadId: UUID,
+        body: String,
+        authorHandle: String? = nil,
+        client: SupabaseClient = SupabaseService.shared.client
+    ) async throws -> UUID {
+        let handle = ContributeReplyIdentity.stableHandle(override: authorHandle)
+        let res: PostgrestResponse<CreateContributePostResult> = try await client
+            .rpc(
+                "create_contribute_post",
+                params: CreateContributePostParams(
+                    p_thread_id: threadId,
+                    p_body: body,
+                    p_author_handle: handle
+                )
+            )
+            .single()
+            .execute()
+        return res.value.id
     }
 }

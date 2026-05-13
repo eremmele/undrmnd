@@ -353,6 +353,7 @@ struct SearchPlaceholderView: View {
     @State private var scoredThreads: [ScoredThreadHit] = []
     @State private var searchError: String?
     @State private var isQuerying = false
+    @State private var embeddingDiagnostic: String?
 
     private struct ScoredContentHit: Identifiable {
         let item: ContentItem
@@ -464,10 +465,17 @@ struct SearchPlaceholderView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
 
-                        Text("Ranking blends Supabase text search with on-device keyword overlap (not generative text).")
+                        if let embeddingDiagnostic {
+                            Text(embeddingDiagnostic)
+                                .font(AppFont.caption2)
+                                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Text("Supabase finds candidates; on-device embeddings from Apple NaturalLanguage re-rank by meaning (no generative text).")
                             .font(AppFont.caption2)
                             .foregroundStyle(UndrmndPrototypeTheme.muted)
-                            .padding(.top, 4)
+                            .padding(.top, 2)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
@@ -571,6 +579,7 @@ struct SearchPlaceholderView: View {
             scoredThreads = []
             searchError = nil
             isQuerying = false
+            embeddingDiagnostic = nil
             return
         }
 
@@ -585,23 +594,27 @@ struct SearchPlaceholderView: View {
             let items = try await itemsTask
             let docForItem: (ContentItem) -> String = { "\($0.title) \($0.hook)" }
             scoredContent = items
-                .map { ScoredContentHit(item: $0, score: SemanticSearchRanker.normalizedTokenOverlap(query: t, document: docForItem($0))) }
+                .map { ScoredContentHit(item: $0, score: SemanticSearchRanker.embeddingSimilarity(query: t, document: docForItem($0))) }
                 .sorted { $0.score > $1.score }
 
             let threadHits: [ScoredThreadHit] = threads.compactMap { row in
                 let doc = "\(row.title) \(row.topic) \(row.lastPostHandle ?? "") \(row.createdByHandle ?? "")"
-                let overlap = SemanticSearchRanker.normalizedTokenOverlap(query: t, document: doc)
+                let sim = SemanticSearchRanker.embeddingSimilarity(query: t, document: doc)
                 let substring =
                     row.title.localizedStandardContains(t)
                     || row.topic.localizedStandardContains(t)
-                guard overlap > 0.04 || substring else { return nil }
-                let score = max(overlap, substring ? 0.1 : 0)
+                guard sim >= 0.17 || substring else { return nil }
+                let score = substring ? max(sim, 0.26) : sim
                 return ScoredThreadHit(row: row, score: score)
             }
             scoredThreads = threadHits.sorted { $0.score > $1.score }
+
+            let mode = SemanticSearchRanker.isSentenceEmbeddingAvailable ? "sentence" : "word-average"
+            embeddingDiagnostic = "Semantic index: on-device (\(mode))."
         } catch {
             scoredContent = []
             scoredThreads = []
+            embeddingDiagnostic = nil
             searchError = "Library search didn’t complete. Check your connection and try again."
         }
     }
