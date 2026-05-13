@@ -58,13 +58,14 @@ struct ProfileView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .padding(.top, 8)
         }
         .background(UndrmndPrototypeTheme.paper)
         /// Keeps the control above the tab bar and out of scroll views; without this it often sits under the tab chrome.
         .safeAreaInset(edge: .bottom, spacing: 0) {
             quietLogoutFooter
         }
-        .navigationTitleBrand("Profile")
+        .toolbar(.hidden, for: .navigationBar)
         .task { await refreshSession() }
         .onChange(of: isSignedIn) { _, _ in Task { await load() } }
         .onChange(of: showSignIn) { _, isShowing in
@@ -114,58 +115,67 @@ struct ProfileView: View {
 
     @ViewBuilder
     private func profileBody(_ p: Profile) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(p.displayName ?? p.username)
-                            .font(AppFont.title2)
-                        Text("@\(p.username)")
-                            .font(AppFont.subheadline)
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    }
-                    Spacer()
-                    Button("Edit") { isEditing = true }
-                }
-                if let b = p.bio, !b.isEmpty {
-                    Text(b)
-                        .font(AppFont.body)
-                }
-                if !p.pillarsFollowing.isEmpty {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Following")
-                            .font(AppFont.caption)
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                        FlowPillChips(titles: p.pillarsFollowing.map(\.displayName))
-                    }
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Contributions")
-                        .font(AppFont.headline)
-                    ForEach(cards) { c in
-                        NavigationLink {
-                            ContentDetailReadOnlyView(contentId: c.id)
-                        } label: {
-                            Text(c.title)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(p.displayName ?? p.username)
+                                .font(AppFont.title2)
+                            Text("@\(p.username)")
                                 .font(AppFont.subheadline)
-                                .foregroundStyle(UndrmndPrototypeTheme.primary)
-                        }
-                    }
-                }
-                if !pathNodes.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("On paths")
-                            .font(AppFont.headline)
-                        ForEach(pathNodes) { n in
-                            let title = pathTitles[n.pathId] ?? "Path"
-                            Text("\(title) · \(n.branchPrompt ?? "node")")
-                                .font(AppFont.caption)
                                 .foregroundStyle(UndrmndPrototypeTheme.secondary)
                         }
+                        Spacer()
+                        Button("Edit") { isEditing = true }
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
                     }
+                    if let b = p.bio, !b.isEmpty {
+                        Text(b)
+                            .font(AppFont.body)
+                    }
+                    if !p.pillarsFollowing.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Following")
+                                .font(AppFont.caption)
+                                .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                            FlowPillChips(titles: p.pillarsFollowing.map(\.displayName))
+                        }
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Contributions")
+                            .font(AppFont.headline)
+                        ForEach(cards) { c in
+                            NavigationLink {
+                                ContentDetailReadOnlyView(contentId: c.id)
+                            } label: {
+                                Text(c.title)
+                                    .font(AppFont.subheadline)
+                                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            }
+                        }
+                    }
+                    if !pathNodes.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("On paths")
+                                .font(AppFont.headline)
+                            ForEach(pathNodes) { n in
+                                let title = pathTitles[n.pathId] ?? "Path"
+                                Text("\(title) · \(n.branchPrompt ?? "node")")
+                                    .font(AppFont.caption)
+                                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                            }
+                        }
+                    }
+
+                    Color.clear
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: max(0, geo.size.height - 40))
                 }
+                .padding(20)
+                .frame(maxWidth: .infinity, minHeight: geo.size.height, alignment: .topLeading)
             }
-            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -178,13 +188,21 @@ struct ProfileView: View {
         )
     }
 
-    /// Subdued but legible row above the tab bar; clears session (if any) and returns to the scan interstitial.
+    /// Footer above the tab bar: replay intro + log out (no extra divider strip).
     private var quietLogoutFooter: some View {
         VStack(spacing: 0) {
-            Rectangle()
-                .fill(UndrmndPrototypeTheme.divider)
-                .frame(height: 1)
-                .allowsHitTesting(false)
+            Button {
+                returnToIntroSplash()
+            } label: {
+                Text("Open intro again")
+                    .font(AppFont.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Open intro again")
+            .accessibilityHint("Shows the introductory screen.")
 
             Button {
                 Task { await logoutAndReturnToIntro() }

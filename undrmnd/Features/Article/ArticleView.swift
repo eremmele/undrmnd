@@ -40,6 +40,9 @@ struct ArticleView: View {
         .background(UndrmndPrototypeTheme.paper)
         .navigationTitle(bundle.map(\.article.title) ?? "")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(UndrmndPrototypeTheme.paper, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(.light, for: .navigationBar)
         .task(id: contentId) {
             await load(force: false)
         }
@@ -287,27 +290,59 @@ struct ArticleView: View {
             )
     }
 
+    @ViewBuilder
     private func relatedCardsSection(cards: [ArticleRelatedCard]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let sorted = cards.sorted { $0.orderIndex < $1.orderIndex }
+        VStack(alignment: .leading, spacing: 12) {
             Text("Related cards")
                 .font(AppFont.subheadlineEmphasis)
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(cards.sorted { $0.orderIndex < $1.orderIndex }, id: \.contentId) { r in
-                    NavigationLink {
-                        ContentDetailReadOnlyView(contentId: r.contentId)
-                    } label: {
-                        HStack {
-                            Text("Open related content")
-                            Image(systemName: "chevron.right")
-                                .font(AppFont.caption2)
+                .foregroundStyle(UndrmndPrototypeTheme.primary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(sorted, id: \.contentId) { r in
+                        NavigationLink {
+                            ContentDetailReadOnlyView(contentId: r.contentId)
+                        } label: {
+                            relatedCardPreviewChip(r)
                         }
-                        .font(AppFont.caption)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 10)
+                        .buttonStyle(.plain)
                     }
                 }
+                .padding(.vertical, 2)
             }
         }
+    }
+
+    private func relatedCardPreviewChip(_ r: ArticleRelatedCard) -> some View {
+        let title = (r.previewTitle?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? "Related card"
+        return VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(AppFont.subheadline)
+                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                .multilineTextAlignment(.leading)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 6) {
+                Text("Explore")
+                    .font(AppFont.captionEmphasis)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .foregroundStyle(UndrmndPrototypeTheme.primary)
+        }
+        .padding(14)
+        .frame(width: 168, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(UndrmndPrototypeTheme.panel)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title). Explore related card.")
     }
 
     private func readTimeMinutes(_ md: String) -> Int? {
@@ -379,9 +414,13 @@ struct ArticleEditSheet: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Button("Close", action: onClose)
-                        .font(AppFont.body)
-                        .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel("Close")
                     Spacer()
                 }
                 Text("Edit text")
@@ -468,9 +507,13 @@ struct ArticleForkSheet: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Button("Close", action: onClose)
-                        .font(AppFont.body)
-                        .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel("Close")
                     Spacer()
                 }
                 Text("Title")

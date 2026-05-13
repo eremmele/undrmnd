@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>undrmnd — Fog of war reference</title>
+  <style>
+    :root {
+      --bg: #e9e6dc;
+      --paper: #f4f1e8;
+      --ink: #2a2925;
+      --mid: #7a766d;
+      --fog-dark: rgba(54,52,48,0.78);
+      --fog-mid: rgba(78,75,69,0.46);
+      --fog-light: rgba(108,104,97,0.22);
+      --border: rgba(42,41,37,0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: radial-gradient(circle at top, #f6f4ee 0%, var(--bg) 52%, #ddd8cd 100%);
+      color: var(--ink);
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .title {
+      margin-bottom: 18px;
+      letter-spacing: 0.03em;
+    }
+    .subtitle {
+      max-width: 760px;
+      color: var(--mid);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .frame {
+      position: relative;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      height: 78vh;
+      min-height: 680px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+    .grain, .fine-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+    .grain {
+      opacity: 0.14;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(0,0,0,0.1) 0 1px, transparent 1.2px),
+        radial-gradient(circle at 70% 40%, rgba(0,0,0,0.08) 0 1px, transparent 1.2px),
+        radial-gradient(circle at 40% 70%, rgba(0,0,0,0.08) 0 1px, transparent 1.2px),
+        radial-gradient(circle at 85% 80%, rgba(0,0,0,0.07) 0 1px, transparent 1.2px);
+      background-size: 12px 12px, 14px 14px, 16px 16px, 18px 18px;
+    }
+    .fine-grain {
+      opacity: 0.07;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.16) 1px, transparent 1px);
+      background-size: 3px 3px;
+    }
+    .map {
+      position: absolute;
+      inset: 0;
+      padding: 44px;
+    }
+    .cluster {
+      position: absolute;
+      display: grid;
+      gap: 10px;
+      width: 250px;
+    }
+    .cluster.small { width: 180px; }
+    .strata {
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(42,41,37,0.18);
+      padding: 10px 12px;
+      backdrop-filter: blur(1px);
+    }
+    .strata .kicker {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 6px;
+    }
+    .strata .name {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .strata .meta {
+      font-size: 12px;
+      color: var(--mid);
+    }
+    .line {
+      position: absolute;
+      border-top: 1px dashed rgba(42,41,37,0.2);
+      transform-origin: left center;
+      opacity: 0.7;
+    }
+    .island {
+      position: absolute;
+      left: 6%; top: 12%;
+      width: 42%; height: 56%;
+      border-radius: 46% 54% 48% 52% / 42% 46% 54% 58%;
+      background:
+        radial-gradient(circle at 45% 45%, rgba(255,255,255,0.78), rgba(255,255,255,0.28) 58%, rgba(255,255,255,0.08) 72%, transparent 78%),
+        radial-gradient(circle at 60% 55%, rgba(255,255,255,0.45), transparent 70%);
+      box-shadow: inset 0 0 0 1px rgba(42,41,37,0.08);
+      pointer-events: none;
+    }
+    .fog {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 26% 40%, transparent 0 13%, rgba(255,255,255,0.08) 14%, var(--fog-light) 18%, var(--fog-mid) 23%, var(--fog-dark) 33%),
+        radial-gradient(circle at 74% 30%, rgba(48,46,42,0.74), rgba(46,44,40,0.78));
+      mask-image:
+        radial-gradient(circle at 26% 40%, transparent 0 14%, rgba(0,0,0,0.08) 16%, rgba(0,0,0,0.45) 20%, rgba(0,0,0,0.76) 26%, rgba(0,0,0,1) 38%),
+        linear-gradient(#000,#000);
+      -webkit-mask-image:
+        radial-gradient(circle at 26% 40%, transparent 0 14%, rgba(0,0,0,0.08) 16%, rgba(0,0,0,0.45) 20%, rgba(0,0,0,0.76) 26%, rgba(0,0,0,1) 38%),
+        linear-gradient(#000,#000);
+      pointer-events: none;
+    }
+    .fog::before, .fog::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+    .fog::before {
+      opacity: 0.38;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.22) 1px, transparent 1px),
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.12) 0 1px, transparent 1px),
+        radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08) 0 1px, transparent 1px);
+      background-size: 4px 4px, 4px 4px, 11px 11px, 15px 15px;
+      filter: contrast(115%);
+    }
+    .fog::after {
+      opacity: 0.14;
+      background-image:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.16) 0 2px, transparent 2px),
+        radial-gradient(circle at 80% 70%, rgba(0,0,0,0.14) 0 2px, transparent 2px),
+        radial-gradient(circle at 50% 50%, rgba(0,0,0,0.16) 0 1px, transparent 1px);
+      background-size: 19px 19px, 23px 23px, 9px 9px;
+    }
+    .callout {
+      position: absolute;
+      right: 26px;
+      bottom: 24px;
+      width: 290px;
+      background: rgba(244,241,232,0.92);
+      border: 1px solid rgba(42,41,37,0.18);
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    .callout h2 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+    .callout p, .callout li {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--mid);
+    }
+    .callout ul { padding-left: 18px; margin: 10px 0 0; }
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      color: var(--mid);
+      font-size: 12px;
+    }
+    .swatch {
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(42,41,37,0.16);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .dense { background:
+      linear-gradient(rgba(0,0,0,0.28) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.22) 1px, transparent 1px);
+      background-size: 4px 4px; }
+    .edge { background:
+      linear-gradient(rgba(0,0,0,0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.09) 1px, transparent 1px);
+      background-size: 6px 6px; }
+    .clear { background: rgba(255,255,255,0.45); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Fog-of-war reference</h1>
+    <p class="subtitle">A monochrome, bitmap-like fog treatment for an e-ink iOS interface. The revealed island stays quiet and readable, while unrevealed territory becomes denser through pixel texture and stippled grain instead of glossy blur or fantasy smoke.</p>
+    <div class="frame">
+      <div class="map">
+        <div class="line" style="left:180px; top:180px; width:160px; transform:rotate(12deg)"></div>
+        <div class="line" style="left:260px; top:250px; width:150px; transform:rotate(-22deg)"></div>
+        <div class="line" style="left:360px; top:290px; width:170px; transform:rotate(10deg)"></div>
+        <div class="line" style="left:520px; top:220px; width:240px; transform:rotate(-8deg)"></div>
+
+        <div class="cluster" style="left:120px; top:110px;">
+          <div class="strata"><div class="kicker">Strata</div><div class="name">Birdsong as memory aid</div><div class="meta">field note attached · visible</div></div>
+          <div class="strata"><div class="kicker">Strata</div><div class="name">What a lichen patch can signal</div><div class="meta">community contribution · visible</div></div>
+          <div class="strata"><div class="kicker">Strata</div><div class="name">Why moss prefers shade</div><div class="meta">source + analogy · visible</div></div>
+        </div>
+
+        <div class="cluster small" style="left:380px; top:300px;">
+          <div class="strata"><div class="kicker">Adjacent</div><div class="name">Urban fungi map</div><div class="meta">partially revealed</div></div>
+          <div class="strata"><div class="kicker">Adjacent</div><div class="name">Soil moisture note</div><div class="meta">partially revealed</div></div>
+        </div>
+
+        <div class="cluster small" style="left:740px; top:150px; opacity:0.45; filter: blur(0.2px);">
+          <div class="strata"><div class="kicker">Unknown</div><div class="name">Seed dispersal patterns</div><div class="meta">obscured</div></div>
+        </div>
+
+        <div class="cluster small" style="left:820px; top:420px; opacity:0.4; filter: blur(0.2px);">
+          <div class="strata"><div class="kicker">Unknown</div><div class="name">Mycelial networks</div><div class="meta">obscured</div></div>
+        </div>
+      </div>
+
+      <div class="island"></div>
+      <div class="fog"></div>
+      <div class="grain"></div>
+      <div class="fine-grain"></div>
+
+      <div class="callout">
+        <h2>Desired feel</h2>
+        <p>This should read like paper and bitmap texture, not smoke or magic. The map is still calm, but the world is visibly incomplete until the user reads and contributes.</p>
+        <ul>
+          <li>Dense pixel texture in obscured regions</li>
+          <li>Lighter stipple at reveal edge</li>
+          <li>Soft atmospheric transition, still clearly bitmap-based</li>
+          <li>Compatible with e-ink and low-stimulation visuals</li>
+        </ul>
+        <div class="legend">
+          <span><span class="swatch dense"></span>Dense fog</span>
+          <span><span class="swatch edge"></span>Reveal edge</span>
+          <span><span class="swatch clear"></span>Visible island</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

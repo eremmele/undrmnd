@@ -52,17 +52,17 @@ struct ContentPreview: Codable, Identifiable, Hashable {
     }
 
     /// Offline / empty-catalog fallback so three-card sessions still work when the RPC returns no active rows.
+    /// IDs must match real `content_items` rows in Supabase that have active articles (see `get_article_for_card`).
     static let sessionFallback: [ContentPreview] = {
-        // Placeholder UUIDs. Detail fetches will fail silently; card copy still works from preview fields.
-        let a = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-        let b = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
-        let c = UUID(uuidString: "00000000-0000-0000-0000-000000000003")!
+        let a = UUID(uuidString: "fd70d870-dc5b-42ed-b9c0-161f05fdb01d")!
+        let b = UUID(uuidString: "db1826a6-623f-4e65-bb8d-cc7c09ebdaf0")!
+        let c = UUID(uuidString: "617c1b37-21cd-44b9-b69f-a78d91e960d8")!
         return [
             ContentPreview(
                 id: a,
                 title: "What is dark matter, really?",
-                hook: "85% of the matter in the universe is invisible, and no one knows what it’s made of.",
-                interactionType: .read,
+                hook: "85% of the matter in the universe is invisible, and no one knows what it's made of.",
+                interactionType: .contribute,
                 sourceUrl: nil,
                 actionUrl: nil,
                 topic: .cosmos,
@@ -70,23 +70,23 @@ struct ContentPreview: Codable, Identifiable, Hashable {
             ),
             ContentPreview(
                 id: b,
-                title: "How many species share Earth with us? No one knows within a factor of 10.",
-                hook: "Estimates range from 2 million to a trillion. Most of the uncertainty is microbes.",
-                interactionType: .read,
-                sourceUrl: nil,
-                actionUrl: nil,
-                topic: .livingWorld,
-                contributedBy: "nneka_o"
-            ),
-            ContentPreview(
-                id: c,
                 title: "Why is the replication crisis not a scandal?",
-                hook: "Somewhere between 36% and 65% of published psychology findings don’t replicate. That’s not a failure. It’s the system working.",
-                interactionType: .reflect,
-                sourceUrl: nil,
+                hook: "Somewhere between 36% and 65% of published psychology findings don't replicate. That's not a failure — it's the system working.",
+                interactionType: .read,
+                sourceUrl: "https://doi.org/10.1126/science.aac4716",
                 actionUrl: nil,
                 topic: .howWeKnow,
                 contributedBy: "ilhan_b"
+            ),
+            ContentPreview(
+                id: c,
+                title: "Is consciousness something physics can describe?",
+                hook: "We don't have a theory that explains why there's a \"what it's like\" to be you.",
+                interactionType: .reflect,
+                sourceUrl: "https://doi.org/10.1038/s41586-023-06345-5",
+                actionUrl: nil,
+                topic: .mindAndBrain,
+                contributedBy: "sage_m"
             )
         ]
     }()

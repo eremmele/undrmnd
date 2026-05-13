@@ -167,6 +167,10 @@ extension View {
                     }
                 }
             }
+            // Explicit paper bar so pushed screens override Explore’s floating / hidden fog chrome.
+            .toolbarBackground(UndrmndPrototypeTheme.paper, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
     }
 }
 

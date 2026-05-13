@@ -8,6 +8,7 @@ struct ExploreFogRootView: View {
     var onAbout: () -> Void
 
     @Environment(\.openArticleForContent) private var openArticleForContent
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     @State private var strata: [Strata] = []
     @State private var loadFailed = false
@@ -18,6 +19,7 @@ struct ExploreFogRootView: View {
                 explorePath: .firstIsland(strata: strata, wideRevealFromContribution: false),
                 onThreadTap: { id in openArticleForContent(id) }
             )
+            .ignoresSafeArea(edges: .top)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Clear the fog, then tap a lit dot to open a contributed card.")
@@ -47,9 +49,19 @@ struct ExploreFogRootView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .font(.system(size: 22, weight: .medium))
-                            .foregroundStyle(UndrmndPrototypeTheme.primary)
+                            .foregroundStyle(FogMapShellChrome.mapInkSoft.opacity(0.92))
                             .padding(14)
-                            .background(.ultraThinMaterial, in: Circle())
+                            .background {
+                                if reduceTransparency {
+                                    Circle().fill(Color.black.opacity(0.45))
+                                } else {
+                                    Circle().fill(.ultraThinMaterial)
+                                }
+                            }
+                            .overlay(
+                                Circle()
+                                    .strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
+                            )
                     }
                     .accessibilityLabel("More explore actions")
                     .padding(.trailing, 16)
@@ -57,8 +69,14 @@ struct ExploreFogRootView: View {
                 }
             }
         }
-        .background(UndrmndPrototypeTheme.paper)
-        .navigationTitleBrand("Explore")
+        .background(Color.clear)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                FogToolbarPrincipalWordmark()
+            }
+        }
         .task { await loadStrata() }
     }
 

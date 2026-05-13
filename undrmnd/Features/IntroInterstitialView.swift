@@ -59,7 +59,7 @@ struct IntroInterstitialView: View {
                     .lineLimit(2)
                     .tracking(0.3)
 
-                Text("Explore anything, the room is yours.")
+                Text("Explore anything. The room is yours.")
                     .font(AppFont.body)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(IntroEInkPaper.body)

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum HomeRoute: Hashable {
     case goalClarifier
@@ -9,6 +10,41 @@ enum HomeRoute: Hashable {
     case about
 }
 
+/// Shell chrome for tab bar + Explore stack navigation (fog maps vs paper surfaces).
+enum ShellChromeStyle: Hashable {
+    case lightPaper
+    case darkGlass
+}
+
+private struct ShellChromeStyleKey: EnvironmentKey {
+    static let defaultValue: ShellChromeStyle = .lightPaper
+}
+
+extension EnvironmentValues {
+    /// Current main-shell chrome; drives tab bar material and Explore navigation bar treatment.
+    var shellChromeStyle: ShellChromeStyle {
+        get { self[ShellChromeStyleKey.self] }
+        set { self[ShellChromeStyleKey.self] = newValue }
+    }
+}
+
+private struct ReplayIntroSplashActiveKey: EnvironmentKey {
+    static let defaultValue: Bool = false
+}
+
+extension EnvironmentValues {
+    /// True while the full-screen intro replay overlay is up (`UndrmndApp`); suppresses tab chrome underneath.
+    var replayIntroSplashActive: Bool {
+        get { self[ReplayIntroSplashActiveKey.self] }
+        set { self[ReplayIntroSplashActiveKey.self] = newValue }
+    }
+}
+
+/// Shared fog-map toolbar ink (warm paper-white on charcoal).
+enum FogMapShellChrome {
+    static let mapInkSoft = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255)
+}
+
 struct RootView: View {
     enum MainTab: Hashable {
         case explore
@@ -17,6 +53,8 @@ struct RootView: View {
         case profile
     }
 
+    @Environment(\.replayIntroSplashActive) private var replayIntroSplashActive
+    @EnvironmentObject private var onboarding: OnboardingCoordinator
     @State private var tab: MainTab = .explore
     @State private var explorePath = NavigationPath()
     @State private var contributePath = NavigationPath()
@@ -26,41 +64,85 @@ struct RootView: View {
 
     @StateObject private var alertsStore = AlertsStore()
 
+    /// Bottom tabs stay hidden through intro + topic search and while the intro replay overlay is up; appear after the first committed search (reveal → island) and in the main app.
+    private var showsMainTabBar: Bool {
+        if replayIntroSplashActive { return false }
+        if onboarding.hasUnlockedMainNavigation { return true }
+        switch onboarding.phase {
+        case .interstitial, .chooseBeginning:
+            return false
+        case .revealing, .firstIsland, .onboardingComplete:
+            return true
+        }
+    }
+
+    /// Explore stack: dark floating chrome only on fog roots; pushed screens bring their own paper bars via `navigationTitleBrand`.
+    private var exploreStackChromeStyle: ShellChromeStyle {
+        if !onboarding.hasUnlockedMainNavigation {
+            switch onboarding.phase {
+            case .revealing, .firstIsland:
+                return .darkGlass
+            default:
+                return .lightPaper
+            }
+        }
+        return explorePath.isEmpty ? .darkGlass : .lightPaper
+    }
+
+    /// Tab bar + global env: light on non-Explore tabs; on Explore, match the fog stack when at root or in onboarding fog phases.
+    private var shellChromeStyleForCurrentTab: ShellChromeStyle {
+        switch tab {
+        case .explore:
+            return exploreStackChromeStyle
+        default:
+            return .lightPaper
+        }
+    }
+
     var body: some View {
         TabView(selection: $tab) {
-            NavigationStack(path: $explorePath) {
-                ExploreFogRootView(
-                    onGoalClarifier: { explorePath.append(HomeRoute.goalClarifier) },
-                    onTerritoryMap: { explorePath.append(HomeRoute.territoryMap) },
-                    onOpenContribute: { tab = .contribute },
-                    onAbout: { explorePath.append(HomeRoute.about) }
-                )
-                .navigationDestination(for: HomeRoute.self) { route in
-                    switch route {
-                    case .goalClarifier:
-                        GoalClarifierView(
-                            onSelectPath: { slug in explorePath.append(HomeRoute.path(slug)) },
-                            onThreeCardSession: { p in explorePath.append(HomeRoute.threeCard(p)) }
+            Group {
+                if onboarding.hasUnlockedMainNavigation {
+                    NavigationStack(path: $explorePath) {
+                        ExploreFogRootView(
+                            onGoalClarifier: { explorePath.append(HomeRoute.goalClarifier) },
+                            onTerritoryMap: { explorePath.append(HomeRoute.territoryMap) },
+                            onOpenContribute: { tab = .contribute },
+                            onAbout: { explorePath.append(HomeRoute.about) }
                         )
-                    case .path(let slug):
-                        PathView(slug: slug)
-                    case .threeCard(let pillar):
-                        ThreeCardSessionView(topicFilter: pillar)
-                    case .articleForCard(let id):
-                        ArticleView(contentId: id)
-                    case .territoryMap:
-                        TerritoryMapPlaceholderView { pillar in
-                            explorePath.append(HomeRoute.threeCard(pillar))
+                        .navigationDestination(for: HomeRoute.self) { route in
+                            switch route {
+                            case .goalClarifier:
+                                GoalClarifierView(
+                                    onSelectPath: { slug in explorePath.append(HomeRoute.path(slug)) },
+                                    onThreeCardSession: { p in explorePath.append(HomeRoute.threeCard(p)) }
+                                )
+                            case .path(let slug):
+                                PathView(slug: slug)
+                            case .threeCard(let pillar):
+                                ThreeCardSessionView(topicFilter: pillar)
+                            case .articleForCard(let id):
+                                ArticleView(contentId: id)
+                            case .territoryMap:
+                                TerritoryMapPlaceholderView { pillar in
+                                    explorePath.append(HomeRoute.threeCard(pillar))
+                                }
+                            case .about:
+                                AboutUndrmndView()
+                            }
                         }
-                    case .about:
-                        AboutUndrmndView()
                     }
+                    .environment(\.openArticleForContent) { id in
+                        explorePath.append(HomeRoute.articleForCard(id))
+                    }
+                    .modifier(ShellNavigationBarModifier(style: exploreStackChromeStyle))
+                    .appShellNavigationToolbar()
+                } else {
+                    OnboardingRootView()
                 }
             }
-            .environment(\.openArticleForContent) { id in
-                explorePath.append(HomeRoute.articleForCard(id))
-            }
-            .appShellNavigationToolbar()
+            // Hiding on the Explore tab content is required for reliable tab suppression (see Apple “toolbar hidden for tabBar”).
+            .toolbar(showsMainTabBar ? .automatic : .hidden, for: .tabBar)
             .tabItem {
                 Label("Explore", systemImage: "sparkles")
             }
@@ -97,8 +179,9 @@ struct RootView: View {
             .tag(MainTab.profile)
         }
         .tint(UndrmndPrototypeTheme.primary)
-        .toolbarBackground(UndrmndPrototypeTheme.paper, for: .tabBar)
-        .toolbarBackground(.visible, for: .tabBar)
+        .environment(\.shellChromeStyle, shellChromeStyleForCurrentTab)
+        .toolbar(showsMainTabBar ? .automatic : .hidden, for: .tabBar)
+        .modifier(ShellTabBarChromeModifier(isVisible: showsMainTabBar, style: shellChromeStyleForCurrentTab))
         .environmentObject(alertsStore)
         .environment(\.openTerritoryMapFromShell) { showExploreMap = true }
         .environment(\.openTopicSearchFromShell) { showSearch = true }
@@ -116,6 +199,7 @@ struct RootView: View {
                 }
             }
             .environmentObject(alertsStore)
+            .environment(\.shellChromeStyle, .lightPaper)
         }
         .sheet(isPresented: $showExploreMap) {
             NavigationStack {
@@ -130,10 +214,12 @@ struct RootView: View {
             }
             .appShellNavigationToolbar()
             .environmentObject(alertsStore)
+            .environment(\.shellChromeStyle, .lightPaper)
         }
         .sheet(isPresented: $showAlerts) {
             AlertsPanelView()
                 .environmentObject(alertsStore)
+                .environment(\.shellChromeStyle, .lightPaper)
         }
     }
 }
@@ -259,6 +345,72 @@ struct ToolbarPillButton: View {
     }
 }
 
+/// Frosted 40×40 control for fog-map navigation rows (pairs with ``ToolbarPillButton`` on paper surfaces).
+struct FogGlassToolbarPillButton: View {
+    let systemName: String
+    var accessibilityLabel: String
+    let action: () -> Void
+
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(FogMapShellChrome.mapInkSoft.opacity(0.94))
+                .frame(width: 40, height: 40)
+                .background {
+                    Group {
+                        if reduceTransparency {
+                            Circle()
+                                .fill(Color.black.opacity(0.45))
+                        } else {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        }
+                    }
+                    .overlay(
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
+                    )
+                }
+        }
+        .buttonStyle(.borderless)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
+/// Centered **undrmnd** for fog-map navigation; optional frosted capsule (Explore / first island) vs plain text (topic search).
+struct FogToolbarPrincipalWordmark: View {
+    var useMaterialBackdrop: Bool = true
+
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    var body: some View {
+        Text("undrmnd")
+            .font(AppFont.brandWordmark)
+            .foregroundStyle(FogMapShellChrome.mapInkSoft.opacity(0.96))
+            .padding(.horizontal, useMaterialBackdrop ? 16 : 0)
+            .padding(.vertical, useMaterialBackdrop ? 7 : 0)
+            .background {
+                if useMaterialBackdrop {
+                    Group {
+                        if reduceTransparency {
+                            Capsule().fill(Color.black.opacity(0.52))
+                        } else {
+                            Capsule().fill(.ultraThinMaterial)
+                        }
+                    }
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
+                    )
+                }
+            }
+            .accessibilityLabel("undrmnd")
+    }
+}
+
 // MARK: - Global Explore shell (map + search) for any pushed screen
 
 private struct OpenTerritoryMapKey: EnvironmentKey {
@@ -313,44 +465,208 @@ extension EnvironmentValues {
     }
 }
 
+private enum UndrmndUITabBarSync {
+    /// Aligns UIKit tab bar with SwiftUI fog chrome (removes the extra gray slab under the floating items).
+    static func apply(tabBarVisible: Bool, style: ShellChromeStyle) {
+        let appearance = UITabBarAppearance()
+        if !tabBarVisible {
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundColor = .clear
+        } else if style == .darkGlass {
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundColor = .clear
+            appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
+            appearance.shadowImage = UIImage()
+            appearance.shadowColor = nil
+            let primaryInk = UIColor(red: 0.1, green: 0.1, blue: 0.098, alpha: 1.0)
+            let mutedInk = UIColor(red: 0.36, green: 0.353, blue: 0.345, alpha: 1.0)
+            appearance.stackedLayoutAppearance.normal.iconColor = mutedInk
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: mutedInk]
+            appearance.stackedLayoutAppearance.selected.iconColor = primaryInk
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: primaryInk]
+            appearance.inlineLayoutAppearance.normal.iconColor = mutedInk
+            appearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: mutedInk]
+            appearance.inlineLayoutAppearance.selected.iconColor = primaryInk
+            appearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: primaryInk]
+            appearance.compactInlineLayoutAppearance.normal.iconColor = mutedInk
+            appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: mutedInk]
+            appearance.compactInlineLayoutAppearance.selected.iconColor = primaryInk
+            appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: primaryInk]
+        } else {
+            appearance.configureWithOpaqueBackground()
+            let paper = UIColor(red: 0.98, green: 0.976, blue: 0.969, alpha: 1.0)
+            appearance.backgroundColor = paper
+            appearance.shadowImage = nil
+            appearance.shadowColor = nil
+            let secondary = UIColor(red: 0.29, green: 0.283, blue: 0.275, alpha: 1.0)
+            let primary = UIColor(red: 0.1, green: 0.1, blue: 0.098, alpha: 1.0)
+            appearance.stackedLayoutAppearance.normal.iconColor = secondary
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: secondary]
+            appearance.stackedLayoutAppearance.selected.iconColor = primary
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: primary]
+            appearance.inlineLayoutAppearance.normal.iconColor = secondary
+            appearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: secondary]
+            appearance.inlineLayoutAppearance.selected.iconColor = primary
+            appearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: primary]
+            appearance.compactInlineLayoutAppearance.normal.iconColor = secondary
+            appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: secondary]
+            appearance.compactInlineLayoutAppearance.selected.iconColor = primary
+            appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: primary]
+        }
+        let tabBar = UITabBar.appearance()
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+        tabBar.isTranslucent = tabBarVisible && style == .darkGlass
+        if style == .darkGlass, tabBarVisible {
+            tabBar.tintColor = UIColor(red: 0.1, green: 0.1, blue: 0.098, alpha: 1.0)
+        } else {
+            tabBar.tintColor = nil
+        }
+    }
+}
+
+private struct ShellTabBarChromeModifier: ViewModifier {
+    let isVisible: Bool
+    let style: ShellChromeStyle
+
+    func body(content: Content) -> some View {
+        Group {
+            if !isVisible {
+                content
+            } else {
+                switch style {
+                case .lightPaper:
+                    content
+                        .toolbarBackground(UndrmndPrototypeTheme.paper, for: .tabBar)
+                        .toolbarBackground(.visible, for: .tabBar)
+                case .darkGlass:
+                    content
+                        .toolbarBackground(.hidden, for: .tabBar)
+                        .toolbarColorScheme(.light, for: .tabBar)
+                }
+            }
+        }
+        .onAppear {
+            UndrmndUITabBarSync.apply(tabBarVisible: isVisible, style: isVisible ? style : .lightPaper)
+        }
+        .onChange(of: isVisible) { _, newVisible in
+            UndrmndUITabBarSync.apply(tabBarVisible: newVisible, style: newVisible ? style : .lightPaper)
+        }
+        .onChange(of: style) { _, newStyle in
+            UndrmndUITabBarSync.apply(tabBarVisible: isVisible, style: isVisible ? newStyle : .lightPaper)
+        }
+    }
+}
+
+/// Explore `NavigationStack` only: floating fog chrome at root; paper when pushed screens apply `navigationTitleBrand`.
+private struct ShellNavigationBarModifier: ViewModifier {
+    let style: ShellChromeStyle
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        switch style {
+        case .lightPaper:
+            content
+                .toolbarBackground(UndrmndPrototypeTheme.paper, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarColorScheme(.light, for: .navigationBar)
+        case .darkGlass:
+            content
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbarColorScheme(.dark, for: .navigationBar)
+        }
+    }
+}
+
 /// Search + map + alerts dock. Applied **once** on each `NavigationStack` root (see `appShellNavigationToolbar()`), not on every pushed screen, so the chrome does not re-mount and flicker.
 struct AppShellToolbarTrailing: View {
     @Environment(\.openTerritoryMapFromShell) private var openTerritoryMap
     @Environment(\.openTopicSearchFromShell) private var openTopicSearch
     @Environment(\.openAlertsFromShell) private var openAlertsFromShell
+    @Environment(\.shellChromeStyle) private var shellChromeStyle
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @EnvironmentObject private var alerts: AlertsStore
 
     var body: some View {
         HStack(spacing: 8) {
-            ToolbarPillButton(
-                systemName: "magnifyingglass",
-                accessibilityLabel: "Search topics and paths",
-                action: openTopicSearch
-            )
-            ToolbarPillButton(
-                systemName: "map",
-                accessibilityLabel: "Open your topic map",
-                action: openTerritoryMap
-            )
-            if alerts.unreadCount > 0 {
-                Button(action: openAlertsFromShell) {
-                    Image(systemName: "bell")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                        .frame(width: 40, height: 40)
-                        .background { ToolbarPillBackground() }
+            if shellChromeStyle == .darkGlass {
+                FogGlassToolbarPillButton(
+                    systemName: "magnifyingglass",
+                    accessibilityLabel: "Search topics and paths",
+                    action: openTopicSearch
+                )
+                FogGlassToolbarPillButton(
+                    systemName: "map",
+                    accessibilityLabel: "Open your topic map",
+                    action: openTerritoryMap
+                )
+                if alerts.unreadCount > 0 {
+                    fogBellBadgeButton
+                } else {
+                    FogGlassToolbarPillButton(
+                        systemName: "bell",
+                        accessibilityLabel: "Open alerts",
+                        action: openAlertsFromShell
+                    )
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Open alerts, \(alerts.unreadCount) unread")
-                .badge(alerts.unreadCount)
             } else {
                 ToolbarPillButton(
-                    systemName: "bell",
-                    accessibilityLabel: "Open alerts",
-                    action: openAlertsFromShell
+                    systemName: "magnifyingglass",
+                    accessibilityLabel: "Search topics and paths",
+                    action: openTopicSearch
                 )
+                ToolbarPillButton(
+                    systemName: "map",
+                    accessibilityLabel: "Open your topic map",
+                    action: openTerritoryMap
+                )
+                if alerts.unreadCount > 0 {
+                    Button(action: openAlertsFromShell) {
+                        Image(systemName: "bell")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                            .frame(width: 40, height: 40)
+                            .background { ToolbarPillBackground() }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Open alerts, \(alerts.unreadCount) unread")
+                    .badge(alerts.unreadCount)
+                } else {
+                    ToolbarPillButton(
+                        systemName: "bell",
+                        accessibilityLabel: "Open alerts",
+                        action: openAlertsFromShell
+                    )
+                }
             }
         }
+    }
+
+    private var fogBellBadgeButton: some View {
+        Button(action: openAlertsFromShell) {
+            Image(systemName: "bell")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(FogMapShellChrome.mapInkSoft.opacity(0.94))
+                .frame(width: 40, height: 40)
+                .background {
+                    Group {
+                        if reduceTransparency {
+                            Circle()
+                                .fill(Color.black.opacity(0.45))
+                        } else {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        }
+                    }
+                    .overlay(
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
+                    )
+                }
+        }
+        .buttonStyle(.borderless)
+        .accessibilityLabel("Open alerts, \(alerts.unreadCount) unread")
+        .badge(alerts.unreadCount)
     }
 }
 
@@ -368,4 +684,5 @@ extension View {
 #Preview {
     RootView()
         .environmentObject(AlertsStore())
+        .environmentObject(OnboardingCoordinator())
 }

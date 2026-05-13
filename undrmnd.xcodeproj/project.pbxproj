@@ -15,15 +15,22 @@
 		A100002F245A1B000000002F /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030245A1B0000000030 /* SupabaseService.swift */; };
 		E61A6F922F62165C009CA58F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9B2F62090300EC3C29 /* Supabase */; };
 		E6B3D3C52F8F4C560037A1B2 /* CardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */; };
-		E8F2A0B12F9000A1009CA58F /* UndrmndPrototypeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */; };
-		E8F2A0B22F9000A1009CA58F /* WalkPathModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */; };
-		E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */; };
-		E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */; };
-		E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */; };
 		E6DC4A9D2F620FD600EC3C29 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E6DC4A9C2F620FD600EC3C29 /* Supabase */; };
+		E7A10100 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10101 /* Article.swift */; };
+		E7A10102 /* ArticleVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10103 /* ArticleVersion.swift */; };
+		E7A10104 /* ArticlePrimarySource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10105 /* ArticlePrimarySource.swift */; };
+		E7A10106 /* ArticleBranch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10107 /* ArticleBranch.swift */; };
+		E7A10108 /* ArticleRelatedCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10109 /* ArticleRelatedCard.swift */; };
+		E7A1010A /* ArticleBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1010B /* ArticleBundle.swift */; };
+		E7A1010C /* ArticleContributionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1010D /* ArticleContributionType.swift */; };
+		E7A1010E /* Pillar+ArticleChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1010F /* Pillar+ArticleChrome.swift */; };
+		E7A10110 /* ArticleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10111 /* ArticleService.swift */; };
+		E7A10112 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10113 /* ArticleView.swift */; };
+		E7AF1002 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AF1001 /* AppFont.swift */; };
 		E7B8SCAN02 /* ScanEffect in Resources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN01 /* ScanEffect */; };
 		E7B8SCAN04 /* IntroInterstitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN03 /* IntroInterstitialView.swift */; };
 		E7B8SCAN06 /* ScanEffectWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B8SCAN05 /* ScanEffectWebView.swift */; };
+		E7CMT02 /* CommunityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CMT01 /* CommunityService.swift */; };
 		E7D10010 /* Pillar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10011 /* Pillar.swift */; };
 		E7D10012 /* InteractionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10013 /* InteractionType.swift */; };
 		E7D10014 /* ContentPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D10015 /* ContentPreview.swift */; };
@@ -54,28 +61,21 @@
 		E7D50001 /* ContributeFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D50002 /* ContributeFeature.swift */; };
 		E7D60001 /* AlertsPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D60002 /* AlertsPanelView.swift */; };
 		E7D61001 /* AboutUndrmndView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D61002 /* AboutUndrmndView.swift */; };
-		E7AF1002 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AF1001 /* AppFont.swift */; };
+		E7EXF02 /* ExploreFogRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7EXF01 /* ExploreFogRootView.swift */; };
 		E7FN0012 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E7FN0011 /* Fonts */; };
-		E7A10100 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10101 /* Article.swift */; };
-		E7A10102 /* ArticleVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10103 /* ArticleVersion.swift */; };
-		E7A10104 /* ArticlePrimarySource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10105 /* ArticlePrimarySource.swift */; };
-		E7A10106 /* ArticleBranch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10107 /* ArticleBranch.swift */; };
-		E7A10108 /* ArticleRelatedCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10109 /* ArticleRelatedCard.swift */; };
-		E7A1010A /* ArticleBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1010B /* ArticleBundle.swift */; };
-		E7A1010C /* ArticleContributionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1010D /* ArticleContributionType.swift */; };
-		E7A1010E /* Pillar+ArticleChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1010F /* Pillar+ArticleChrome.swift */; };
-		E7A10110 /* ArticleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10111 /* ArticleService.swift */; };
-		E7A10112 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A10113 /* ArticleView.swift */; };
-		E7STRT02 /* Strata.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7STRT01 /* Strata.swift */; };
 		E7IFOG02 /* IslandFogCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7IFOG01 /* IslandFogCanvas.swift */; };
 		E7LCFM02 /* LearningCommonsFogMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7LCFM01 /* LearningCommonsFogMapView.swift */; };
-		E7CMT02 /* CommunityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CMT01 /* CommunityService.swift */; };
-		E7SEM02 /* SemanticSearchRanker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7SEM01 /* SemanticSearchRanker.swift */; };
-		E7EXF02 /* ExploreFogRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7EXF01 /* ExploreFogRootView.swift */; };
 		E7ONB02 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ONB01 /* OnboardingCoordinator.swift */; };
 		E7ONB04 /* OnboardingRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ONB03 /* OnboardingRootView.swift */; };
 		E7ONB06 /* ChooseBeginningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ONB05 /* ChooseBeginningView.swift */; };
 		E7ONB08 /* OnboardingStrataDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ONB07 /* OnboardingStrataDetailView.swift */; };
+		E7SEM02 /* SemanticSearchRanker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7SEM01 /* SemanticSearchRanker.swift */; };
+		E7STRT02 /* Strata.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7STRT01 /* Strata.swift */; };
+		E8F2A0B12F9000A1009CA58F /* UndrmndPrototypeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */; };
+		E8F2A0B22F9000A1009CA58F /* WalkPathModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */; };
+		E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */; };
+		E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */; };
+		E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,14 +99,21 @@
 		A100002E245A1B000000002E /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		A1000030245A1B0000000030 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardItem.swift; sourceTree = "<group>"; };
-		E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndrmndPrototypeTheme.swift; sourceTree = "<group>"; };
-		E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathModels.swift; sourceTree = "<group>"; };
-		E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathFlowView.swift; sourceTree = "<group>"; };
-		E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalClarifierView.swift; sourceTree = "<group>"; };
-		E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrototypeShellViews.swift; sourceTree = "<group>"; };
+		E7A10101 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		E7A10103 /* ArticleVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVersion.swift; sourceTree = "<group>"; };
+		E7A10105 /* ArticlePrimarySource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePrimarySource.swift; sourceTree = "<group>"; };
+		E7A10107 /* ArticleBranch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleBranch.swift; sourceTree = "<group>"; };
+		E7A10109 /* ArticleRelatedCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleRelatedCard.swift; sourceTree = "<group>"; };
+		E7A1010B /* ArticleBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleBundle.swift; sourceTree = "<group>"; };
+		E7A1010D /* ArticleContributionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleContributionType.swift; sourceTree = "<group>"; };
+		E7A1010F /* Pillar+ArticleChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pillar+ArticleChrome.swift"; sourceTree = "<group>"; };
+		E7A10111 /* ArticleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleService.swift; sourceTree = "<group>"; };
+		E7A10113 /* ArticleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
+		E7AF1001 /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		E7B8SCAN01 /* ScanEffect */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ScanEffect; sourceTree = "<group>"; };
 		E7B8SCAN03 /* IntroInterstitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroInterstitialView.swift; sourceTree = "<group>"; };
 		E7B8SCAN05 /* ScanEffectWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanEffectWebView.swift; sourceTree = "<group>"; };
+		E7CMT01 /* CommunityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityService.swift; sourceTree = "<group>"; };
 		E7D10011 /* Pillar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pillar.swift; sourceTree = "<group>"; };
 		E7D10013 /* InteractionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionType.swift; sourceTree = "<group>"; };
 		E7D10015 /* ContentPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPreview.swift; sourceTree = "<group>"; };
@@ -138,28 +145,21 @@
 		E7D50002 /* ContributeFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeFeature.swift; sourceTree = "<group>"; };
 		E7D60002 /* AlertsPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsPanelView.swift; sourceTree = "<group>"; };
 		E7D61002 /* AboutUndrmndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutUndrmndView.swift; sourceTree = "<group>"; };
-		E7AF1001 /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
+		E7EXF01 /* ExploreFogRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreFogRootView.swift; sourceTree = "<group>"; };
 		E7FN0011 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
-		E7A10101 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
-		E7A10103 /* ArticleVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVersion.swift; sourceTree = "<group>"; };
-		E7A10105 /* ArticlePrimarySource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePrimarySource.swift; sourceTree = "<group>"; };
-		E7A10107 /* ArticleBranch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleBranch.swift; sourceTree = "<group>"; };
-		E7A10109 /* ArticleRelatedCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleRelatedCard.swift; sourceTree = "<group>"; };
-		E7A1010B /* ArticleBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleBundle.swift; sourceTree = "<group>"; };
-		E7A1010D /* ArticleContributionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleContributionType.swift; sourceTree = "<group>"; };
-		E7A1010F /* Pillar+ArticleChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pillar+ArticleChrome.swift"; sourceTree = "<group>"; };
-		E7A10111 /* ArticleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleService.swift; sourceTree = "<group>"; };
-		E7A10113 /* ArticleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
-		E7STRT01 /* Strata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strata.swift; sourceTree = "<group>"; };
 		E7IFOG01 /* IslandFogCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandFogCanvas.swift; sourceTree = "<group>"; };
 		E7LCFM01 /* LearningCommonsFogMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningCommonsFogMapView.swift; sourceTree = "<group>"; };
-		E7CMT01 /* CommunityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityService.swift; sourceTree = "<group>"; };
-		E7SEM01 /* SemanticSearchRanker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearchRanker.swift; sourceTree = "<group>"; };
-		E7EXF01 /* ExploreFogRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreFogRootView.swift; sourceTree = "<group>"; };
 		E7ONB01 /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
 		E7ONB03 /* OnboardingRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRootView.swift; sourceTree = "<group>"; };
 		E7ONB05 /* ChooseBeginningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseBeginningView.swift; sourceTree = "<group>"; };
 		E7ONB07 /* OnboardingStrataDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStrataDetailView.swift; sourceTree = "<group>"; };
+		E7SEM01 /* SemanticSearchRanker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearchRanker.swift; sourceTree = "<group>"; };
+		E7STRT01 /* Strata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strata.swift; sourceTree = "<group>"; };
+		E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndrmndPrototypeTheme.swift; sourceTree = "<group>"; };
+		E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathModels.swift; sourceTree = "<group>"; };
+		E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathFlowView.swift; sourceTree = "<group>"; };
+		E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalClarifierView.swift; sourceTree = "<group>"; };
+		E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrototypeShellViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,27 +235,6 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		E7SPGRP1 /* Spatial */ = {
-			isa = PBXGroup;
-			children = (
-				E7IFOG01 /* IslandFogCanvas.swift */,
-				E7LCFM01 /* LearningCommonsFogMapView.swift */,
-				E7EXF01 /* ExploreFogRootView.swift */,
-			);
-			path = Spatial;
-			sourceTree = "<group>";
-		};
-		E7ONBGRP /* Onboarding */ = {
-			isa = PBXGroup;
-			children = (
-				E7ONB01 /* OnboardingCoordinator.swift */,
-				E7ONB03 /* OnboardingRootView.swift */,
-				E7ONB05 /* ChooseBeginningView.swift */,
-				E7ONB07 /* OnboardingStrataDetailView.swift */,
-			);
-			path = Onboarding;
-			sourceTree = "<group>";
-		};
 		A1000012245A1B000000000E /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -272,109 +251,6 @@
 				E7D61003 /* About */,
 			);
 			path = Features;
-			sourceTree = "<group>";
-		};
-		E7A10114 /* Article */ = {
-			isa = PBXGroup;
-			children = (
-				E7A10113 /* ArticleView.swift */,
-			);
-			path = Article;
-			sourceTree = "<group>";
-		};
-		E7D50003 /* Contribute */ = {
-			isa = PBXGroup;
-			children = (
-				E7D50002 /* ContributeFeature.swift */,
-			);
-			path = Contribute;
-			sourceTree = "<group>";
-		};
-		E7D60004 /* Alerts */ = {
-			isa = PBXGroup;
-			children = (
-				E7D60002 /* AlertsPanelView.swift */,
-			);
-			path = Alerts;
-			sourceTree = "<group>";
-		};
-		E7D61003 /* About */ = {
-			isa = PBXGroup;
-			children = (
-				E7D61002 /* AboutUndrmndView.swift */,
-			);
-			path = About;
-			sourceTree = "<group>";
-		};
-		E7LEG0001 /* Legacy */ = {
-			isa = PBXGroup;
-			children = (
-				E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */,
-				E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */,
-				E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */,
-			);
-			path = Legacy;
-			sourceTree = "<group>";
-		};
-		E7D2000F /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				E7D2000E /* Path */,
-				E7D2000D /* Profile */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		E7D2000E /* Path */ = {
-			isa = PBXGroup;
-			children = (
-				E7D20011 /* SafariView.swift */,
-				E7D20013 /* CardView.swift */,
-				E7D20015 /* BranchView.swift */,
-				E7D20017 /* EndpointView.swift */,
-				E7D20019 /* PathView.swift */,
-				E7D2001B /* PathMapView.swift */,
-			);
-			path = Path;
-			sourceTree = "<group>";
-		};
-		E7D2000D /* Profile */ = {
-			isa = PBXGroup;
-			children = (
-				E7D2001D /* PublicProfileView.swift */,
-				E7D30004 /* SignInView.swift */,
-				E7D30006 /* ProfileEditView.swift */,
-				E7D30008 /* ProfileView.swift */,
-				E7D3000A /* ContentDetailReadOnlyView.swift */,
-			);
-			path = Profile;
-			sourceTree = "<group>";
-		};
-		E7V2GRP00 /* v2 */ = {
-			isa = PBXGroup;
-			children = (
-				E7STRT01 /* Strata.swift */,
-				E7D10011 /* Pillar.swift */,
-				E7D10013 /* InteractionType.swift */,
-				E7D10015 /* ContentPreview.swift */,
-				E7D10017 /* ContentItem.swift */,
-				E7D10019 /* Profile.swift */,
-				E7D1001B /* Path.swift */,
-				E7D1001D /* PathNode.swift */,
-				E7D1001F /* PathEdge.swift */,
-				E7D10021 /* PathMap.swift */,
-				E7D10023 /* PathMapLayout.swift */,
-				E7D10025 /* Session.swift */,
-				E7A10101 /* Article.swift */,
-				E7A10103 /* ArticleVersion.swift */,
-				E7A10105 /* ArticlePrimarySource.swift */,
-				E7A10107 /* ArticleBranch.swift */,
-				E7A10109 /* ArticleRelatedCard.swift */,
-				E7A1010B /* ArticleBundle.swift */,
-				E7A1010D /* ArticleContributionType.swift */,
-				E7A1010F /* Pillar+ArticleChrome.swift */,
-			);
-			path = v2;
 			sourceTree = "<group>";
 		};
 		A1000013245A1B000000000F /* Patterns */ = {
@@ -425,6 +301,130 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E7A10114 /* Article */ = {
+			isa = PBXGroup;
+			children = (
+				E7A10113 /* ArticleView.swift */,
+			);
+			path = Article;
+			sourceTree = "<group>";
+		};
+		E7D2000D /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				E7D2001D /* PublicProfileView.swift */,
+				E7D30004 /* SignInView.swift */,
+				E7D30006 /* ProfileEditView.swift */,
+				E7D30008 /* ProfileView.swift */,
+				E7D3000A /* ContentDetailReadOnlyView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		E7D2000E /* Path */ = {
+			isa = PBXGroup;
+			children = (
+				E7D20011 /* SafariView.swift */,
+				E7D20013 /* CardView.swift */,
+				E7D20015 /* BranchView.swift */,
+				E7D20017 /* EndpointView.swift */,
+				E7D20019 /* PathView.swift */,
+				E7D2001B /* PathMapView.swift */,
+			);
+			path = Path;
+			sourceTree = "<group>";
+		};
+		E7D2000F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E7D2000E /* Path */,
+				E7D2000D /* Profile */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E7D50003 /* Contribute */ = {
+			isa = PBXGroup;
+			children = (
+				E7D50002 /* ContributeFeature.swift */,
+			);
+			path = Contribute;
+			sourceTree = "<group>";
+		};
+		E7D60004 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				E7D60002 /* AlertsPanelView.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
+		E7D61003 /* About */ = {
+			isa = PBXGroup;
+			children = (
+				E7D61002 /* AboutUndrmndView.swift */,
+			);
+			path = About;
+			sourceTree = "<group>";
+		};
+		E7LEG0001 /* Legacy */ = {
+			isa = PBXGroup;
+			children = (
+				E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */,
+				E6B3D3C42F8F4C560037A1B2 /* CardItem.swift */,
+				E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */,
+			);
+			path = Legacy;
+			sourceTree = "<group>";
+		};
+		E7ONBGRP /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				E7ONB01 /* OnboardingCoordinator.swift */,
+				E7ONB03 /* OnboardingRootView.swift */,
+				E7ONB05 /* ChooseBeginningView.swift */,
+				E7ONB07 /* OnboardingStrataDetailView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		E7SPGRP1 /* Spatial */ = {
+			isa = PBXGroup;
+			children = (
+				E7IFOG01 /* IslandFogCanvas.swift */,
+				E7LCFM01 /* LearningCommonsFogMapView.swift */,
+				E7EXF01 /* ExploreFogRootView.swift */,
+			);
+			path = Spatial;
+			sourceTree = "<group>";
+		};
+		E7V2GRP00 /* v2 */ = {
+			isa = PBXGroup;
+			children = (
+				E7STRT01 /* Strata.swift */,
+				E7D10011 /* Pillar.swift */,
+				E7D10013 /* InteractionType.swift */,
+				E7D10015 /* ContentPreview.swift */,
+				E7D10017 /* ContentItem.swift */,
+				E7D10019 /* Profile.swift */,
+				E7D1001B /* Path.swift */,
+				E7D1001D /* PathNode.swift */,
+				E7D1001F /* PathEdge.swift */,
+				E7D10021 /* PathMap.swift */,
+				E7D10023 /* PathMapLayout.swift */,
+				E7D10025 /* Session.swift */,
+				E7A10101 /* Article.swift */,
+				E7A10103 /* ArticleVersion.swift */,
+				E7A10105 /* ArticlePrimarySource.swift */,
+				E7A10107 /* ArticleBranch.swift */,
+				E7A10109 /* ArticleRelatedCard.swift */,
+				E7A1010B /* ArticleBundle.swift */,
+				E7A1010D /* ArticleContributionType.swift */,
+				E7A1010F /* Pillar+ArticleChrome.swift */,
+			);
+			path = v2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
