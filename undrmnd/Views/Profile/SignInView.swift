@@ -143,7 +143,7 @@ struct SignInView: View {
                     if let f = fullName.familyName { parts.append(f) }
                     let s = parts.joined(separator: " ")
                     if !s.isEmpty {
-                        try? await client.auth.update(
+                        _ = try? await client.auth.update(
                             user: UserAttributes(data: ["full_name": .string(s)])
                         )
                     }

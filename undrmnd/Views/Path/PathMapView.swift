@@ -395,7 +395,7 @@ struct PathMapView: View {
                 let rN = Self.estimatedTagCollisionRadius(for: t)
                 var dx = p.x - center.x
                 var dy = p.y - center.y
-                var d = hypot(dx, dy)
+                let d = hypot(dx, dy)
                 let need = rE + rN + Self.edgeVsNodeClearance
                 if d < 0.001 {
                     p.x += need * 0.4

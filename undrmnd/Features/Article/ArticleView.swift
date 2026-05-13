@@ -1,4 +1,5 @@
 import SwiftUI
+import Supabase
 
 /// Full-bleed article for a `content_items` id (the “Open the work” surface).
 struct ArticleView: View {
@@ -37,7 +38,7 @@ struct ArticleView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(UndrmndPrototypeTheme.paper)
-        .navigationTitle(bundle?.article.title ?? "")
+        .navigationTitle(bundle.map(\.article.title) ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .task(id: contentId) {
             await load(force: false)
@@ -324,14 +325,27 @@ struct ArticleView: View {
         do {
             let b = try await ArticleService.fetchForCard(contentId: contentId)
             bundle = b
+        } catch ArticleServiceError.noArticleForContent {
+            loadError =
+                "This card is not linked to a published article in the library yet. Try another dot on the map, or open a card from the home feed."
         } catch let e as ArticleServiceError {
             #if DEBUG
             print("ArticleView: ArticleServiceError for contentId \(contentId): \(e)")
             #endif
-            // Reads are expected to be public; any service error still reads as a load failure in UI.
             loadError = "Could not load the article. Try again in a moment."
         } catch let url as URLError where url.code == .notConnectedToInternet {
             loadError = "You appear to be offline. Check your connection, then try again."
+        } catch is DecodingError {
+            #if DEBUG
+            print("ArticleView: decode failed for contentId \(contentId)")
+            #endif
+            loadError =
+                "The library returned data this build could not read. Pull to refresh, or update the app if the problem continues."
+        } catch let pg as PostgrestError {
+            #if DEBUG
+            print("ArticleView: PostgREST \(pg.code ?? "?") for contentId \(contentId): \(pg.message)")
+            #endif
+            loadError = "Could not reach the library (\(pg.code ?? "error")). Try again in a moment."
         } catch {
             #if DEBUG
             print("ArticleView: failed to load article for contentId \(contentId): \(error)")
