@@ -172,6 +172,57 @@ extension View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.light, for: .navigationBar)
     }
+
+    /// Same layout as ``navigationTitleBrand(_:showsAppWordmark:)`` for screens stacked over the Explore fog canvas (hidden bar, warm paper-white ink).
+    func navigationTitleBrandFog(_ title: String, showsAppWordmark: Bool = true) -> some View {
+        navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    if showsAppWordmark {
+                        VStack(spacing: 2) {
+                            Text("undrmnd")
+                                .font(AppFont.caption2)
+                                .foregroundStyle(ExploreFogNavigationInk.muted)
+                            Text(title)
+                                .font(AppFont.brandWordmark)
+                                .foregroundStyle(ExploreFogNavigationInk.title)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("undrmnd, \(title)")
+                    } else {
+                        Text(title)
+                            .font(AppFont.brandWordmark)
+                            .foregroundStyle(ExploreFogNavigationInk.title)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+    }
+}
+
+/// Typography on the live fog map (matches ``FogMapShellChrome`` in `ContentView`).
+enum ExploreFogNavigationInk {
+    static let title = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255)
+    static let secondary = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255).opacity(0.78)
+    static let muted = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255).opacity(0.52)
+}
+
+private struct ExploreUsesFogBackdropKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    /// True when this Explore screen is presented above ``LearningCommonsFogMapView`` (goal clarifier, open-topic session).
+    var exploreUsesFogBackdrop: Bool {
+        get { self[ExploreUsesFogBackdropKey.self] }
+        set { self[ExploreUsesFogBackdropKey.self] = newValue }
+    }
 }
 
 // MARK: - Shell text CTAs (Done, Mark all read, in-flow Continue on light surfaces)

@@ -39,18 +39,22 @@ struct OnboardingRootView: View {
                     RevealingFogMapLoadingView()
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                FogGlassToolbarPillButton(systemName: "chevron.backward", accessibilityLabel: "Back to topic search") {
-                                    onboarding.returnToTopicSearchFromRevealing()
-                                }
+                                FogGlassToolbarPillButton(
+                                    systemName: "chevron.backward",
+                                    accessibilityLabel: "Back to topic search",
+                                    iconPointSize: 17,
+                                    action: { onboarding.returnToTopicSearchFromRevealing() }
+                                )
                             }
                             ToolbarItem(placement: .principal) {
-                                FogToolbarPrincipalWordmark()
+                                FogToolbarPrincipalWordmark(useMaterialBackdrop: false)
                             }
                         }
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbarBackground(.hidden, for: .navigationBar)
                         .toolbarColorScheme(.dark, for: .navigationBar)
                         .tint(RevealingFogChrome.mapInkSoft)
+                        .appShellNavigationToolbar()
                 }
                 .task {
                     try? await Task.sleep(nanoseconds: 280_000_000)
@@ -77,19 +81,27 @@ struct OnboardingRootView: View {
                     .tint(RevealingFogChrome.mapInkSoft)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                            FogGlassToolbarPillButton(systemName: "chevron.backward", accessibilityLabel: "Back to topic search") {
-                                onboarding.returnToTopicSearchFromMap()
-                            }
+                            FogGlassToolbarPillButton(
+                                systemName: "chevron.backward",
+                                accessibilityLabel: "Back to topic search",
+                                iconPointSize: 17,
+                                action: { onboarding.returnToTopicSearchFromMap() }
+                            )
                         }
                         ToolbarItem(placement: .principal) {
-                            FogToolbarPrincipalWordmark()
+                            FogToolbarPrincipalWordmark(useMaterialBackdrop: false)
                         }
-                        ToolbarItem(placement: .primaryAction) {
-                            if let primary = onboarding.starterCluster.first(where: { $0.mapVisibility == .revealed }) {
-                                FogGlassToolbarPillButton(systemName: "square.and.pencil", accessibilityLabel: "Leave a short note for the library") {
-                                    firstIslandSheet = .contribution(primary)
+                        ToolbarItemGroup(placement: .topBarTrailing) {
+                            HStack(spacing: 8) {
+                                AppShellToolbarTrailing()
+                                if let primary = onboarding.starterCluster.first(where: { $0.mapVisibility == .revealed }) {
+                                    FogGlassToolbarPillButton(
+                                        systemName: "square.and.pencil",
+                                        accessibilityLabel: "Leave a short note for the library",
+                                        accessibilityHint: "Opens a small contribution sheet for your first field note",
+                                        action: { firstIslandSheet = .contribution(primary) }
+                                    )
                                 }
-                                .accessibilityHint("Opens a small contribution sheet for your first field note")
                             }
                         }
                     }
@@ -175,4 +187,5 @@ private struct RevealingFogMapLoadingView: View {
 #Preview {
     OnboardingRootView()
         .environmentObject(OnboardingCoordinator())
+        .environmentObject(AlertsStore())
 }

@@ -8,13 +8,27 @@ struct ThreeCardSessionView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.openArticleForContent) private var openArticleForContent
+    @Environment(\.exploreUsesFogBackdrop) private var exploreUsesFogBackdrop
     @State private var items: [ContentPreview] = []
     @State private var step: Int = 0
     @State private var error: String?
     @State private var detail: ContentItem?
     @State private var isDone: Bool = false
 
-    var body: some View {
+    private var cardInkTitle: Color {
+        exploreUsesFogBackdrop ? ExploreFogNavigationInk.title : UndrmndPrototypeTheme.primary
+    }
+
+    private var cardInkSecondary: Color {
+        exploreUsesFogBackdrop ? ExploreFogNavigationInk.secondary : UndrmndPrototypeTheme.secondary
+    }
+
+    private var cardCaption: Color {
+        exploreUsesFogBackdrop ? ExploreFogNavigationInk.muted : UndrmndPrototypeTheme.secondary
+    }
+
+    @ViewBuilder
+    private var sessionStack: some View {
         VStack(alignment: .leading, spacing: 0) {
             if isDone {
                 VStack(alignment: .center, spacing: 0) {
@@ -22,10 +36,11 @@ struct ThreeCardSessionView: View {
                         VStack(alignment: .center, spacing: 16) {
                             Text("You’re done with this set.")
                                 .font(AppFont.title3)
+                                .foregroundStyle(cardInkTitle)
                             Text("That’s the end of this set. When you want more, go home and start a new session on purpose.")
                                 .font(AppFont.subheadline)
                                 .multilineTextAlignment(.center)
-                                .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                                .foregroundStyle(cardInkSecondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .top)
                         .padding(.horizontal, 24)
@@ -48,22 +63,37 @@ struct ThreeCardSessionView: View {
                 VStack(spacing: 12) {
                     Text(err)
                         .font(AppFont.body)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .foregroundStyle(cardInkSecondary)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .padding(28)
             } else if items.isEmpty {
-                ProgressView("Loading topics…")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if exploreUsesFogBackdrop {
+                    ProgressView("Loading topics…")
+                        .tint(FogMapShellChrome.mapInkSoft)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ProgressView("Loading topics…")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             } else if step < 3, items.indices.contains(step) {
                 cardStepView(preview: items[step])
             }
         }
+    }
+
+    var body: some View {
+        Group {
+            if exploreUsesFogBackdrop {
+                sessionStack.navigationTitleBrandFog("Open topics")
+            } else {
+                sessionStack.navigationTitleBrand("Open topics")
+            }
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(UndrmndPrototypeTheme.paper)
-        .navigationTitleBrand("Open topics")
+        .background(exploreUsesFogBackdrop ? Color.clear : UndrmndPrototypeTheme.paper)
         .task { await load() }
     }
 
@@ -120,23 +150,27 @@ struct ThreeCardSessionView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("\(step + 1) of 3")
                         .font(AppFont.caption)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .foregroundStyle(cardCaption)
                     if let d = detail {
                         Text(d.title)
                             .font(AppFont.title3)
+                            .foregroundStyle(cardInkTitle)
                         Text(d.hook)
                             .font(AppFont.subheadline)
-                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                            .foregroundStyle(cardInkSecondary)
                         if let b = d.body, !b.isEmpty {
                             Text(b)
                                 .font(AppFont.body)
+                                .foregroundStyle(cardInkSecondary)
                                 .lineSpacing(5)
                         }
                     } else {
                         Text(preview.title)
                             .font(AppFont.title3)
+                            .foregroundStyle(cardInkTitle)
                         Text(preview.hook)
                             .font(AppFont.subheadline)
+                            .foregroundStyle(cardInkSecondary)
                     }
                     if step == 0 {
                         openingCardPrimarySourceLinks()

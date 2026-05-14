@@ -8,7 +8,6 @@ struct ExploreFogRootView: View {
     var onAbout: () -> Void
 
     @Environment(\.openArticleForContent) private var openArticleForContent
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     @State private var strata: [Strata] = []
     @State private var loadFailed = false
@@ -49,20 +48,11 @@ struct ExploreFogRootView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .font(.system(size: 22, weight: .medium))
-                            .foregroundStyle(FogMapShellChrome.mapInkSoft.opacity(0.92))
-                            .padding(14)
-                            .background {
-                                if reduceTransparency {
-                                    Circle().fill(Color.black.opacity(0.45))
-                                } else {
-                                    Circle().fill(.ultraThinMaterial)
-                                }
-                            }
-                            .overlay(
-                                Circle()
-                                    .strokeBorder(Color.white.opacity(0.14), lineWidth: 0.5)
-                            )
+                            .foregroundStyle(FogMapShellChrome.mapInkSoft.opacity(0.96))
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel("More explore actions")
                     .padding(.trailing, 16)
                     .padding(.bottom, 8)
@@ -74,7 +64,7 @@ struct ExploreFogRootView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                FogToolbarPrincipalWordmark()
+                FogToolbarPrincipalWordmark(useMaterialBackdrop: false)
             }
         }
         .task { await loadStrata() }

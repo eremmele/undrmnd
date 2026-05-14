@@ -5,10 +5,14 @@ struct ChooseBeginningView: View {
     @EnvironmentObject private var onboarding: OnboardingCoordinator
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var searchText = ""
+    @FocusState private var isSearchFieldFocused: Bool
 
-    /// Ink tuned for warm-tinted frosted glass over the night fog canvas (~4.5:1+ at body/caption sizes).
-    private static let glassPrimaryText = Color(red: 0.11, green: 0.105, blue: 0.096)
-    private static let glassMutedText = Color(red: 0.30, green: 0.292, blue: 0.282)
+    /// Dark “command palette” ink over the fog map (WCAG-friendly on charcoal panels).
+    private static let darkPrimaryText = Color(red: 0.93, green: 0.91, blue: 0.87)
+    private static let darkMutedText = Color(red: 0.62, green: 0.60, blue: 0.56)
+    private static let darkCardFill = Color(red: 0.12, green: 0.12, blue: 0.13)
+    private static let darkRowFill = Color(red: 0.17, green: 0.17, blue: 0.18)
+    private static let darkHairline = Color.white.opacity(0.10)
 
     private static let seededExamples: [String] = [
         "Dark matter & cosmology",
@@ -45,7 +49,7 @@ struct ChooseBeginningView: View {
                     searchBand
 
                     Rectangle()
-                        .fill(Self.glassPrimaryText.opacity(reduceTransparency ? 0.14 : 0.10))
+                        .fill(Self.darkHairline)
                         .frame(height: 1)
                         .padding(.horizontal, 14)
 
@@ -56,10 +60,7 @@ struct ChooseBeginningView: View {
                 .clipShape(RoundedRectangle(cornerRadius: cardCorner, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: cardCorner, style: .continuous)
-                        .strokeBorder(
-                            UndrmndPrototypeTheme.divider.opacity(reduceTransparency ? 0.88 : 0.42),
-                            lineWidth: 1
-                        )
+                        .strokeBorder(Self.darkHairline.opacity(reduceTransparency ? 1.0 : 0.85), lineWidth: 1)
                 )
                 .shadow(color: .black.opacity(0.14), radius: 28, y: 16)
                 .padding(.horizontal, 24)
@@ -74,12 +75,23 @@ struct ChooseBeginningView: View {
         .tint(FogMapShellChrome.mapInkSoft)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                FogGlassToolbarPillButton(systemName: "chevron.backward", accessibilityLabel: "Back to intro") {
-                    onboarding.returnToInterstitial()
-                }
+                FogGlassToolbarPillButton(
+                    systemName: "chevron.backward",
+                    accessibilityLabel: "Back to intro",
+                    iconPointSize: 17,
+                    action: { onboarding.returnToInterstitial() }
+                )
             }
             ToolbarItem(placement: .principal) {
                 FogToolbarPrincipalWordmark(useMaterialBackdrop: false)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                FogGlassToolbarPillButton(
+                    systemName: "magnifyingglass",
+                    accessibilityLabel: "Focus topic search",
+                    accessibilityHint: "Moves keyboard focus to the topic search field",
+                    action: { isSearchFieldFocused = true }
+                )
             }
         }
     }
@@ -88,11 +100,13 @@ struct ChooseBeginningView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Self.glassMutedText)
+                .foregroundStyle(Self.darkMutedText)
             TextField("Search a topic, question, hobby, or curiosity", text: $searchText)
                 .textFieldStyle(.plain)
                 .font(AppFont.body)
-                .foregroundStyle(Self.glassPrimaryText)
+                .foregroundStyle(Self.darkPrimaryText)
+                .tint(Self.darkPrimaryText.opacity(0.85))
+                .focused($isSearchFieldFocused)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
                 .submitLabel(.search)
@@ -112,12 +126,12 @@ struct ChooseBeginningView: View {
                         HStack {
                             Text(label)
                                 .font(AppFont.subheadline)
-                                .foregroundStyle(Self.glassPrimaryText)
+                                .foregroundStyle(Self.darkPrimaryText)
                                 .multilineTextAlignment(.leading)
                             Spacer()
                             Image(systemName: "arrow.right")
                                 .font(.caption.weight(.semibold))
-                                .foregroundStyle(Self.glassMutedText)
+                                .foregroundStyle(Self.darkMutedText)
                         }
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
@@ -126,7 +140,7 @@ struct ChooseBeginningView: View {
                         }
                         .overlay(
                             RoundedRectangle(cornerRadius: rowCorner, style: .continuous)
-                                .strokeBorder(UndrmndPrototypeTheme.divider.opacity(0.55), lineWidth: 1)
+                                .strokeBorder(Self.darkHairline, lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
@@ -139,40 +153,17 @@ struct ChooseBeginningView: View {
 
     @ViewBuilder
     private var rowChromeBackground: some View {
-        if reduceTransparency {
-            RoundedRectangle(cornerRadius: rowCorner, style: .continuous)
-                .fill(UndrmndPrototypeTheme.paper.opacity(0.75))
-        } else {
-            ZStack {
-                RoundedRectangle(cornerRadius: rowCorner, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                RoundedRectangle(cornerRadius: rowCorner, style: .continuous)
-                    .fill(Color.white.opacity(0.05))
-            }
-        }
+        RoundedRectangle(cornerRadius: rowCorner, style: .continuous)
+            .fill(Self.darkRowFill.opacity(reduceTransparency ? 1.0 : 0.94))
     }
 
-    @ViewBuilder
     private var fogGlassCardBackground: some View {
-        if reduceTransparency {
-            RoundedRectangle(cornerRadius: cardCorner, style: .continuous)
-                .fill(UndrmndPrototypeTheme.panel.opacity(0.96))
-        } else {
-            ZStack {
-                RoundedRectangle(cornerRadius: cardCorner, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                warmGlassVeil
-            }
-        }
-    }
-
-    private var warmGlassVeil: some View {
         RoundedRectangle(cornerRadius: cardCorner, style: .continuous)
             .fill(
                 LinearGradient(
                     colors: [
-                        UndrmndPrototypeTheme.paper.opacity(0.14),
-                        UndrmndPrototypeTheme.paper.opacity(0.09)
+                        Self.darkCardFill.opacity(reduceTransparency ? 1.0 : 0.98),
+                        Color(red: 0.09, green: 0.09, blue: 0.095).opacity(reduceTransparency ? 1.0 : 0.98)
                     ],
                     startPoint: .top,
                     endPoint: .bottom

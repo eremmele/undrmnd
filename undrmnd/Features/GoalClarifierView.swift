@@ -35,6 +35,7 @@ struct GoalClarifierView: View {
     var onSelectPath: (String) -> Void
     var onThreeCardSession: (Pillar?) -> Void
 
+    @Environment(\.exploreUsesFogBackdrop) private var exploreUsesFogBackdrop
     @State private var activePaths: [PathRecord] = []
     @State private var loadError: String?
     @State private var searchText: String = ""
@@ -67,32 +68,45 @@ struct GoalClarifierView: View {
         return rows
     }
 
-    var body: some View {
+    private var goalEyebrow: Color {
+        exploreUsesFogBackdrop ? ExploreFogNavigationInk.muted : UndrmndPrototypeTheme.muted
+    }
+
+    private var goalSectionHeading: Color {
+        exploreUsesFogBackdrop ? ExploreFogNavigationInk.title : UndrmndPrototypeTheme.primary
+    }
+
+    private var goalSupporting: Color {
+        exploreUsesFogBackdrop ? ExploreFogNavigationInk.secondary : UndrmndPrototypeTheme.secondary
+    }
+
+    private var goalScrollContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("What are you curious about right now?")
                         .font(AppFont.title2)
-                        .foregroundStyle(UndrmndPrototypeTheme.primary)
+                        .foregroundStyle(goalSectionHeading)
                     Text(
                         "You don’t need a polished question right now. Try a fragment or a full sentence to search open topics, or contribute one of your own."
                     )
                     .font(AppFont.subheadline)
-                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .foregroundStyle(goalSupporting)
                     .fixedSize(horizontal: false, vertical: true)
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Search topics & paths")
                         .font(AppFont.caption)
-                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                        .foregroundStyle(goalEyebrow)
                     HStack(spacing: 10) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(UndrmndPrototypeTheme.muted)
+                            .foregroundStyle(goalEyebrow)
                         TextField("Try “dark matter”, “species”, “replication”…", text: $searchText)
                             .textFieldStyle(.plain)
                             .font(AppFont.body)
+                            .foregroundStyle(UndrmndPrototypeTheme.primary)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                             .submitLabel(.search)
@@ -145,6 +159,7 @@ struct GoalClarifierView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Paths from the library")
                             .font(AppFont.subheadlineEmphasis)
+                            .foregroundStyle(goalSectionHeading)
                         ForEach(activePaths, id: \.id) { p in
                             Button {
                                 onSelectPath(p.slug)
@@ -173,20 +188,32 @@ struct GoalClarifierView: View {
                 } else {
                     Text("No full paths are published right now. You can still use search above or pick an open-topic set by pillar.")
                         .font(AppFont.caption)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .foregroundStyle(goalSupporting)
                 }
 
                 if let loadError {
                     Text(loadError)
                         .font(AppFont.caption)
-                        .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        .foregroundStyle(goalSupporting)
                 }
             }
             .padding(24)
             .padding(.bottom, 32)
         }
-        .background(UndrmndPrototypeTheme.paper)
-        .navigationTitleBrand("Your goal")
+    }
+
+    var body: some View {
+        Group {
+            if exploreUsesFogBackdrop {
+                goalScrollContent
+                    .background(Color.clear)
+                    .navigationTitleBrandFog("Your goal")
+            } else {
+                goalScrollContent
+                    .background(UndrmndPrototypeTheme.paper)
+                    .navigationTitleBrand("Your goal")
+            }
+        }
         .task { await load() }
     }
 
@@ -194,6 +221,7 @@ struct GoalClarifierView: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Recent topics")
                 .font(AppFont.subheadlineEmphasis)
+                .foregroundStyle(goalSectionHeading)
             let chips: [(String, Pillar)] = [
                 ("Dark matter & cosmology", .cosmos),
                 ("Speed of the universe (Hubble tension)", .cosmos),
