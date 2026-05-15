@@ -73,7 +73,7 @@ struct OnboardingRootView: View {
                                 firstIslandSheet = .article(contentId: contentItemId)
                             }
                         )
-                        .ignoresSafeArea(edges: .top)
+                        .ignoresSafeArea()
                     }
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbarBackground(.hidden, for: .navigationBar)
@@ -157,15 +157,17 @@ struct OnboardingRootView: View {
 // MARK: - Reveal transition (dark fog chrome)
 
 private enum RevealingFogChrome {
-    static let nightFog = Color(red: 22 / 255, green: 20 / 255, blue: 15 / 255)
+    static let nightFog = LearningCommonsFogMapView.nightCanvas
     static let mapInkSoft = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255)
     static let ringAccent = Color(red: 196 / 255, green: 178 / 255, blue: 138 / 255)
 }
 
+/// Explore reveal interstitial — full-bleed charcoal; safe-area handling lives here, not on parents.
 private struct RevealingFogMapLoadingView: View {
     var body: some View {
         ZStack {
-            RevealingFogChrome.nightFog.ignoresSafeArea(edges: .top)
+            RevealingFogChrome.nightFog
+                .ignoresSafeArea()
 
             VStack(spacing: 18) {
                 ProgressView()
@@ -181,6 +183,8 @@ private struct RevealingFogMapLoadingView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Opening the map")
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
     }
 }
 

@@ -10,6 +10,10 @@ struct ArticleView: View {
     @State private var isLoading = true
     @State private var showEdit = false
     @State private var branchToFork: ArticleBranch?
+    /// Fills in related-card chips when `related_cards` omits title fields from the RPC.
+    @State private var relatedCardLibraryCopy: [UUID: ContentItem] = [:]
+    /// Card-only surface when `get_article_for_card` returns null but the `content_items` row exists.
+    @State private var contributionCardOnly: ContentItem?
 
     var body: some View {
         Group {
@@ -31,6 +35,8 @@ struct ArticleView: View {
                 .padding(24)
             } else if let b = bundle {
                 articleBody(b)
+            } else if let card = contributionCardOnly {
+                contributionCardBody(card)
             } else {
                 Text("Nothing to show.")
                     .foregroundStyle(UndrmndPrototypeTheme.secondary)
@@ -302,7 +308,7 @@ struct ArticleView: View {
                 HStack(spacing: 12) {
                     ForEach(sorted, id: \.contentId) { r in
                         NavigationLink {
-                            ContentDetailReadOnlyView(contentId: r.contentId)
+                            ArticleView(contentId: r.contentId)
                         } label: {
                             relatedCardPreviewChip(r)
                         }
@@ -315,24 +321,32 @@ struct ArticleView: View {
     }
 
     private func relatedCardPreviewChip(_ r: ArticleRelatedCard) -> some View {
-        let title = (r.previewTitle?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 } ?? "Related card"
-        return VStack(alignment: .leading, spacing: 10) {
+        let title = relatedCardDisplayTitle(r)
+        let hook = relatedCardDisplayHook(r)
+        return VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(AppFont.subheadline)
+                .font(AppFont.subheadlineEmphasis)
                 .foregroundStyle(UndrmndPrototypeTheme.primary)
                 .multilineTextAlignment(.leading)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
+            if let hook, !hook.isEmpty {
+                Text(hook)
+                    .font(AppFont.caption)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+            }
             HStack(spacing: 6) {
-                Text("Explore")
+                Text("Open the work")
                     .font(AppFont.captionEmphasis)
-                Image(systemName: "sparkles")
-                    .font(.system(size: 13, weight: .semibold))
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 12, weight: .semibold))
             }
             .foregroundStyle(UndrmndPrototypeTheme.primary)
         }
         .padding(14)
-        .frame(width: 168, alignment: .leading)
+        .frame(width: 188, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(UndrmndPrototypeTheme.panel)
@@ -342,7 +356,84 @@ struct ArticleView: View {
                 .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title). Explore related card.")
+        .accessibilityLabel("\(title). Open the work, full contribution.")
+    }
+
+    private func relatedCardDisplayTitle(_ r: ArticleRelatedCard) -> String {
+        if let t = r.previewTitle?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty {
+            return t
+        }
+        if let item = relatedCardLibraryCopy[r.contentId] {
+            return item.title
+        }
+        return "Related contribution"
+    }
+
+    private func relatedCardDisplayHook(_ r: ArticleRelatedCard) -> String? {
+        relatedCardLibraryCopy[r.contentId]?.hook
+    }
+
+    /// Loads `content_items` rows so related chips always show library title + hook when the RPC omits them.
+    private func resolveRelatedCardLibraryCopy(cards: [ArticleRelatedCard]) async {
+        var copy: [UUID: ContentItem] = [:]
+        for card in cards {
+            if let item = try? await ContentService.fetchCardDetail(id: card.contentId) {
+                copy[card.contentId] = item
+            }
+        }
+        guard !copy.isEmpty else { return }
+        await MainActor.run {
+            relatedCardLibraryCopy.merge(copy) { _, new in new }
+        }
+    }
+
+    /// When no `articles` row exists yet, still show the contributed card (notes, attribution) instead of a dead end.
+    private func contributionCardBody(_ item: ContentItem) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(item.title)
+                    .font(AppFont.title2)
+                    .foregroundStyle(UndrmndPrototypeTheme.primary)
+                Text(item.hook)
+                    .font(AppFont.subheadline)
+                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                if let body = item.body, !body.isEmpty {
+                    Text(body)
+                        .font(AppFont.body)
+                        .lineSpacing(5)
+                        .foregroundStyle(UndrmndPrototypeTheme.primary)
+                }
+                if let citation = item.sourceCitation, !citation.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Attribution")
+                            .font(AppFont.captionEmphasis)
+                        Text(citation)
+                            .font(AppFont.caption)
+                            .foregroundStyle(UndrmndPrototypeTheme.secondary)
+                        if let url = item.sourceURL {
+                            Link("Source link", destination: url)
+                                .font(AppFont.caption)
+                        }
+                    }
+                }
+                if let handle = item.contributedBy, !handle.isEmpty {
+                    Text("Contributed by \(handle.hasPrefix("@") ? handle : "@\(handle)")")
+                        .font(AppFont.caption)
+                        .foregroundStyle(UndrmndPrototypeTheme.muted)
+                }
+                Text(
+                    "This contribution is not linked to a published article yet, so editing, branches, and related cards are not available here."
+                )
+                .font(AppFont.caption)
+                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 22)
+        }
+        .navigationTitle(item.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func readTimeMinutes(_ md: String) -> Int? {
@@ -356,13 +447,19 @@ struct ArticleView: View {
         if force { isLoading = true }
         if !force, bundle != nil { isLoading = false; return }
         loadError = nil
+        contributionCardOnly = nil
         isLoading = true
         do {
             let b = try await ArticleService.fetchForCard(contentId: contentId)
             bundle = b
+            await resolveRelatedCardLibraryCopy(cards: b.relatedCards)
         } catch ArticleServiceError.noArticleForContent {
-            loadError =
-                "This card is not linked to a published article in the library yet. Try another dot on the map, or open a card from the home feed."
+            if let card = try? await ContentService.fetchCardDetail(id: contentId) {
+                contributionCardOnly = card
+            } else {
+                loadError =
+                    "This card is not linked to a published article in the library yet. Try another dot on the map, or open a card from the home feed."
+            }
         } catch let e as ArticleServiceError {
             #if DEBUG
             print("ArticleView: ArticleServiceError for contentId \(contentId): \(e)")

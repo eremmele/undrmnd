@@ -76,6 +76,7 @@
 		E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */; };
 		E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */; };
 		E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */; };
+		E7TSCH02 /* TopicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7TSCH01 /* TopicSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,6 +161,7 @@
 		E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathFlowView.swift; sourceTree = "<group>"; };
 		E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalClarifierView.swift; sourceTree = "<group>"; };
 		E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrototypeShellViews.swift; sourceTree = "<group>"; };
+		E7TSCH01 /* TopicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,6 +247,7 @@
 				E7D30002 /* ThreeCardSessionView.swift */,
 				E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */,
 				E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */,
+				E7TSCH01 /* TopicSearchView.swift */,
 				E7A10114 /* Article */,
 				E7D50003 /* Contribute */,
 				E7D60004 /* Alerts */,
@@ -548,6 +551,7 @@
 				E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */,
 				E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */,
 				E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */,
+				E7TSCH02 /* TopicSearchView.swift in Sources */,
 				E7STRT02 /* Strata.swift in Sources */,
 				E7IFOG02 /* IslandFogCanvas.swift in Sources */,
 				E7LCFM02 /* LearningCommonsFogMapView.swift in Sources */,

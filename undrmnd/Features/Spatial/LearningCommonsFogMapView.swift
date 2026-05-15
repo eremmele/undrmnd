@@ -180,74 +180,87 @@ private enum LearningCommonsFogMapLayout {
 struct LearningCommonsFogMapView: View {
     var explorePath: FogMapExplorePath
     var onThreadTap: ((UUID) -> Void)?
+    /// Pause TimelineView ticks while the user types in a field above the map (keeps keyboard + first responder stable).
+    var pauseAnimation: Bool = false
+    /// When false, disables the full-screen drag gesture so text fields keep focus and receive input.
+    var enablePointerReveal: Bool = true
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var pointerActive = false
     @State private var pointerLocation: CGPoint = .zero
 
-    private let night = Color(red: 22 / 255, green: 20 / 255, blue: 15 / 255)
+    private var timelineInterval: TimeInterval {
+        if pauseAnimation { return 3600 }
+        return reduceMotion ? 1.0 / 8.0 : 1.0 / 30.0
+    }
+
+    /// Charcoal fog canvas — matches ``ExploreFogChrome/nightCanvas`` on the Explore shell.
+    static let nightCanvas = Color(red: 22 / 255, green: 20 / 255, blue: 15 / 255)
+    private let night = nightCanvas
     private let gridLine = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255).opacity(0.06)
     private let edgeStroke = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255).opacity(0.20)
     private let nodeFill = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255)
     private let ringStroke = Color(red: 196 / 255, green: 178 / 255, blue: 138 / 255)
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: reduceMotion ? 1.0 / 8.0 : 1.0 / 30.0)) { timeline in
-            GeometryReader { geo in
-                let size = geo.size
-                let nodes = LearningCommonsFogMapLayout.nodes(for: explorePath, size: size)
-                let scrollAnalog = scrollRevealAnalog(for: explorePath)
-                let reveal = revealGeometry(in: size, at: timeline.date, scrollAnalog: scrollAnalog)
-                let layoutScale = min(size.width, size.height) / 390
+        ZStack {
+            night
+                .ignoresSafeArea()
 
-                ZStack {
-                    night
+            TimelineView(.animation(minimumInterval: timelineInterval)) { timeline in
+                GeometryReader { geo in
+                    let size = geo.size
+                    let nodes = LearningCommonsFogMapLayout.nodes(for: explorePath, size: size)
+                    let scrollAnalog = scrollRevealAnalog(for: explorePath)
+                    let reveal = revealGeometry(in: size, at: timeline.date, scrollAnalog: scrollAnalog)
+                    let layoutScale = min(size.width, size.height) / 390
 
-                    Canvas { context, canvasSize in
-                        drawGrid(context: &context, size: canvasSize)
-                        drawClusterEdges(
-                            context: &context,
+                    ZStack {
+                        night
+
+                        Canvas { context, canvasSize in
+                            drawGrid(context: &context, size: canvasSize)
+                            drawClusterEdges(
+                                context: &context,
+                                nodes: nodes,
+                                center: reveal.center,
+                                baseRadius: reveal.baseRadius,
+                                edgeDistanceThreshold: 110 * layoutScale
+                            )
+                            drawNodes(
+                                context: &context,
+                                nodes: nodes,
+                                center: reveal.center,
+                                baseRadius: reveal.baseRadius
+                            )
+                            drawFogVignette(
+                                context: &context,
+                                size: canvasSize,
+                                center: reveal.center,
+                                baseRadius: reveal.baseRadius
+                            )
+                            drawEdgeBleed(context: &context, size: canvasSize)
+                        }
+                        .allowsHitTesting(false)
+
+                        tapOverlay(
                             nodes: nodes,
                             center: reveal.center,
                             baseRadius: reveal.baseRadius,
-                            edgeDistanceThreshold: 110 * layoutScale
-                        )
-                        drawNodes(
-                            context: &context,
-                            nodes: nodes,
-                            center: reveal.center,
-                            baseRadius: reveal.baseRadius
-                        )
-                        drawFogVignette(
-                            context: &context,
-                            size: canvasSize,
-                            center: reveal.center,
-                            baseRadius: reveal.baseRadius
+                            onThreadTap: onThreadTap
                         )
                     }
-                    .allowsHitTesting(false)
-
-                    tapOverlay(
-                        nodes: nodes,
-                        center: reveal.center,
-                        baseRadius: reveal.baseRadius,
-                        onThreadTap: onThreadTap
-                    )
+                    .modifier(FogMapPointerRevealGesture(
+                        enabled: enablePointerReveal,
+                        pointerActive: $pointerActive,
+                        pointerLocation: $pointerLocation
+                    ))
                 }
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            pointerActive = true
-                            pointerLocation = value.location
-                        }
-                        .onEnded { _ in
-                            pointerActive = false
-                        }
-                )
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Library map preview")
         .accessibilityHint("The fog clears around where you touch. Strata appear as you read and contribute.")
@@ -399,7 +412,7 @@ struct LearningCommonsFogMapView: View {
         let stops: [Gradient.Stop] = [
             .init(color: night.opacity(0), location: 0),
             .init(color: night.opacity(0.55), location: 0.6),
-            .init(color: night.opacity(0.92), location: 1),
+            .init(color: night, location: 1),
         ]
         context.fill(
             Path(rect),
@@ -407,7 +420,31 @@ struct LearningCommonsFogMapView: View {
                 Gradient(stops: stops),
                 center: center,
                 startRadius: baseRadius * 0.2,
-                endRadius: baseRadius * 1.4
+                endRadius: max(baseRadius * 1.4, min(size.width, size.height) * 0.55)
+            )
+        )
+    }
+
+    /// Opaque charcoal at status-bar and home-indicator gutters so the map never reads light at the edges.
+    private func drawEdgeBleed(context: inout GraphicsContext, size: CGSize) {
+        let bleed = max(72, size.height * 0.14)
+        let topRect = CGRect(x: 0, y: 0, width: size.width, height: bleed)
+        let bottomRect = CGRect(x: 0, y: size.height - bleed, width: size.width, height: bleed)
+        let edgeStops: [Gradient.Stop] = [
+            .init(color: night, location: 0),
+            .init(color: night.opacity(0.72), location: 0.55),
+            .init(color: night.opacity(0), location: 1),
+        ]
+        context.fill(
+            Path(topRect),
+            with: .linearGradient(Gradient(stops: edgeStops), startPoint: .zero, endPoint: CGPoint(x: 0, y: bleed))
+        )
+        context.fill(
+            Path(bottomRect),
+            with: .linearGradient(
+                Gradient(stops: edgeStops),
+                startPoint: CGPoint(x: 0, y: size.height),
+                endPoint: CGPoint(x: 0, y: size.height - bleed)
             )
         )
     }
@@ -441,6 +478,33 @@ struct LearningCommonsFogMapView: View {
                     .accessibilityHint("Opens the contributed reading for this dot")
                 }
             }
+        }
+    }
+}
+
+// MARK: - Pointer reveal (optional; off while text fields are focused)
+
+private struct FogMapPointerRevealGesture: ViewModifier {
+    let enabled: Bool
+    @Binding var pointerActive: Bool
+    @Binding var pointerLocation: CGPoint
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            pointerActive = true
+                            pointerLocation = value.location
+                        }
+                        .onEnded { _ in
+                            pointerActive = false
+                        }
+                )
+        } else {
+            content
         }
     }
 }

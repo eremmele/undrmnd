@@ -225,6 +225,14 @@ extension EnvironmentValues {
     }
 }
 
+extension View {
+    /// Typed + caret ink for search fields over the fog map (overrides app-wide `.light` color scheme on ``RootView``).
+    func fogMapSearchFieldInk() -> some View {
+        foregroundStyle(ExploreFogNavigationInk.title)
+            .tint(ExploreFogNavigationInk.title)
+    }
+}
+
 // MARK: - Shell text CTAs (Done, Mark all read, in-flow Continue on light surfaces)
 
 extension View {

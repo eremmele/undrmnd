@@ -18,7 +18,7 @@ struct ExploreFogRootView: View {
                 explorePath: .firstIsland(strata: strata, wideRevealFromContribution: false),
                 onThreadTap: { id in openArticleForContent(id) }
             )
-            .ignoresSafeArea(edges: .top)
+            .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Clear the fog, then tap a lit dot to open a contributed card.")

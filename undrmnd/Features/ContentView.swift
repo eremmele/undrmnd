@@ -57,6 +57,24 @@ enum FogMapShellChrome {
     static let mapInkSoft = Color(red: 233 / 255, green: 226 / 255, blue: 209 / 255)
 }
 
+/// Night fog canvas — fills Explore tab gutters (including behind the floating tab bar) when ``ShellChromeStyle/darkGlass`` is active.
+enum ExploreFogChrome {
+    static let nightCanvas = LearningCommonsFogMapView.nightCanvas
+}
+
+private struct ExploreFogTabBackdropModifier: ViewModifier {
+    let isActive: Bool
+
+    func body(content: Content) -> some View {
+        content.background {
+            if isActive {
+                ExploreFogChrome.nightCanvas
+                    .ignoresSafeArea()
+            }
+        }
+    }
+}
+
 struct RootView: View {
     enum MainTab: Hashable {
         case explore
@@ -116,9 +134,11 @@ struct RootView: View {
         }
     }
 
-    /// Tab bar selection tint: dark ink so the selected tab stays readable on the system’s light selection capsule over fog.
+    /// Tab bar selection tint on fog: warm paper-white; dark ink on paper tabs elsewhere.
     private var tabSelectionTint: Color {
-        UndrmndPrototypeTheme.primary
+        shellChromeStyleForCurrentTab == .darkGlass
+            ? FogMapShellChrome.mapInkSoft
+            : UndrmndPrototypeTheme.primary
     }
 
     @ViewBuilder
@@ -126,14 +146,22 @@ struct RootView: View {
         switch route {
         case .goalClarifier:
             ZStack {
+                ExploreFogChrome.nightCanvas
+                    .ignoresSafeArea()
                 LearningCommonsFogMapView(
                     explorePath: .curiosityEntry(typingRevealProgress: 0.32),
-                    onThreadTap: nil
+                    onThreadTap: nil,
+                    enablePointerReveal: false
                 )
                 .ignoresSafeArea()
+                .allowsHitTesting(false)
                 GoalClarifierView(
                     onSelectPath: { slug in explorePath.append(.path(slug)) },
-                    onThreeCardSession: { p in explorePath.append(.threeCard(p)) }
+                    onThreeCardSession: { p in explorePath.append(.threeCard(p)) },
+                    onCommunityThread: { id in
+                        tab = .contribute
+                        contributePath.append(id)
+                    }
                 )
             }
             .environment(\.exploreUsesFogBackdrop, true)
@@ -141,11 +169,15 @@ struct RootView: View {
             PathView(slug: slug)
         case .threeCard(let pillar):
             ZStack {
+                ExploreFogChrome.nightCanvas
+                    .ignoresSafeArea()
                 LearningCommonsFogMapView(
                     explorePath: .curiosityEntry(typingRevealProgress: 0.28),
-                    onThreadTap: nil
+                    onThreadTap: nil,
+                    enablePointerReveal: false
                 )
                 .ignoresSafeArea()
+                .allowsHitTesting(false)
                 ThreeCardSessionView(topicFilter: pillar)
             }
             .environment(\.exploreUsesFogBackdrop, true)
@@ -184,6 +216,7 @@ struct RootView: View {
                     OnboardingRootView()
                 }
             }
+            .modifier(ExploreFogTabBackdropModifier(isActive: exploreStackChromeStyle == .darkGlass))
             // Hiding on the Explore tab content is required for reliable tab suppression (see Apple “toolbar hidden for tabBar”).
             .toolbar(showsMainTabBar ? .automatic : .hidden, for: .tabBar)
             .tabItem {
@@ -516,21 +549,21 @@ private enum UndrmndUITabBarSync {
             appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
             appearance.shadowImage = UIImage()
             appearance.shadowColor = nil
-            // Unselected: soft cream on the fog. Selected: dark ink so labels/icons stay legible on the system’s light “liquid” selection pill (iOS 18+).
-            let normalOnFog = UIColor(red: 233 / 255, green: 226 / 255, blue: 209 / 255, alpha: 0.52)
-            let selectedOnSystemPill = UIColor(red: 0.1, green: 0.1, blue: 0.099, alpha: 1.0)
-            appearance.stackedLayoutAppearance.normal.iconColor = normalOnFog
-            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalOnFog]
-            appearance.stackedLayoutAppearance.selected.iconColor = selectedOnSystemPill
-            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedOnSystemPill]
-            appearance.inlineLayoutAppearance.normal.iconColor = normalOnFog
-            appearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalOnFog]
-            appearance.inlineLayoutAppearance.selected.iconColor = selectedOnSystemPill
-            appearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedOnSystemPill]
-            appearance.compactInlineLayoutAppearance.normal.iconColor = normalOnFog
-            appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalOnFog]
-            appearance.compactInlineLayoutAppearance.selected.iconColor = selectedOnSystemPill
-            appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedOnSystemPill]
+            // Warm paper-white on charcoal fog (`FogMapShellChrome.mapInkSoft`); selected Explore uses full ink, others slightly muted.
+            let inkSoft = UIColor(red: 233 / 255, green: 226 / 255, blue: 209 / 255, alpha: 1.0)
+            let inkMuted = UIColor(red: 233 / 255, green: 226 / 255, blue: 209 / 255, alpha: 0.58)
+            appearance.stackedLayoutAppearance.normal.iconColor = inkMuted
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: inkMuted]
+            appearance.stackedLayoutAppearance.selected.iconColor = inkSoft
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: inkSoft]
+            appearance.inlineLayoutAppearance.normal.iconColor = inkMuted
+            appearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: inkMuted]
+            appearance.inlineLayoutAppearance.selected.iconColor = inkSoft
+            appearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: inkSoft]
+            appearance.compactInlineLayoutAppearance.normal.iconColor = inkMuted
+            appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: inkMuted]
+            appearance.compactInlineLayoutAppearance.selected.iconColor = inkSoft
+            appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: inkSoft]
         } else {
             // lightPaper: keep ink tokens for items, but **no** full-width paper slab — fog / scroll content shows through.
             // Opaque `paper` + `isTranslucent == false` also fights iOS 26’s floating tab bar (extra lift + solid white under the pill).
@@ -560,9 +593,11 @@ private enum UndrmndUITabBarSync {
         // Liquid-glass / floating tab bars expect translucency when visible; forcing false pins an opaque strip and lifts the bar on newer OS versions.
         tabBar.isTranslucent = tabBarVisible
         if style == .darkGlass, tabBarVisible {
-            tabBar.tintColor = UIColor(red: 0.1, green: 0.1, blue: 0.099, alpha: 1.0)
+            tabBar.tintColor = UIColor(red: 233 / 255, green: 226 / 255, blue: 209 / 255, alpha: 1.0)
+            tabBar.unselectedItemTintColor = UIColor(red: 233 / 255, green: 226 / 255, blue: 209 / 255, alpha: 0.58)
         } else {
             tabBar.tintColor = nil
+            tabBar.unselectedItemTintColor = nil
         }
     }
 }

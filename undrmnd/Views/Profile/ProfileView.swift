@@ -188,22 +188,9 @@ struct ProfileView: View {
         )
     }
 
-    /// Footer above the tab bar: replay intro + log out (no extra divider strip).
+    /// Footer above the tab bar: log out (no extra divider strip).
     private var quietLogoutFooter: some View {
         VStack(spacing: 0) {
-            Button {
-                returnToIntroSplash()
-            } label: {
-                Text("Open intro again")
-                    .font(AppFont.caption)
-                    .foregroundStyle(UndrmndPrototypeTheme.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Open intro again")
-            .accessibilityHint("Shows the introductory screen.")
-
             Button {
                 Task { await logoutAndReturnToIntro() }
             } label: {

@@ -7,6 +7,7 @@ struct OnboardingStrataDetailView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var observation = ""
+    @FocusState private var isObservationFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -32,7 +33,11 @@ struct OnboardingStrataDetailView: View {
             TextField("Add a note from this corner of the map", text: $observation, axis: .vertical)
                 .textFieldStyle(.plain)
                 .font(AppFont.body)
+                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                .focused($isObservationFocused)
                 .lineLimit(3 ... 6)
+                .submitLabel(.done)
+                .onSubmit(submitObservation)
                 .padding(14)
                 .background(
                     UndrmndPrototypeTheme.panel.opacity(0.92),

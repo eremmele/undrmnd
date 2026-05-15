@@ -17,6 +17,8 @@ struct ArticleRelatedCard: Decodable, Hashable, Sendable {
         case cardHook = "card_hook"
         case hook
         case headline
+        case label
+        case name
         case contentItem = "content_item"
         case contentItems = "content_items"
     }
@@ -40,6 +42,8 @@ struct ArticleRelatedCard: Decodable, Hashable, Sendable {
             try c.decodeIfPresent(String.self, forKey: .cardHook),
             try c.decodeIfPresent(String.self, forKey: .hook),
             try c.decodeIfPresent(String.self, forKey: .headline),
+            try c.decodeIfPresent(String.self, forKey: .label),
+            try c.decodeIfPresent(String.self, forKey: .name),
         ]
 
         let nested: NestedCardCopy?
