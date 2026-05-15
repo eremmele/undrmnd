@@ -253,7 +253,10 @@ struct ArticleView: View {
     }
 
     private func branchCard(article: Article, branch: ArticleBranch) -> some View {
-        HStack(alignment: .top, spacing: 0) {
+        let cornerRadius: CGFloat = 8
+        let cardShape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+
+        return HStack(alignment: .top, spacing: 0) {
             article.pillar.articleStripe
                 .frame(width: 3)
             VStack(alignment: .leading, spacing: 8) {
@@ -278,9 +281,10 @@ struct ArticleView: View {
         }
         .background(UndrmndPrototypeTheme.paper)
         .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            cardShape
                 .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
         )
+        .clipShape(cardShape)
         .accessibilityElement(children: .combine)
     }
 
