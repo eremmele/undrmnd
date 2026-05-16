@@ -22,6 +22,18 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/MDLorienTrial-Bold.otf</string>
+		<string>Fonts/MDLorienTrial-Book.otf</string>
+		<string>Fonts/MDLorienTrial-Regular.otf</string>
+		<string>Fonts/MDLorienTrial-Semibold.otf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -32,29 +44,21 @@
 		<key>UIColorName</key>
 		<string>LaunchScreenBackground</string>
 	</dict>
-	<key>UIAppFonts</key>
-	<array>
-		<!-- Runtime `AppFont` only references Book / Regular / Semibold / Bold; fewer faces = quicker cold-start font registration. -->
-		<string>Fonts/MDLorienTrial-Bold.otf</string>
-		<string>Fonts/MDLorienTrial-Book.otf</string>
-		<string>Fonts/MDLorienTrial-Regular.otf</string>
-		<string>Fonts/MDLorienTrial-Semibold.otf</string>
-	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>
 	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<!-- DEBUG ingest: allow cleartext HTTP to loopback (Cursor NDJSON collector). Without this, ATS blocks URLSession to 127.0.0.1 and no logs are written. -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 </dict>
 </plist>

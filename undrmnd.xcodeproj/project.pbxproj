@@ -71,12 +71,12 @@
 		E7ONB08 /* OnboardingStrataDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ONB07 /* OnboardingStrataDetailView.swift */; };
 		E7SEM02 /* SemanticSearchRanker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7SEM01 /* SemanticSearchRanker.swift */; };
 		E7STRT02 /* Strata.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7STRT01 /* Strata.swift */; };
+		E7TSCH02 /* TopicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7TSCH01 /* TopicSearchView.swift */; };
 		E8F2A0B12F9000A1009CA58F /* UndrmndPrototypeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */; };
 		E8F2A0B22F9000A1009CA58F /* WalkPathModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */; };
 		E8F2A0B32F9000A1009CA58F /* WalkPathFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */; };
 		E8F2A0B42F9000A1009CA58F /* GoalClarifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */; };
 		E8F2A0B52F9000A1009CA58F /* PrototypeShellViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */; };
-		E7TSCH02 /* TopicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7TSCH01 /* TopicSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -156,12 +156,12 @@
 		E7ONB07 /* OnboardingStrataDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStrataDetailView.swift; sourceTree = "<group>"; };
 		E7SEM01 /* SemanticSearchRanker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearchRanker.swift; sourceTree = "<group>"; };
 		E7STRT01 /* Strata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strata.swift; sourceTree = "<group>"; };
+		E7TSCH01 /* TopicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSearchView.swift; sourceTree = "<group>"; };
 		E8F2A0A12F9000A1009CA58F /* UndrmndPrototypeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndrmndPrototypeTheme.swift; sourceTree = "<group>"; };
 		E8F2A0A22F9000A1009CA58F /* WalkPathModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathModels.swift; sourceTree = "<group>"; };
 		E8F2A0A32F9000A1009CA58F /* WalkPathFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkPathFlowView.swift; sourceTree = "<group>"; };
 		E8F2A0A42F9000A1009CA58F /* GoalClarifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalClarifierView.swift; sourceTree = "<group>"; };
 		E8F2A0A52F9000A1009CA58F /* PrototypeShellViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrototypeShellViews.swift; sourceTree = "<group>"; };
-		E7TSCH01 /* TopicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -751,6 +751,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = undrmnd/undrmnd.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -759,10 +760,12 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = undrmnd/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -781,6 +784,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = undrmnd/undrmnd.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -789,10 +793,12 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = undrmnd/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -800,6 +806,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.undrmnd.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOCALIZATION_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

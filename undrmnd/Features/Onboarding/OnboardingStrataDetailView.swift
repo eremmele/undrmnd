@@ -9,10 +9,13 @@ struct OnboardingStrataDetailView: View {
     @State private var observation = ""
     @FocusState private var isObservationFocused: Bool
 
+    private static let fieldPanel = Color(red: 0.17, green: 0.17, blue: 0.18)
+    private static let hairline = Color.white.opacity(0.10)
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Capsule()
-                .fill(UndrmndPrototypeTheme.divider)
+                .fill(Self.hairline)
                 .frame(width: 40, height: 5)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 10)
@@ -20,43 +23,44 @@ struct OnboardingStrataDetailView: View {
 
             Text(strata.title)
                 .font(AppFont.title3)
-                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                .foregroundStyle(ExploreFogNavigationInk.title)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.bottom, 12)
 
             Text("A small mark here reaches the commons—just a phrase is enough.")
                 .font(AppFont.caption)
-                .foregroundStyle(UndrmndPrototypeTheme.muted)
+                .foregroundStyle(ExploreFogNavigationInk.muted)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.bottom, 14)
 
             TextField("Add a note from this corner of the map", text: $observation, axis: .vertical)
                 .textFieldStyle(.plain)
                 .font(AppFont.body)
-                .foregroundStyle(UndrmndPrototypeTheme.primary)
+                .fogMapSearchFieldInk()
                 .focused($isObservationFocused)
                 .lineLimit(3 ... 6)
                 .submitLabel(.done)
                 .onSubmit(submitObservation)
                 .padding(14)
                 .background(
-                    UndrmndPrototypeTheme.panel.opacity(0.92),
+                    Self.fieldPanel,
                     in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(UndrmndPrototypeTheme.divider, lineWidth: 1)
+                        .strokeBorder(Self.hairline, lineWidth: 1)
                 )
 
             Button(action: submitObservation) {
                 Text("Save to the library")
                     .font(AppFont.subheadlineEmphasis)
+                    .foregroundStyle(ExploreFogNavigationInk.title)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(UndrmndPrototypeTheme.accent.opacity(0.12))
+                    .background(UndrmndPrototypeTheme.accent.opacity(0.22))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(UndrmndPrototypeTheme.accent.opacity(0.3), lineWidth: 1)
+                            .strokeBorder(UndrmndPrototypeTheme.accent.opacity(0.45), lineWidth: 1)
                     )
             }
             .buttonStyle(.plain)
@@ -68,7 +72,9 @@ struct OnboardingStrataDetailView: View {
         }
         .padding(.horizontal, 22)
         .padding(.bottom, 20)
-        .background(Color.clear)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(LearningCommonsFogMapView.nightCanvas.ignoresSafeArea())
+        .colorScheme(.dark)
     }
 
     private func submitObservation() {
@@ -87,5 +93,6 @@ struct OnboardingStrataDetailView: View {
                 onContributionComplete: {}
             )
             .presentationDetents([.medium])
+            .presentationBackground(LearningCommonsFogMapView.nightCanvas)
         }
 }

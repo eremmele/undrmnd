@@ -137,7 +137,7 @@ struct OnboardingRootView: View {
                         .presentationDetents([.fraction(0.48), .medium])
                         .presentationDragIndicator(.visible)
                         .presentationCornerRadius(20)
-                        .presentationBackground(.ultraThinMaterial)
+                        .presentationBackground(LearningCommonsFogMapView.nightCanvas)
                     }
                 }
                 .onChange(of: onboarding.phase) { _, newPhase in
