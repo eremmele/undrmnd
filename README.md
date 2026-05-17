@@ -4,15 +4,7 @@ A SwiftUI iOS app with a modular architecture, designed to lower the barriers to
 
 ---
 
-<img width="547" height="1041" alt="Screenshot 2026-05-17 at 11 48 09" src="https://github.com/user-attachments/assets/e96e8e27-5205-4616-97e0-4d03a390f7d6" />
-<img width="547" height="1041" alt="Screenshot 2026-05-17 at 11 47 49" src="https://github.com/user-attachments/assets/f00ac398-1f6a-4fc9-9479-491c925d9eb0" />
-<img width="603" height="1311" alt="IMG_9067" src="https://github.com/user-attachments/assets/1e357d6b-6422-4409-bb25-24f458131deb" />
-<img width="547" height="1041" alt="Screenshot 2026-05-17 at 11 47 45" src="https://github.com/user-attachments/assets/235bfd54-3b7f-4ba9-a507-97f1e2b27d6c" />
-<img width="547" height="1041" alt="Screenshot 2026-05-17 at 11 47 45" src="https://github.com/user-attachments/assets/ab15293a-3f68-4e69-87b6-e2e8bf6c71c2" />
-<img width="547" height="1041" alt="Screenshot 2026-05-17 at 11 47 36" src="https://github.com/user-attachments/assets/8b34790c-e5c7-4678-9c94-924e2f8ce02f" />
-
-
-
+<img width="2736" height="1041" alt="preview" src="https://github.com/user-attachments/assets/7a591a1a-8411-450a-9089-8621f1721dd5" />
 
 ---
 
