@@ -2,7 +2,8 @@
 
 A SwiftUI iOS app with a modular architecture, designed to lower the barriers to scientific inquiry and make curiosity-driven exploration feel as welcoming as social media. Instructions live at [undrmnd.com](https://undrmnd.com) · iOS 17+ · Built with SwiftUI + Supabase
 
-<img width="2736" height="1041" alt="preview" src="https://github.com/user-attachments/assets/44d4a4e7-8397-486c-a001-54fb24d162d9" />
+<img width="3283" height="1041" alt="preview" src="https://github.com/user-attachments/assets/e1f1db50-c020-4796-858f-d55061dafcce" />
+
 
 
 ---
